@@ -18,4 +18,19 @@ defmodule Hyacinth.WarehouseFixtures do
 
     dataset
   end
+
+  @doc """
+  Generate a element.
+  """
+  def element_fixture(attrs \\ %{}) do
+    {:ok, element} =
+      attrs
+      |> Enum.into(%{
+        element_type: "some element_type",
+        path: "some path"
+      })
+      |> Hyacinth.Warehouse.create_element()
+
+    element
+  end
 end
