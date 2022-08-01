@@ -41,7 +41,7 @@ npm-debug.log
 .elixir_ls/
 
 # Test Data (for development)
-/priv/data
+/priv/data/
 
 # OS
 .DS_Store
