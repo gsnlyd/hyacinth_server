@@ -4,9 +4,10 @@ defmodule Hyacinth.Warehouse do
   """
 
   import Ecto.Query, warn: false
-  alias Hyacinth.Repo
+  alias Ecto.Multi
 
-  alias Hyacinth.Warehouse.Dataset
+  alias Hyacinth.Repo
+  alias Hyacinth.Warehouse.{Dataset, Element}
 
   @doc """
   Returns the list of datasets.
@@ -56,6 +57,23 @@ defmodule Hyacinth.Warehouse do
   end
 
   @doc """
+  Creates a root dataset (a dataset with no parent).
+  """
+  def create_root_dataset(name, element_paths) when is_binary(name) and is_list(element_paths) do
+    Multi.new()
+    |> Multi.insert(:dataset, %Dataset{name: name, dataset_type: :root})
+    |> Multi.run(:elements, fn _repo, %{dataset: %Dataset{} = dataset} ->
+      elements =
+        element_paths
+        |> Enum.map(fn path -> %Element{path: path, dataset_id: dataset.id} end)
+        |> Enum.map(&Repo.insert!/1)
+
+      {:ok, elements}
+    end)
+    |> Repo.transaction()
+  end
+
+  @doc """
   Updates a dataset.
 
   ## Examples
@@ -102,7 +120,7 @@ defmodule Hyacinth.Warehouse do
     Dataset.changeset(dataset, attrs)
   end
 
-  alias Hyacinth.Warehouse.Element
+
 
   @doc """
   Returns the list of elements.
