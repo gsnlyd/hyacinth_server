@@ -1,5 +1,5 @@
 defmodule Hyacinth.Labeling.LabelEntry do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Changeset
 
   schema "label_entries" do

@@ -4,7 +4,7 @@ defmodule Hyacinth.Repo.Migrations.CreateLabelEntries do
   def change do
     create table(:label_entries) do
       add :value, :string
-      add :job_id, references(:labeling_jobs, on_delete: :nothing)
+      add :job_id, references(:label_jobs, on_delete: :nothing)
       add :element_id, references(:elements, on_delete: :nothing)
       add :created_by_user_id, references(:users, on_delete: :nothing)
 

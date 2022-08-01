@@ -6,7 +6,8 @@ defmodule Hyacinth.Labeling do
   import Ecto.Query, warn: false
   alias Hyacinth.Repo
 
-  alias Hyacinth.Labeling.LabelJob
+  alias Hyacinth.Labeling.{LabelJob, LabelEntry}
+  alias Hyacinth.Warehouse.{Element}
 
   @doc """
   Returns the list of label_jobs.
@@ -101,5 +102,23 @@ defmodule Hyacinth.Labeling do
   """
   def change_label_job(%LabelJob{} = label_job, attrs \\ %{}) do
     LabelJob.changeset(label_job, attrs)
+  end
+
+  @doc"""
+  List all label entries for an element in a job.
+  """
+  def list_label_entries(%LabelJob{} = job, %Element{} = element) do
+    Repo.all(
+      from le in LabelEntry,
+      where: le.job_id == ^job.id and le.element_id == ^element.id,
+      order_by: [desc: le.inserted_at]
+    )
+  end
+
+  @doc """
+  Creates a label entry.
+  """
+  def create_label_entry(%LabelJob{} = job, %Element{} = element, label_value) when is_binary(label_value) do
+    Repo.insert! %LabelEntry{value: label_value, job_id: job.id, element_id: element.id}
   end
 end

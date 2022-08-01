@@ -1,7 +1,25 @@
 <div>
   <span>Job: <%= @job.name %></span>
   <span>Element: <%= Path.basename(@element.path) %></span>
-  <img class="" src={Routes.image_path(@conn, :show, @element.id)} />
+  <div class="flex items-center space-x-4">
+    <img class="" src={Routes.image_path(@conn, :show, @element.id)} />
+    <div class="flex flex-col space-y-2">
+      <%= for label_val <- ["some label", "another", "label xyz"] do %>
+        <a
+          class="px-3 py-1 w-32 text-white bg-gray-800 hover:bg-gray-700 rounded"
+          href={Routes.label_path(@conn, :set_label, @job.id, @element.id, label_val)}
+        >
+          <%= label_val %>
+        </a>
+      <% end %>
+    </div>
+    <div>
+      <div>Labels</div>
+      <%= for label <- @labels do %>
+        <div class="text-sm font-bold"><%= label.value %></div>
+      <% end %>
+    </div>
+  </div>
   <div>
     <a class="" href={Routes.label_path(@conn, :index, @job.id, @element_index - 1)}>Prev</a>
     <a class="" href={Routes.label_path(@conn, :index, @job.id, @element_index + 1)}>Next</a>
