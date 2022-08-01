@@ -40,6 +40,9 @@ npm-debug.log
 # Elixir LSP
 .elixir_ls/
 
+# Test Data (for development)
+/priv/data
+
 # OS
 .DS_Store
 .DS_Store?
