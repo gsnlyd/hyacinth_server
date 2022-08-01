@@ -1,0 +1,18 @@
+<h1>Show Label job</h1>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @label_job.name %>
+  </li>
+
+  <li>
+    <strong>Label type:</strong>
+    <%= @label_job.label_type %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.label_job_path(@conn, :edit, @label_job) %></span> |
+<span><%= link "Back", to: Routes.label_job_path(@conn, :index) %></span>
