@@ -1,5 +1,5 @@
 defmodule Hyacinth.Accounts.User do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Changeset
 
   schema "users" do

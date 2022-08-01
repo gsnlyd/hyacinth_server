@@ -1,5 +1,5 @@
 defmodule Hyacinth.Accounts.UserToken do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Query
   alias Hyacinth.Accounts.UserToken
 

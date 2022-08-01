@@ -1,5 +1,5 @@
 defmodule Hyacinth.Warehouse.Dataset do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Changeset
 
   schema "datasets" do

@@ -1,5 +1,5 @@
 defmodule Hyacinth.Warehouse.Element do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Changeset
 
   schema "elements" do

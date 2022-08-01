@@ -59,6 +59,9 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Default to utc_datetime_usec timestamps in migrations
+config :hyacinth, Hyacinth.Repo, migration_timestamps: [type: :utc_datetime_usec]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
