@@ -1,5 +1,5 @@
 defmodule Hyacinth.Labeling.LabelJob do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Changeset
 
   schema "label_jobs" do
