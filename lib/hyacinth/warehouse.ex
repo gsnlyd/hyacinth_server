@@ -135,6 +135,14 @@ defmodule Hyacinth.Warehouse do
     Repo.all(Element)
   end
 
+  def list_dataset_elements(dataset_id) do
+    Repo.all(
+      from e in Element,
+      where: e.dataset_id == ^dataset_id,
+      order_by: e.id
+    )
+  end
+
   @doc """
   Gets a single element.
 

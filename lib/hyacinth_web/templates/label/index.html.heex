@@ -1,0 +1,9 @@
+<div>
+  <span>Job: <%= @job.name %></span>
+  <span>Element: <%= Path.basename(@element.path) %></span>
+  <img class="" src={Routes.image_path(@conn, :show, @element.id)} />
+  <div>
+    <a class="" href={Routes.label_path(@conn, :index, @job.id, @element_index - 1)}>Prev</a>
+    <a class="" href={Routes.label_path(@conn, :index, @job.id, @element_index + 1)}>Next</a>
+  </div>
+</div>
