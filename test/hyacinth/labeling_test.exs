@@ -2,13 +2,14 @@ defmodule Hyacinth.LabelingTest do
   use Hyacinth.DataCase
 
   alias Hyacinth.Labeling
+  import Hyacinth.WarehouseFixtures
 
   describe "label_jobs" do
     alias Hyacinth.Labeling.LabelJob
 
     import Hyacinth.LabelingFixtures
 
-    @invalid_attrs %{label_type: nil, name: nil}
+    @invalid_attrs %{label_type: nil, name: nil, dataset_id: nil}
 
     test "list_label_jobs/0 returns all label_jobs" do
       label_job = label_job_fixture()
@@ -21,7 +22,8 @@ defmodule Hyacinth.LabelingTest do
     end
 
     test "create_label_job/1 with valid data creates a label_job" do
-      valid_attrs = %{label_type: :classification, name: "some name"}
+      dataset = root_dataset_fixture()
+      valid_attrs = %{label_type: :classification, name: "some name", dataset_id: dataset.id}
 
       assert {:ok, %LabelJob{} = label_job} = Labeling.create_label_job(valid_attrs)
       assert label_job.label_type == :classification

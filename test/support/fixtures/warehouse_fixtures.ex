@@ -4,6 +4,9 @@ defmodule Hyacinth.WarehouseFixtures do
   entities via the `Hyacinth.Warehouse` context.
   """
 
+  alias Hyacinth.Warehouse
+  alias Hyacinth.Warehouse.{Dataset}
+
   @doc """
   Generate a dataset.
   """
@@ -16,6 +19,17 @@ defmodule Hyacinth.WarehouseFixtures do
       })
       |> Hyacinth.Warehouse.create_dataset()
 
+    dataset
+  end
+
+  @doc """
+  Generate a root dataset with elements.
+  """
+  def root_dataset_fixture(name \\ nil, num_elements \\ 3) do
+    name = if name != nil, do: name, else: "Dataset #{System.unique_integer()}"
+    element_paths = Enum.map(1..num_elements, fn i -> "/tmp/some/path/element#{i}.png" end)
+
+    {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset(name, element_paths)
     dataset
   end
 

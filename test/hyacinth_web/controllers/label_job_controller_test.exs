@@ -1,16 +1,17 @@
 defmodule HyacinthWeb.LabelJobControllerTest do
   use HyacinthWeb.ConnCase
 
+  import Hyacinth.WarehouseFixtures
   import Hyacinth.LabelingFixtures
 
   @create_attrs %{label_type: :classification, name: "some name"}
-  @update_attrs %{label_type: :classification, name: "some updated name"}
-  @invalid_attrs %{label_type: nil, name: nil}
+  @update_attrs %{name: "some updated name"}
+  @invalid_attrs %{label_type: nil, name: nil, dataset_id: nil}
 
   describe "index" do
     test "lists all label_jobs", %{conn: conn} do
       conn = get(conn, Routes.label_job_path(conn, :index))
-      assert html_response(conn, 200) =~ "Listing Label jobs"
+      assert html_response(conn, 200) =~ "Label Jobs"
     end
   end
 
@@ -23,7 +24,8 @@ defmodule HyacinthWeb.LabelJobControllerTest do
 
   describe "create label_job" do
     test "redirects to show when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.label_job_path(conn, :create), label_job: @create_attrs)
+      dataset = root_dataset_fixture()
+      conn = post(conn, Routes.label_job_path(conn, :create), label_job: Map.put(@create_attrs, :dataset_id, dataset.id))
 
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == Routes.label_job_path(conn, :show, id)
