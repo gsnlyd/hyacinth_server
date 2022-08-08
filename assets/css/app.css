@@ -2,23 +2,65 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+
 a {
     @apply text-blue-200 hover:text-blue-300 hover:underline font-medium;
+}
+
+
+/* Buttons */
+
+.btn {
+    @apply px-3 py-1.5 rounded focus:ring-2 ring-offset-2 ring-offset-gray-900 transition;
+}
+
+.btn-blue {
+    @apply text-black font-medium;
+    @apply bg-blue-300 hover:bg-blue-400;
+    @apply focus:ring-blue-200 focus:hover:ring-blue-300;
+    @apply focus:outline-none;
+}
+
+
+/* Forms */
+
+.form-content {
+    @apply flex flex-col items-start space-y-4;
+}
+
+.form-content p {
+    @apply flex flex-col items-start space-y-1;
+}
+
+.form-content .invalid-feedback {
+    @apply text-xs text-red-400;
+}
+
+.form-content label {
+    @apply text-sm text-gray-300;
+}
+
+.form-content input[type="text"],
+.form-content input[type="password"] {
+    @apply px-2 py-1;
+    @apply placeholder-gray-500;
+    @apply bg-gray-700 rounded;
+    @apply border-gray-400 hover:border-white focus:border-blue-500 focus:ring-blue-500;
+}
+
+.form-content button[type='submit'] {
+    @apply btn btn-blue;
 }
 
 /* This file is for your main application CSS */
 
 /* Alerts and form errors used by phx.new */
 .alert {
-  padding: 15px;
-  margin-bottom: 20px;
-  border: 1px solid transparent;
-  border-radius: 4px;
+    @apply px-3 py-2 mb-4;
+    @apply border rounded;
 }
 .alert-info {
-  color: #31708f;
-  background-color: #d9edf7;
-  border-color: #bce8f1;
+    @apply bg-blue-900 text-blue-50 border-blue-500;
 }
 .alert-warning {
   color: #8a6d3b;
@@ -26,9 +68,7 @@ a {
   border-color: #faebcc;
 }
 .alert-danger {
-  color: #a94442;
-  background-color: #f2dede;
-  border-color: #ebccd1;
+    @apply bg-red-900 text-red-50 border-red-200;
 }
 .alert p {
   margin-bottom: 0;
@@ -36,11 +76,13 @@ a {
 .alert:empty {
   display: none;
 }
+/*
 .invalid-feedback {
   color: #a94442;
   display: block;
   margin: -1rem 0 2rem;
 }
+*/
 
 /* LiveView specific classes for your customization */
 .phx-no-feedback.invalid-feedback,

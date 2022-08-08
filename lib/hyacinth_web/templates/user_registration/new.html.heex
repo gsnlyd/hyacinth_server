@@ -1,26 +1,37 @@
-<h1>Register</h1>
+<header>
+  <h1 class="text-2xl font-medium">Register</h1>
+</header>
 
-<.form let={f} for={@changeset} action={Routes.user_registration_path(@conn, :create)}>
-  <%= if @changeset.action do %>
-    <div class="alert alert-danger">
-      <p>Oops, something went wrong! Please check the errors below.</p>
+<main class="mt-2">
+  <.form let={f} for={@changeset} action={Routes.user_registration_path(@conn, :create)}>
+    <%= if @changeset.action do %>
+      <div class="alert alert-danger">
+        <p>Oops, something went wrong! Please check the errors below.</p>
+      </div>
+    <% end %>
+
+    <div class="form-content">
+      <p>
+        <%= label f, :email %>
+        <%= text_input f, :email, placeholder: "Email address" %>
+        <%= error_tag f, :email %>
+      </p>
+
+      <p>
+        <%= label f, :password %>
+        <%= password_input f, :password, placeholder: "Password" %>
+        <%= error_tag f, :password %>
+      </p>
+
+      <div>
+        <%= submit "Register", class: "mt-2" %>
+      </div>
     </div>
-  <% end %>
+  </.form>
 
-  <%= label f, :email %>
-  <%= email_input f, :email, required: true %>
-  <%= error_tag f, :email %>
-
-  <%= label f, :password %>
-  <%= password_input f, :password, required: true %>
-  <%= error_tag f, :password %>
-
-  <div>
-    <%= submit "Register" %>
+  <div class="mt-4 space-x-1">
+    <%= link "Log in", to: Routes.user_session_path(@conn, :new) %>
+    <span>|</span>
+    <%= link "Forgot your password?", to: Routes.user_reset_password_path(@conn, :new) %>
   </div>
-</.form>
-
-<p>
-  <%= link "Log in", to: Routes.user_session_path(@conn, :new) %> |
-  <%= link "Forgot your password?", to: Routes.user_reset_password_path(@conn, :new) %>
-</p>
+</main>
