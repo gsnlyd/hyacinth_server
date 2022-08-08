@@ -51,8 +51,7 @@ defmodule Hyacinth.Labeling do
 
   """
   def create_label_job(attrs \\ %{}) do
-    # TODO: accept dataset_id as parameter
-    %LabelJob{dataset_id: 1}
+    %LabelJob{}
     |> LabelJob.changeset(attrs)
     |> Repo.insert()
   end

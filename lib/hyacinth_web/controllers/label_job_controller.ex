@@ -1,7 +1,7 @@
 defmodule HyacinthWeb.LabelJobController do
   use HyacinthWeb, :controller
 
-  alias Hyacinth.Labeling
+  alias Hyacinth.{Warehouse, Labeling}
   alias Hyacinth.Labeling.LabelJob
 
   def index(conn, _params) do
@@ -11,7 +11,8 @@ defmodule HyacinthWeb.LabelJobController do
 
   def new(conn, _params) do
     changeset = Labeling.change_label_job(%LabelJob{})
-    render(conn, "new.html", changeset: changeset)
+    datasets = Warehouse.list_datasets()
+    render(conn, "new.html", changeset: changeset, datasets: datasets)
   end
 
   def create(conn, %{"label_job" => label_job_params}) do
@@ -22,7 +23,8 @@ defmodule HyacinthWeb.LabelJobController do
         |> redirect(to: Routes.label_job_path(conn, :show, label_job))
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        datasets = Warehouse.list_datasets()
+        render(conn, "new.html", changeset: changeset, datasets: datasets)
     end
   end
 
