@@ -3,6 +3,12 @@
 @import "tailwindcss/utilities";
 
 
+/* Basic Elements */
+
+h1 {
+    @apply text-2xl text-gray-300 font-medium;
+}
+
 a {
     @apply text-blue-200 hover:text-blue-300 hover:underline font-medium;
 }
@@ -19,6 +25,16 @@ a {
     @apply bg-blue-300 hover:bg-blue-400;
     @apply focus:ring-blue-200 focus:hover:ring-blue-300;
     @apply focus:outline-none;
+}
+
+
+/* Table */
+.table th {
+    @apply text-sm text-gray-400 font-medium;
+}
+.table th, .table td {
+    @apply px-2 py-1;
+    @apply border border-gray-500;
 }
 
 
@@ -44,6 +60,12 @@ a {
 .form-content input[type="password"] {
     @apply px-2 py-1;
     @apply placeholder-gray-500;
+    @apply bg-gray-700 rounded;
+    @apply border-gray-400 hover:border-white focus:border-blue-500 focus:ring-blue-500;
+}
+
+.form-content select {
+    @apply w-60 px-2 py-1 pr-8;
     @apply bg-gray-700 rounded;
     @apply border-gray-400 hover:border-white focus:border-blue-500 focus:ring-blue-500;
 }

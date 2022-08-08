@@ -1,6 +1,9 @@
-<h1>Listing Label jobs</h1>
+<header class="flex items-center space-x-2">
+  <h1>Label Jobs</h1>
+  <%= link "[New Job]", to: Routes.label_job_path(@conn, :new) %>
+</header>
 
-<table>
+<table class="table mt-2">
   <thead>
     <tr>
       <th>Name</th>
@@ -10,20 +13,18 @@
     </tr>
   </thead>
   <tbody>
-<%= for label_job <- @label_jobs do %>
-    <tr>
-      <td><%= label_job.name %></td>
-      <td><%= label_job.label_type %></td>
+    <%= for label_job <- @label_jobs do %>
+      <tr>
+        <td><%= label_job.name %></td>
+        <td><%= label_job.label_type %></td>
 
-      <td>
-        <span><%= link "Label", to: Routes.label_path(@conn, :index, label_job.id, 0) %></span>
-        <span><%= link "Show", to: Routes.label_job_path(@conn, :show, label_job) %></span>
-        <span><%= link "Edit", to: Routes.label_job_path(@conn, :edit, label_job) %></span>
-        <span><%= link "Delete", to: Routes.label_job_path(@conn, :delete, label_job), method: :delete, data: [confirm: "Are you sure?"] %></span>
-      </td>
-    </tr>
-<% end %>
+        <td class="text-xs space-x-2">
+          <span><%= link "Label", to: Routes.label_path(@conn, :index, label_job.id, 0) %></span>
+          <span><%= link "Show", to: Routes.label_job_path(@conn, :show, label_job) %></span>
+          <span><%= link "Edit", to: Routes.label_job_path(@conn, :edit, label_job) %></span>
+          <span><%= link "Delete", to: Routes.label_job_path(@conn, :delete, label_job), method: :delete, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
   </tbody>
 </table>
-
-<span><%= link "New Label job", to: Routes.label_job_path(@conn, :new) %></span>
