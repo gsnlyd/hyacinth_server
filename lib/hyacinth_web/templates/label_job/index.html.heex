@@ -9,6 +9,7 @@
       <th>Name</th>
       <th>Label type</th>
       <th>Dataset</th>
+      <th>Created By User</th>
 
       <th></th>
     </tr>
@@ -19,6 +20,7 @@
         <td><%= label_job.name %></td>
         <td><%= label_job.label_type %></td>
         <td><%= label_job.dataset_id %></td>
+        <td><%= label_job.created_by_user_id %></td>
 
         <td class="text-xs space-x-2">
           <span><%= link "Label", to: Routes.label_path(@conn, :index, label_job.id, 0) %></span>

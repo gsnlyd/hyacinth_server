@@ -6,8 +6,9 @@ defmodule Hyacinth.Labeling do
   import Ecto.Query, warn: false
   alias Hyacinth.Repo
 
-  alias Hyacinth.Labeling.{LabelJob, LabelEntry}
+  alias Hyacinth.Accounts.{User}
   alias Hyacinth.Warehouse.{Element}
+  alias Hyacinth.Labeling.{LabelJob, LabelEntry}
 
   @doc """
   Returns the list of label_jobs.
@@ -50,8 +51,8 @@ defmodule Hyacinth.Labeling do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_label_job(attrs \\ %{}) do
-    %LabelJob{}
+  def create_label_job(attrs \\ %{}, %User{} = created_by_user) do
+    %LabelJob{created_by_user_id: created_by_user.id}
     |> LabelJob.changeset(attrs)
     |> Repo.insert()
   end

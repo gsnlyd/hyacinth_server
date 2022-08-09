@@ -18,7 +18,7 @@ defmodule Hyacinth.Labeling.LabelJob do
   @doc false
   def changeset(label_job, attrs) do
     label_job
-    |> cast(attrs, [:name, :label_type, :dataset_id, :created_by_user_id])
-    |> validate_required([:name, :label_type, :dataset_id, :created_by_user_id])
+    |> cast(attrs, [:name, :label_type, :dataset_id])
+    |> validate_required([:name, :label_type, :dataset_id])
   end
 end

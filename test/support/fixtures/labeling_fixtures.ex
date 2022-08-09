@@ -20,9 +20,8 @@ defmodule Hyacinth.LabelingFixtures do
         label_type: :classification,
         name: "some name",
         dataset_id: dataset.id,
-        created_by_user_id: user.id,
       })
-      |> Hyacinth.Labeling.create_label_job()
+      |> Hyacinth.Labeling.create_label_job(user)
 
     label_job
   end

@@ -26,15 +26,16 @@ defmodule Hyacinth.LabelingTest do
     test "create_label_job/1 with valid data creates a label_job" do
       user = user_fixture()
       dataset = root_dataset_fixture()
-      valid_attrs = %{label_type: :classification, name: "some name", dataset_id: dataset.id, created_by_user_id: user.id}
+      valid_attrs = %{label_type: :classification, name: "some name", dataset_id: dataset.id}
 
-      assert {:ok, %LabelJob{} = label_job} = Labeling.create_label_job(valid_attrs)
+      assert {:ok, %LabelJob{} = label_job} = Labeling.create_label_job(valid_attrs, user)
       assert label_job.label_type == :classification
       assert label_job.name == "some name"
     end
 
     test "create_label_job/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Labeling.create_label_job(@invalid_attrs)
+      user = user_fixture()
+      assert {:error, %Ecto.Changeset{}} = Labeling.create_label_job(@invalid_attrs, user)
     end
 
     test "update_label_job/2 with valid data updates the label_job" do

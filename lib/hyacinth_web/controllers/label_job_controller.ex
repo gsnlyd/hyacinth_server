@@ -16,7 +16,7 @@ defmodule HyacinthWeb.LabelJobController do
   end
 
   def create(conn, %{"label_job" => label_job_params}) do
-    case Labeling.create_label_job(label_job_params) do
+    case Labeling.create_label_job(label_job_params, conn.assigns.current_user) do
       {:ok, label_job} ->
         conn
         |> put_flash(:info, "Label job created successfully.")

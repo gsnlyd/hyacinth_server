@@ -1,7 +1,6 @@
 defmodule HyacinthWeb.LabelJobControllerTest do
   use HyacinthWeb.ConnCase
 
-  import Hyacinth.AccountsFixtures
   import Hyacinth.WarehouseFixtures
   import Hyacinth.LabelingFixtures
 
@@ -24,13 +23,11 @@ defmodule HyacinthWeb.LabelJobControllerTest do
   end
 
   describe "create label_job" do
+    setup [:register_and_log_in_user]
+
     test "redirects to show when data is valid", %{conn: conn} do
-      user = user_fixture()
       dataset = root_dataset_fixture()
-      attrs =
-        @create_attrs
-        |> Map.put(:dataset_id, dataset.id)
-        |> Map.put(:created_by_user_id, user.id)
+      attrs = Map.put(@create_attrs, :dataset_id, dataset.id)
       conn = post(conn, Routes.label_job_path(conn, :create), label_job: attrs)
 
       assert %{id: id} = redirected_params(conn)
