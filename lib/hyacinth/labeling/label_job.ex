@@ -2,11 +2,15 @@ defmodule Hyacinth.Labeling.LabelJob do
   use Hyacinth.Schema
   import Ecto.Changeset
 
+  alias Hyacinth.Warehouse.Dataset
+  alias Hyacinth.Accounts.User
+
   schema "label_jobs" do
-    field :label_type, Ecto.Enum, values: [:classification]
     field :name, :string
-    field :dataset_id, :id
-    field :created_by_user_id, :id
+    field :label_type, Ecto.Enum, values: [:classification]
+
+    belongs_to :dataset, Dataset
+    belongs_to :created_by_user, User
 
     timestamps()
   end

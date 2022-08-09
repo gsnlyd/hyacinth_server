@@ -2,11 +2,16 @@ defmodule Hyacinth.Labeling.LabelEntry do
   use Hyacinth.Schema
   import Ecto.Changeset
 
+  alias Hyacinth.Labeling.LabelJob
+  alias Hyacinth.Warehouse.Element
+  alias Hyacinth.Accounts.User
+
   schema "label_entries" do
     field :value, :string
-    field :job_id, :id
-    field :element_id, :id
-    field :created_by_user_id, :id
+
+    belongs_to :job, LabelJob
+    belongs_to :element, Element
+    belongs_to :created_by_user, User
 
     timestamps()
   end

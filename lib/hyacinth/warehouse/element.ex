@@ -2,12 +2,16 @@ defmodule Hyacinth.Warehouse.Element do
   use Hyacinth.Schema
   import Ecto.Changeset
 
+  alias Hyacinth.Warehouse.{Dataset, Element}
+  alias Hyacinth.Accounts.User
+
   schema "elements" do
-    field :element_type, :string
     field :path, :string
-    field :dataset_id, :id
-    field :parent_element_id, :id
-    field :created_by_user_id, :id
+    field :element_type, :string
+
+    belongs_to :dataset, Dataset
+    belongs_to :parent_element, Element
+    belongs_to :created_by_user, User
 
     timestamps()
   end
