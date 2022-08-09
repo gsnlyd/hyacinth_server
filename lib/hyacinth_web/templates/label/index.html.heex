@@ -1,27 +1,45 @@
-<div>
-  <span>Job: <%= @job.name %></span>
-  <span>Element: <%= Path.basename(@element.path) %></span>
-  <div class="flex items-center space-x-4">
-    <img class="" src={Routes.image_path(@conn, :show, @element.id)} />
+<header>
+  <h1>
+    <span class="text-gray-400">Element:</span>
+    <%= Path.basename(@element.path) %>
+  </h1>
+  <h2 class="text-gray-400">
+    <span>Job:</span>
+    <%= link @job.name, to: Routes.label_job_path(@conn, :show, @job) %>
+  </h2>
+</header>
+
+<main class="mt-8">
+  <div class="flex items-center space-x-12">
+    <img class="w-1/2" src={Routes.image_path(@conn, :show, @element.id)} />
+
     <div class="flex flex-col space-y-2">
       <%= for label_val <- ["some label", "another", "label xyz"] do %>
-        <a
-          class="px-3 py-1 w-32 text-white bg-gray-800 hover:bg-gray-700 rounded"
-          href={Routes.label_path(@conn, :set_label, @job.id, @element.id, label_val)}
-        >
-          <%= label_val %>
-        </a>
+        <%= link label_val, class: "link-btn btn-lg btn-blue", to: Routes.label_path(@conn, :set_label, @job.id, @element.id, label_val), method: :post %>
       <% end %>
     </div>
-    <div>
-      <div>Labels</div>
-      <%= for label <- @labels do %>
-        <div class="text-sm font-bold"><%= label.value %></div>
-      <% end %>
+
+    <div class="mt-4">
+      <div class="text-lg text-gray-300 font-medium"><%= length(@labels) %> Labels</div>
+      <table class="mt-2 table">
+        <thead>
+          <th>Value</th>
+          <th>User</th>
+        </thead>
+        <tbody>
+          <%= for label <- @labels do %>
+            <tr>
+              <td><%= label.value %></td>
+              <td><%= label.created_by_user.id %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
   </div>
-  <div>
+
+  <div class="mt-4">
     <a class="" href={Routes.label_path(@conn, :index, @job.id, @element_index - 1)}>Prev</a>
     <a class="" href={Routes.label_path(@conn, :index, @job.id, @element_index + 1)}>Next</a>
   </div>
-</div>
+</main>

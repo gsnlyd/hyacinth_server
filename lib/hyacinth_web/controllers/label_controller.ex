@@ -20,7 +20,7 @@ defmodule HyacinthWeb.LabelController do
   def set_label(conn, %{"job_id" => job_id, "element_id" => element_id, "label_value" => label_value}) do
     job = Labeling.get_label_job!(job_id)
     element = Warehouse.get_element!(element_id)
-    Labeling.create_label_entry(job, element, label_value)
+    Labeling.create_label_entry(job, element, conn.assigns.current_user, label_value)
 
     redirect(conn, to: Routes.label_path(conn, :index, job.id, 0))
   end

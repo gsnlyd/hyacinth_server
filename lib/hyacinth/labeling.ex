@@ -111,14 +111,16 @@ defmodule Hyacinth.Labeling do
     Repo.all(
       from le in LabelEntry,
       where: le.job_id == ^job.id and le.element_id == ^element.id,
-      order_by: [desc: le.inserted_at]
+      order_by: [desc: le.inserted_at],
+      select: le,
+      preload: [:created_by_user]
     )
   end
 
   @doc """
   Creates a label entry.
   """
-  def create_label_entry(%LabelJob{} = job, %Element{} = element, label_value) when is_binary(label_value) do
-    Repo.insert! %LabelEntry{value: label_value, job_id: job.id, element_id: element.id}
+  def create_label_entry(%LabelJob{} = job, %Element{} = element, %User{} = user, label_value) when is_binary(label_value) do
+    Repo.insert! %LabelEntry{value: label_value, job_id: job.id, element_id: element.id, created_by_user_id: user.id}
   end
 end
