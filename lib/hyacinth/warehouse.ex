@@ -123,18 +123,8 @@ defmodule Hyacinth.Warehouse do
 
 
   @doc """
-  Returns the list of elements.
-
-  ## Examples
-
-      iex> list_elements()
-      [%Element{}, ...]
-
+  Lists all elements for a dataset.
   """
-  def list_elements do
-    Repo.all(Element)
-  end
-
   def list_dataset_elements(dataset_id) do
     Repo.all(
       from e in Element,
@@ -158,69 +148,4 @@ defmodule Hyacinth.Warehouse do
 
   """
   def get_element!(id), do: Repo.get!(Element, id)
-
-  @doc """
-  Creates a element.
-
-  ## Examples
-
-      iex> create_element(%{field: value})
-      {:ok, %Element{}}
-
-      iex> create_element(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_element(attrs \\ %{}) do
-    %Element{}
-    |> Element.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a element.
-
-  ## Examples
-
-      iex> update_element(element, %{field: new_value})
-      {:ok, %Element{}}
-
-      iex> update_element(element, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_element(%Element{} = element, attrs) do
-    element
-    |> Element.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a element.
-
-  ## Examples
-
-      iex> delete_element(element)
-      {:ok, %Element{}}
-
-      iex> delete_element(element)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_element(%Element{} = element) do
-    Repo.delete(element)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking element changes.
-
-  ## Examples
-
-      iex> change_element(element)
-      %Ecto.Changeset{data: %Element{}}
-
-  """
-  def change_element(%Element{} = element, attrs \\ %{}) do
-    Element.changeset(element, attrs)
-  end
 end
