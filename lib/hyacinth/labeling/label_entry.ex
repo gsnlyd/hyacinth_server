@@ -19,7 +19,7 @@ defmodule Hyacinth.Labeling.LabelEntry do
   @doc false
   def changeset(label_entry, attrs) do
     label_entry
-    |> cast(attrs, [:value])
-    |> validate_required([:value])
+    |> cast(attrs, [:value, :job_id, :element_id, :created_by_user_id])
+    |> validate_required([:value, :job_id, :element_id, :created_by_user_id])
   end
 end

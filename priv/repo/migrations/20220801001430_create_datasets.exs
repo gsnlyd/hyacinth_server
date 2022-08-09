@@ -3,10 +3,11 @@ defmodule Hyacinth.Repo.Migrations.CreateDatasets do
 
   def change do
     create table(:datasets) do
-      add :name, :string
-      add :dataset_type, :string
-      add :parent_dataset_id, references(:datasets, on_delete: :nothing)
-      add :created_by_user_id, references(:users, on_delete: :nothing)
+      add :name, :string, null: false
+      add :dataset_type, :string, null: false
+
+      add :parent_dataset_id, references(:datasets, on_delete: :restrict, on_update: :restrict)
+      add :created_by_user_id, references(:users, on_delete: :restrict, on_update: :restrict)
 
       timestamps()
     end

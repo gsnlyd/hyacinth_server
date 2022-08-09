@@ -65,7 +65,7 @@ defmodule Hyacinth.Warehouse do
     |> Multi.run(:elements, fn _repo, %{dataset: %Dataset{} = dataset} ->
       elements =
         element_paths
-        |> Enum.map(fn path -> %Element{path: path, dataset_id: dataset.id} end)
+        |> Enum.map(fn path -> %Element{path: path, element_type: "png", dataset_id: dataset.id} end)
         |> Enum.map(&Repo.insert!/1)
 
       {:ok, elements}
