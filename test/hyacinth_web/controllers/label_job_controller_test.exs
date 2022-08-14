@@ -4,7 +4,7 @@ defmodule HyacinthWeb.LabelJobControllerTest do
   import Hyacinth.WarehouseFixtures
   import Hyacinth.LabelingFixtures
 
-  @create_attrs %{label_type: :classification, name: "some name"}
+  @create_attrs %{name: "some name", label_type: :classification, label_options: ["option 1", "option2 ", "option 3"]}
   @update_attrs %{name: "some updated name"}
   @invalid_attrs %{label_type: nil, name: nil, dataset_id: nil}
 

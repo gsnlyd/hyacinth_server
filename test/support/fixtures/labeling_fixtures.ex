@@ -17,8 +17,9 @@ defmodule Hyacinth.LabelingFixtures do
     {:ok, label_job} =
       attrs
       |> Enum.into(%{
-        label_type: :classification,
         name: "some name",
+        label_type: :classification,
+        label_options: ["option 1", "option 2", "option 3"],
         dataset_id: dataset.id,
       })
       |> Hyacinth.Labeling.create_label_job(user)
