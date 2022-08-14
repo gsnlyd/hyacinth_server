@@ -3,9 +3,10 @@ defmodule Hyacinth.Repo.Migrations.CreateLabelElementsObjects do
 
   def change do
     create table(:label_elements_objects) do
-      add :object_index, :integer
-      add :label_element_id, references(:label_elements, on_delete: :nothing)
-      add :object_id, references(:objects, on_delete: :nothing)
+      add :object_index, :integer, null: false
+
+      add :label_element_id, references(:label_elements, on_delete: :restrict, on_update: :restrict), null: false
+      add :object_id, references(:objects, on_delete: :restrict, on_update: :restrict), null: false
 
       timestamps()
     end

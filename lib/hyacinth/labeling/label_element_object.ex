@@ -1,11 +1,15 @@
 defmodule Hyacinth.Labeling.LabelElementObject do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Changeset
+
+  alias Hyacinth.Warehouse.Object
+  alias Hyacinth.Labeling.LabelElement
 
   schema "label_elements_objects" do
     field :object_index, :integer
-    field :label_element_id, :id
-    field :object_id, :id
+
+    belongs_to :label_element, LabelElement
+    belongs_to :object, Object
 
     timestamps()
   end

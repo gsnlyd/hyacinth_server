@@ -1,11 +1,15 @@
 defmodule Hyacinth.Labeling.LabelSession do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Changeset
+
+  alias Hyacinth.Accounts.User
+  alias Hyacinth.Labeling.LabelJob
 
   schema "label_sessions" do
     field :blueprint, :boolean, default: false
-    field :user_id, :id
-    field :job_id, :id
+
+    belongs_to :job, LabelJob
+    belongs_to :user, User
 
     timestamps()
   end
