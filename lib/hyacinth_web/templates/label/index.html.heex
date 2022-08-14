@@ -15,7 +15,7 @@
 
     <div class="flex flex-col space-y-2">
       <%= for label_val <- ["some label", "another", "label xyz"] do %>
-        <%= link label_val, class: "link-btn btn-lg btn-blue", to: Routes.label_path(@conn, :set_label, @job.id, @object.id, label_val), method: :post %>
+        <%= link label_val, class: "link-btn btn-lg btn-blue", to: "" %>
       <% end %>
     </div>
 

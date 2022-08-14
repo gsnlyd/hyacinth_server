@@ -9,16 +9,8 @@ defmodule HyacinthWeb.LabelController do
     objects = Warehouse.list_dataset_objects(job.dataset_id)
     object = Enum.at(objects, object_index)
 
-    labels = Labeling.list_label_entries(job, object)
+    labels = []
 
     render(conn, "index.html", job: job, object: object, labels: labels, object_index: object_index)
-  end
-
-  def set_label(conn, %{"job_id" => job_id, "object_id" => object_id, "label_value" => label_value}) do
-    job = Labeling.get_label_job!(job_id)
-    object = Warehouse.get_object!(object_id)
-    Labeling.create_label_entry(job, object, conn.assigns.current_user, label_value)
-
-    redirect(conn, to: Routes.label_path(conn, :index, job.id, 0))
   end
 end

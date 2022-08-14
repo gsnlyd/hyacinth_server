@@ -7,8 +7,7 @@ defmodule Hyacinth.Labeling do
   alias Hyacinth.Repo
 
   alias Hyacinth.Accounts.{User}
-  alias Hyacinth.Warehouse.{Object}
-  alias Hyacinth.Labeling.{LabelJob, LabelEntry}
+  alias Hyacinth.Labeling.{LabelJob}
 
   @doc """
   Returns the list of label_jobs.
@@ -102,25 +101,5 @@ defmodule Hyacinth.Labeling do
   """
   def change_label_job(%LabelJob{} = label_job, attrs \\ %{}) do
     LabelJob.changeset(label_job, attrs)
-  end
-
-  @doc"""
-  List all label entries for an object in a job.
-  """
-  def list_label_entries(%LabelJob{} = job, %Object{} = object) do
-    Repo.all(
-      from le in LabelEntry,
-      where: le.job_id == ^job.id and le.object_id == ^object.id,
-      order_by: [desc: le.inserted_at],
-      select: le,
-      preload: [:created_by_user]
-    )
-  end
-
-  @doc """
-  Creates a label entry.
-  """
-  def create_label_entry(%LabelJob{} = job, %Object{} = object, %User{} = user, label_value) when is_binary(label_value) do
-    Repo.insert! %LabelEntry{value: label_value, job_id: job.id, object_id: object.id, created_by_user_id: user.id}
   end
 end
