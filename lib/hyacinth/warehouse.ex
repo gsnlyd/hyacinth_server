@@ -7,7 +7,7 @@ defmodule Hyacinth.Warehouse do
   alias Ecto.Multi
 
   alias Hyacinth.Repo
-  alias Hyacinth.Warehouse.{Dataset, Element}
+  alias Hyacinth.Warehouse.{Dataset, Object}
 
   @doc """
   Returns the list of datasets.
@@ -59,16 +59,16 @@ defmodule Hyacinth.Warehouse do
   @doc """
   Creates a root dataset (a dataset with no parent).
   """
-  def create_root_dataset(name, element_paths) when is_binary(name) and is_list(element_paths) do
+  def create_root_dataset(name, object_paths) when is_binary(name) and is_list(object_paths) do
     Multi.new()
     |> Multi.insert(:dataset, %Dataset{name: name, dataset_type: :root})
-    |> Multi.run(:elements, fn _repo, %{dataset: %Dataset{} = dataset} ->
-      elements =
-        element_paths
-        |> Enum.map(fn path -> %Element{path: path, element_type: "png", dataset_id: dataset.id} end)
+    |> Multi.run(:objects, fn _repo, %{dataset: %Dataset{} = dataset} ->
+      objects =
+        object_paths
+        |> Enum.map(fn path -> %Object{path: path, type: "png", dataset_id: dataset.id} end)
         |> Enum.map(&Repo.insert!/1)
 
-      {:ok, elements}
+      {:ok, objects}
     end)
     |> Repo.transaction()
   end
@@ -123,29 +123,29 @@ defmodule Hyacinth.Warehouse do
 
 
   @doc """
-  Lists all elements for a dataset.
+  Lists all objects for a dataset.
   """
-  def list_dataset_elements(dataset_id) do
+  def list_dataset_objects(dataset_id) do
     Repo.all(
-      from e in Element,
-      where: e.dataset_id == ^dataset_id,
-      order_by: e.id
+      from o in Object,
+      where: o.dataset_id == ^dataset_id,
+      order_by: o.id
     )
   end
 
   @doc """
-  Gets a single element.
+  Gets a single Object.
 
-  Raises `Ecto.NoResultsError` if the Element does not exist.
+  Raises `Ecto.NoResultsError` if the Object does not exist.
 
   ## Examples
 
-      iex> get_element!(123)
-      %Element{}
+      iex> get_object!(123)
+      %Object{}
 
-      iex> get_element!(456)
+      iex> get_object!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_element!(id), do: Repo.get!(Element, id)
+  def get_object!(id), do: Repo.get!(Object, id)
 end

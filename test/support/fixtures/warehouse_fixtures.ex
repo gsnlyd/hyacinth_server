@@ -23,13 +23,13 @@ defmodule Hyacinth.WarehouseFixtures do
   end
 
   @doc """
-  Generate a root dataset with elements.
+  Generate a root dataset with objects.
   """
-  def root_dataset_fixture(name \\ nil, num_elements \\ 3) do
+  def root_dataset_fixture(name \\ nil, num_objects \\ 3) do
     name = if name != nil, do: name, else: "Dataset #{System.unique_integer()}"
-    element_paths = Enum.map(1..num_elements, fn i -> "/tmp/some/path/element#{i}.png" end)
+    object_paths = Enum.map(1..num_objects, fn i -> "/tmp/some/path/object#{i}.png" end)
 
-    {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset(name, element_paths)
+    {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset(name, object_paths)
     dataset
   end
 end

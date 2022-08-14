@@ -11,7 +11,7 @@ defmodule Hyacinth.Scripts.NewDataset do
     {name, dataset_path}
   end
 
-  def get_element_paths(dataset_path) do
+  def get_object_paths(dataset_path) do
     # TODO: support many file types
     dataset_path
     |> File.ls!()
@@ -22,12 +22,12 @@ defmodule Hyacinth.Scripts.NewDataset do
   def new_dataset() do
     {name, dataset_path} = get_inputs!()
 
-    element_paths = get_element_paths(dataset_path)
-    if length(element_paths) == 0, do: raise "No elements found"
+    object_paths = get_object_paths(dataset_path)
+    if length(object_paths) == 0, do: raise "No objects found"
 
-    {:ok, %{dataset: %Dataset{} = dataset, elements: elements}} = Warehouse.create_root_dataset(name, element_paths)
+    {:ok, %{dataset: %Dataset{} = dataset, objects: objects}} = Warehouse.create_root_dataset(name, object_paths)
 
-    Logger.info ~s/Created dataset "#{dataset.name}" with #{length(elements)} elements/
+    Logger.info ~s/Created dataset "#{dataset.name}" with #{length(objects)} objects/
   end
 end
 

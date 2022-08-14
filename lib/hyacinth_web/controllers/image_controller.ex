@@ -3,10 +3,10 @@ defmodule HyacinthWeb.ImageController do
 
   alias Hyacinth.Warehouse
 
-  def show(conn, %{"element_id" => element_id}) do
-    element = Warehouse.get_element!(element_id)
+  def show(conn, %{"object_id" => object_id}) do
+    object = Warehouse.get_object!(object_id)
 
-    if Path.extname(element.path) != ".png", do: raise "invalid element path"  # TODO: sanity, remove later
-    Plug.Conn.send_file(conn, 200, element.path)
+    if Path.extname(object.path) != ".png", do: raise "invalid object path"  # TODO: sanity, remove later
+    Plug.Conn.send_file(conn, 200, object.path)
   end
 end

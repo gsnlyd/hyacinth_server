@@ -3,24 +3,21 @@ defmodule HyacinthWeb.LabelController do
 
   alias Hyacinth.{Warehouse, Labeling}
 
-  def index(conn, %{"job_id" => job_id, "element_index" => element_index}) do
-    element_index = String.to_integer(element_index)
+  def index(conn, %{"job_id" => job_id, "object_index" => object_index}) do
+    object_index = String.to_integer(object_index)
     job = Labeling.get_label_job!(job_id)
-    elements = Warehouse.list_dataset_elements(job.dataset_id)
-    element = Enum.at(elements, element_index)
+    objects = Warehouse.list_dataset_objects(job.dataset_id)
+    object = Enum.at(objects, object_index)
 
-    labels = Labeling.list_label_entries(job, element)
+    labels = Labeling.list_label_entries(job, object)
 
-    IO.inspect job
-    IO.inspect element_index
-
-    render(conn, "index.html", job: job, element: element, labels: labels, element_index: element_index)
+    render(conn, "index.html", job: job, object: object, labels: labels, object_index: object_index)
   end
 
-  def set_label(conn, %{"job_id" => job_id, "element_id" => element_id, "label_value" => label_value}) do
+  def set_label(conn, %{"job_id" => job_id, "object_id" => object_id, "label_value" => label_value}) do
     job = Labeling.get_label_job!(job_id)
-    element = Warehouse.get_element!(element_id)
-    Labeling.create_label_entry(job, element, conn.assigns.current_user, label_value)
+    object = Warehouse.get_object!(object_id)
+    Labeling.create_label_entry(job, object, conn.assigns.current_user, label_value)
 
     redirect(conn, to: Routes.label_path(conn, :index, job.id, 0))
   end

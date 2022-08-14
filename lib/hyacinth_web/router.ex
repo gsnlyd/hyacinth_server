@@ -22,12 +22,12 @@ defmodule HyacinthWeb.Router do
 
     get "/", PageController, :index
 
-    get "/label/:job_id/:element_index", LabelController, :index
-    post "/label/:job_id/:element_id/:label_value", LabelController, :set_label
+    get "/label/:job_id/:object_index", LabelController, :index
+    post "/label/:job_id/:object_id/:label_value", LabelController, :set_label
 
     resources "/label_jobs", LabelJobController
 
-    get "/element-image/:element_id", ImageController, :show
+    get "/object-image/:object_id", ImageController, :show
   end
 
   # Other scopes may use custom stacks.
