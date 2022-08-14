@@ -4,8 +4,7 @@ defmodule HyacinthWeb.LabelJobControllerTest do
   import Hyacinth.WarehouseFixtures
   import Hyacinth.LabelingFixtures
 
-  @create_attrs %{name: "some name", label_type: :classification, label_options: ["option 1", "option2 ", "option 3"]}
-  @update_attrs %{name: "some updated name"}
+  @create_attrs %{name: "some name", label_type: :classification, label_options_string: "option 1, option 2, option 3"}
   @invalid_attrs %{label_type: nil, name: nil, dataset_id: nil}
 
   describe "index" do
@@ -48,23 +47,6 @@ defmodule HyacinthWeb.LabelJobControllerTest do
 
     test "renders form for editing chosen label_job", %{conn: conn, label_job: label_job} do
       conn = get(conn, Routes.label_job_path(conn, :edit, label_job))
-      assert html_response(conn, 200) =~ "Edit Label job"
-    end
-  end
-
-  describe "update label_job" do
-    setup [:create_label_job]
-
-    test "redirects when data is valid", %{conn: conn, label_job: label_job} do
-      conn = put(conn, Routes.label_job_path(conn, :update, label_job), label_job: @update_attrs)
-      assert redirected_to(conn) == Routes.label_job_path(conn, :show, label_job)
-
-      conn = get(conn, Routes.label_job_path(conn, :show, label_job))
-      assert html_response(conn, 200) =~ "some updated name"
-    end
-
-    test "renders errors when data is invalid", %{conn: conn, label_job: label_job} do
-      conn = put(conn, Routes.label_job_path(conn, :update, label_job), label_job: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Label job"
     end
   end

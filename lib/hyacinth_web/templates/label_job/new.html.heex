@@ -24,6 +24,12 @@
       </p>
 
       <p>
+        <%= label f, :label_options_string %>
+        <%= text_input f, :label_options_string, placeholder: "Label1, Label2" %>
+        <%= error_tag f, :label_options_string %>
+      </p>
+
+      <p>
         <%= label f, :dataset_id %>
         <%= select f, :dataset_id, Enum.map(@datasets, fn d -> {d.name, d.id} end), prompt: "Choose a value" %>
         <%= error_tag f, :dataset_id %>
