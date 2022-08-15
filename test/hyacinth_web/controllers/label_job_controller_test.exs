@@ -51,19 +51,6 @@ defmodule HyacinthWeb.LabelJobControllerTest do
     end
   end
 
-  describe "delete label_job" do
-    setup [:create_label_job]
-
-    test "deletes chosen label_job", %{conn: conn, label_job: label_job} do
-      conn = delete(conn, Routes.label_job_path(conn, :delete, label_job))
-      assert redirected_to(conn) == Routes.label_job_path(conn, :index)
-
-      assert_error_sent 404, fn ->
-        get(conn, Routes.label_job_path(conn, :show, label_job))
-      end
-    end
-  end
-
   defp create_label_job(_) do
     label_job = label_job_fixture()
     %{label_job: label_job}

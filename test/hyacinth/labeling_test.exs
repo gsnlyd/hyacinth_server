@@ -49,12 +49,6 @@ defmodule Hyacinth.LabelingTest do
       assert label_job == Labeling.get_label_job!(label_job.id)
     end
 
-    test "delete_label_job/1 deletes the label_job" do
-      label_job = label_job_fixture()
-      assert {:ok, %LabelJob{}} = Labeling.delete_label_job(label_job)
-      assert_raise Ecto.NoResultsError, fn -> Labeling.get_label_job!(label_job.id) end
-    end
-
     test "change_label_job/1 returns a label_job changeset" do
       label_job = label_job_fixture()
       assert %Ecto.Changeset{} = Labeling.change_label_job(label_job)
