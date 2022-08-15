@@ -39,7 +39,7 @@
   </div>
 
   <div class="mt-4">
-    <a class="" href={Routes.label_path(@conn, :index, @job.id, @object_index - 1)}>Prev</a>
-    <a class="" href={Routes.label_path(@conn, :index, @job.id, @object_index + 1)}>Next</a>
+    <a class="" href={Routes.label_session_path(@conn, :index, @job.id, @object_index - 1)}>Prev</a>
+    <a class="" href={Routes.label_session_path(@conn, :index, @job.id, @object_index + 1)}>Next</a>
   </div>
 </main>

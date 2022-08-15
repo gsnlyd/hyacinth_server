@@ -25,7 +25,7 @@
         <td><%= label_job.created_by_user_id %></td>
 
         <td class="text-xs space-x-2">
-          <span><%= link "Label", to: Routes.label_path(@conn, :index, label_job.id, 0) %></span>
+          <span><%= link "Label", to: Routes.label_session_path(@conn, :index, label_job.id, 0) %></span>
           <span><%= link "Show", to: Routes.label_job_path(@conn, :show, label_job) %></span>
           <span><%= link "Edit", to: Routes.label_job_path(@conn, :edit, label_job) %></span>
           <span><%= link "Delete", to: Routes.label_job_path(@conn, :delete, label_job), method: :delete, data: [confirm: "Are you sure?"] %></span>

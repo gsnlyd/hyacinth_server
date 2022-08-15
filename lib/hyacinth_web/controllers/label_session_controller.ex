@@ -1,4 +1,4 @@
-defmodule HyacinthWeb.LabelController do
+defmodule HyacinthWeb.LabelSessionController do
   use HyacinthWeb, :controller
 
   alias Hyacinth.{Warehouse, Labeling}

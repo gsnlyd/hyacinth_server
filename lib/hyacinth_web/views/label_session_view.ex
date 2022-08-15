@@ -1,3 +1,3 @@
-defmodule HyacinthWeb.LabelView do
+defmodule HyacinthWeb.LabelSessionView do
   use HyacinthWeb, :view
 end
