@@ -2,8 +2,9 @@ defmodule Hyacinth.Labeling.LabelJob do
   use Hyacinth.Schema
   import Ecto.Changeset
 
-  alias Hyacinth.Warehouse.Dataset
   alias Hyacinth.Accounts.User
+  alias Hyacinth.Warehouse.Dataset
+  alias Hyacinth.Labeling.LabelSession
 
   schema "label_jobs" do
     field :name, :string
@@ -14,6 +15,8 @@ defmodule Hyacinth.Labeling.LabelJob do
 
     belongs_to :dataset, Dataset
     belongs_to :created_by_user, User
+
+    has_one :blueprint, LabelSession, foreign_key: :job_id, where: [blueprint: true]
 
     timestamps()
   end

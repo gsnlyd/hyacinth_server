@@ -1,18 +1,60 @@
-<h1>Show Label job</h1>
+<header>
+  <h1 class="text-4xl"><%= @label_job.name %></h1>
+</header>
 
-<ul>
+<main class="mt-2">
+  <ul>
+    <li>
+      <span class="text-gray-400 font-medium">Type:</span>
+      <%= @label_job.label_type %>
+    </li>
+    <li>
+      <span class="text-gray-400 font-medium">Options:</span>
+      <%= Enum.join(@label_job.label_options, ", ") %>
+    </li>
+    <li>
+      <span class="text-gray-400 font-medium">Dataset:</span>
+      <%= @label_job.dataset.name %> (id=<%= @label_job.dataset.id %>)
+    </li>
+    <li class="mt-2">
+      <span class="text-gray-400 font-medium">Created At:</span>
+      <%= Calendar.strftime(@label_job.inserted_at, "%c") %>
+    </li>
+    <li>
+      <span class="text-gray-400 font-medium">Updated At:</span>
+      <%= Calendar.strftime(@label_job.updated_at, "%c") %>
+    </li>
+  </ul>
 
-  <li>
-    <strong>Name:</strong>
-    <%= @label_job.name %>
-  </li>
+  <div class="mt-4">
+    <div>
+      <span class="text-gray-400 font-medium">Blueprint:</span>
+    </div>
 
-  <li>
-    <strong>Label type:</strong>
-    <%= @label_job.label_type %>
-  </li>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Element id</th>
+          <th># of Objects</th>
+          <th>Object ids</th>
+          <th>Object names</th>
+        </tr>
+      </thead>
+      <tbody class="text-gray-400">
+        <%= for element <- @label_job.blueprint.elements do %>
+          <tr>
+            <td><%= element.id %></td>
+            <td><%= length(element.objects) %></td>
+            <td>[<%= Enum.join(Enum.map(element.objects, fn o -> o.id end), ", ") %>]</td>
+            <td>[<%= Enum.join(Enum.map(element.objects, fn o -> Path.basename(o.path) end), ", ") %>]</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</main>
 
-</ul>
-
-<span><%= link "Edit", to: Routes.label_job_path(@conn, :edit, @label_job) %></span> |
-<span><%= link "Back", to: Routes.label_job_path(@conn, :index) %></span>
+<div class="mt-2">
+  <span><%= link "Edit", to: Routes.label_job_path(@conn, :edit, @label_job) %></span> |
+  <span><%= link "Back", to: Routes.label_job_path(@conn, :index) %></span>
+</div>

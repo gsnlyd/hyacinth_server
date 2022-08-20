@@ -29,7 +29,8 @@ defmodule HyacinthWeb.LabelJobController do
   end
 
   def show(conn, %{"id" => id}) do
-    label_job = Labeling.get_label_job!(id)
+    label_job = Labeling.get_job_with_blueprint(id)
+    IO.inspect label_job
     render(conn, "show.html", label_job: label_job)
   end
 
@@ -53,9 +54,11 @@ defmodule HyacinthWeb.LabelJobController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    label_job = Labeling.get_label_job!(id)
-    {:ok, _label_job} = Labeling.delete_label_job(label_job)
+  def delete(conn, %{"id" => _id}) do
+    # TODO: maybe bring back delete? requires additional work to handle foreign keys
+
+    #label_job = Labeling.get_label_job!(id)
+    #{:ok, _label_job} = Labeling.delete_label_job(label_job)
 
     conn
     |> put_flash(:info, "Label job deleted successfully.")

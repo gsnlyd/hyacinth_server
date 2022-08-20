@@ -43,16 +43,19 @@ defmodule Hyacinth.Labeling do
   def get_label_job!(id), do: Repo.get!(LabelJob, id)
 
   @doc """
+  Gets a single LabelJob with its blueprint session preloaded.
+  """
+  def get_job_with_blueprint(id) do
+    Repo.one!(
+      from lj in LabelJob,
+      where: lj.id == ^id,
+      select: lj,
+      preload: [dataset: [], blueprint: [elements: :objects]]
+    )
+  end
+
+  @doc """
   Creates a label_job.
-
-  ## Examples
-
-      iex> create_label_job(%{field: value})
-      {:ok, %LabelJob{}}
-
-      iex> create_label_job(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
   """
   def create_label_job(attrs \\ %{}, %User{} = created_by_user) do
     result =
