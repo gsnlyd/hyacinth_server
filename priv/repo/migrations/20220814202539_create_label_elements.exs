@@ -3,6 +3,8 @@ defmodule Hyacinth.Repo.Migrations.CreateLabelElements do
 
   def change do
     create table(:label_elements) do
+      add :element_index, :integer, null: false
+
       add :session_id, references(:label_sessions, on_delete: :restrict, on_update: :restrict), null: false
 
       timestamps()

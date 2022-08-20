@@ -66,8 +66,8 @@ defmodule Hyacinth.Labeling do
       end)
       |> Multi.run(:elements, fn _repo, %{label_job: %LabelJob{} = job, blueprint_session: %LabelSession{} = blueprint} ->
         objects = Warehouse.list_dataset_objects(job.dataset_id)
-        elements = Enum.map(objects, fn o ->
-          element = Repo.insert! %LabelElement{session_id: blueprint.id}
+        elements = Enum.map(Enum.with_index(objects), fn {o, i} ->
+          element = Repo.insert! %LabelElement{element_index: i, session_id: blueprint.id}
           Repo.insert! %LabelElementObject{object_index: 0, label_element_id: element.id, object_id: o.id}
 
           element

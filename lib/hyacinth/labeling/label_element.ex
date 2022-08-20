@@ -5,6 +5,7 @@ defmodule Hyacinth.Labeling.LabelElement do
   alias Hyacinth.Labeling.{LabelSession, LabelElementObject}
 
   schema "label_elements" do
+    field :element_index, :integer
 
     belongs_to :session, LabelSession
 
