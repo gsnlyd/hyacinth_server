@@ -1,0 +1,29 @@
+<header>
+  <h1 class="text-4xl">Session id=<%= @label_session.id %></h1>
+  <div class="text-xl">
+    <%= link "Label", to: Routes.label_session_path(@conn, :index, @label_session, 0) %>
+  </div>
+</header>
+
+<main class="mt-2">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Element id</th>
+        <th># of Objects</th>
+        <th>Object ids</th>
+        <th>Object names</th>
+      </tr>
+    </thead>
+    <tbody class="text-gray-400">
+      <%= for element <- @label_session.elements do %>
+        <tr>
+          <td><%= element.id %></td>
+          <td><%= length(element.objects) %></td>
+          <td>[<%= Enum.join(Enum.map(element.objects, fn o -> o.id end), ", ") %>]</td>
+          <td>[<%= Enum.join(Enum.map(element.objects, fn o -> Path.basename(o.path) end), ", ") %>]</td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</main>

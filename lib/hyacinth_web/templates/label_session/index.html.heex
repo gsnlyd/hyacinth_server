@@ -1,36 +1,39 @@
 <header>
-  <h1>
-    <span class="text-gray-400">Object:</span>
-    <%= Path.basename(@object.path) %>
-  </h1>
-  <h2 class="text-gray-400">
-    <span>Job:</span>
-    <%= link @job.name, to: Routes.label_job_path(@conn, :show, @job) %>
-  </h2>
+  <h1>Element: id=<%= @element.id %> element_index=<%= @element.element_index %></h1>
+  <h2>Session: id=<%= @label_session.id %></h2>
 </header>
 
 <main class="mt-8">
-  <div class="flex items-center space-x-12">
-    <img class="w-1/2" src={Routes.image_path(@conn, :show, @object.id)} />
-
-    <div class="flex flex-col space-y-2">
-      <%= for label_val <- ["some label", "another", "label xyz"] do %>
-        <%= link label_val, class: "link-btn btn-lg btn-blue", to: "" %>
+  <div class="flex items-start space-x-12">
+    <div class="w-1/2 flex">
+      <%= for object <- @element.objects do %>
+        <div class="flex-1">
+          <img class="w-full" src={Routes.image_path(@conn, :show, object.id)} />
+          <div class="mt-2 p-2 text-lg text-gray-300 font-medium text-center bg-gray-800 rounded border border-gray-700">
+            <span><%= Path.basename(object.path) %></span>
+            <span>(<%= object.id %>)</span>
+          </div>
+        </div>
       <% end %>
     </div>
 
-    <div class="mt-4">
-      <div class="text-lg text-gray-300 font-medium"><%= length(@labels) %> Labels</div>
-      <table class="mt-2 table">
+    <div class="flex flex-col space-y-2">
+      <%= for label_val <- @label_job.label_options do %>
+        <%= link label_val, class: "link-btn btn-lg btn-blue", to: Routes.label_session_path(@conn, :set_label, @element, label_val), method: :post %>
+      <% end %>
+    </div>
+
+    <div>
+      <table class="table">
         <thead>
           <th>Value</th>
-          <th>User</th>
+          <th>Timestamp</th>
         </thead>
         <tbody>
           <%= for label <- @labels do %>
             <tr>
-              <td><%= label.value %></td>
-              <td><%= label.created_by_user.id %></td>
+              <td><%= label.label_value %></td>
+              <td><%= Calendar.strftime(label.inserted_at, "%c") %></td>
             </tr>
           <% end %>
         </tbody>
@@ -39,7 +42,7 @@
   </div>
 
   <div class="mt-4">
-    <a class="" href={Routes.label_session_path(@conn, :index, @job.id, @object_index - 1)}>Prev</a>
-    <a class="" href={Routes.label_session_path(@conn, :index, @job.id, @object_index + 1)}>Next</a>
+    <a class="" href={Routes.label_session_path(@conn, :index, @label_session, @element.element_index - 1)}>Prev</a>
+    <a class="" href={Routes.label_session_path(@conn, :index, @label_session, @element.element_index + 1)}>Next</a>
   </div>
 </main>

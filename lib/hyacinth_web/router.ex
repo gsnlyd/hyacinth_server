@@ -22,7 +22,10 @@ defmodule HyacinthWeb.Router do
 
     get "/", PageController, :index
 
-    get "/label/:job_id/:object_index", LabelSessionController, :index
+    get "/label_sessions/new/:label_job_id", LabelSessionController, :new
+    get "/label_sessions/:label_session_id", LabelSessionController, :show
+    get "/label/:label_session_id/:element_index", LabelSessionController, :index
+    post "/set-label/:element_id/:label_value", LabelSessionController, :set_label
 
     resources "/label_jobs", LabelJobController
 
