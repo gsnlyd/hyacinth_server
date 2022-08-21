@@ -11,7 +11,8 @@ defmodule Hyacinth.Labeling do
   alias Hyacinth.Warehouse
 
   alias Hyacinth.Accounts.{User}
-  alias Hyacinth.Labeling.{LabelJob, LabelSession, LabelElement, LabelElementObject, LabelEntry}
+  alias Hyacinth.Warehouse.{Object}
+  alias Hyacinth.Labeling.{LabelType, LabelJob, LabelSession, LabelElement, LabelElementObject, LabelEntry}
 
   @doc """
   Returns the list of label_jobs.
@@ -65,13 +66,23 @@ defmodule Hyacinth.Labeling do
         %LabelSession{blueprint: true, job_id: job.id}
       end)
       |> Multi.run(:elements, fn _repo, %{label_job: %LabelJob{} = job, blueprint_session: %LabelSession{} = blueprint} ->
-        objects = Warehouse.list_dataset_objects(job.dataset_id)
-        elements = Enum.map(Enum.with_index(objects), fn {o, i} ->
-          element = Repo.insert! %LabelElement{element_index: i, session_id: blueprint.id}
-          Repo.insert! %LabelElementObject{object_index: 0, label_element_id: element.id, object_id: o.id}
+        objects_grouped = LabelType.group_objects(job, Warehouse.list_dataset_objects(job.dataset_id))
 
-          element
-        end)
+        elements =
+          objects_grouped
+          |> Enum.with_index()
+          |> Enum.map(fn {objects, element_i} ->
+            element = Repo.insert! %LabelElement{element_index: element_i, session_id: blueprint.id}
+
+            objects
+            |> Enum.with_index()
+            |> Enum.map(fn {%Object{} = object, elobj_i} ->
+              Repo.insert! %LabelElementObject{object_index: elobj_i, label_element_id: element.id, object_id: object.id}
+            end)
+
+            element
+          end)
+
         {:ok, elements}
       end)
       |> Repo.transaction()
