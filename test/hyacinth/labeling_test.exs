@@ -158,19 +158,26 @@ defmodule Hyacinth.LabelingTest do
     end
   end
 
-  describe "create_label_entry!/3" do
-    setup do
-      job = label_job_fixture(%{label_options_string: "valid option, another option, third option"})
-      user = user_fixture()
-      session = label_session_fixture(job, user)
-      session = Labeling.get_label_session_with_elements!(session.id)
-      element = hd(session.elements)
+  def setup_session(_context) do
+    job = label_job_fixture(%{label_options_string: "valid option, another option, third option"})
+    user = user_fixture()
+    session = label_session_fixture(job, user)
+    session = Labeling.get_label_session_with_elements!(session.id)
 
-      %{
-        user: user,
-        element: element,
-      }
-    end
+    %{
+      user: user,
+      session: session,
+    }
+  end
+
+  def extract_element(%{session: %LabelSession{} = session}) do
+    %{
+      element: hd(session.elements),
+    }
+  end
+
+  describe "create_label_entry!/3" do
+    setup [:setup_session, :extract_element]
 
     test "creates LabelEntry", %{user: user, element: element} do
       label_entry = Labeling.create_label_entry!(element, user, "valid option")
@@ -206,18 +213,7 @@ defmodule Hyacinth.LabelingTest do
   end
 
   describe "list_element_labels/1" do
-    setup do
-      job = label_job_fixture(%{label_options_string: "valid option, another option, third option"})
-      user = user_fixture()
-      session = label_session_fixture(job, user)
-      session = Labeling.get_label_session_with_elements!(session.id)
-      element = hd(session.elements)
-
-      %{
-        user: user,
-        element: element,
-      }
-    end
+    setup [:setup_session, :extract_element]
 
     test "returns labels for element in descending order", %{user: user, element: element} do
       Labeling.create_label_entry!(element, user, "valid option")
