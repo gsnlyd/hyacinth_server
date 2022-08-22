@@ -141,7 +141,7 @@ defmodule Hyacinth.Labeling do
       from ls in LabelSession,
       where: ls.id == ^id,
       select: ls,
-      preload: [job: [:dataset], user: [], elements: :objects]
+      preload: [job: [:dataset], user: [], elements: [:objects, :labels]]
     )
   end
 

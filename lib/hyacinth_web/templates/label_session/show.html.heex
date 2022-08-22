@@ -38,19 +38,30 @@
   <table class="table w-full text-xs">
     <thead>
       <tr>
-        <th>Element id</th>
-        <th># of Objects</th>
-        <th>Object ids</th>
-        <th>Object names</th>
+        <th></th>
+        <th>Objects</th>
+        <th>Latest Label</th>
+        <th>Labeled At</th>
+        <%= if @label_session.user == @current_user do %>
+          <th />
+        <% end %>
       </tr>
     </thead>
     <tbody class="text-gray-400">
       <%= for element <- @label_session.elements do %>
         <tr>
-          <td><%= element.id %></td>
-          <td><%= length(element.objects) %></td>
-          <td>[<%= Enum.join(Enum.map(element.objects, fn o -> o.id end), ", ") %>]</td>
+          <td><%= element.element_index + 1%></td>
           <td>[<%= Enum.join(Enum.map(element.objects, fn o -> Path.basename(o.path) end), ", ") %>]</td>
+          <%= if length(element.labels) > 0 do %>
+            <td><%= hd(element.labels).label_value %></td>
+            <td><%= Calendar.strftime(hd(element.labels).inserted_at, "%c") %></td>
+          <% else %>
+            <td>-</td>
+            <td>-</td>
+          <% end %>
+          <%= if @label_session.user == @current_user do %>
+            <td class="text-center"><%= link "Edit", to: Routes.label_session_path(@conn, :label, @label_session, element.element_index) %></td>
+          <% end %>
         </tr>
       <% end %>
     </tbody>
