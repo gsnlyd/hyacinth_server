@@ -30,7 +30,8 @@ defmodule HyacinthWeb.LabelJobController do
 
   def show(conn, %{"id" => id}) do
     label_job = Labeling.get_job_with_blueprint(id)
-    render(conn, "show.html", label_job: label_job)
+    job_sessions = Labeling.list_job_sessions(label_job)
+    render(conn, "show.html", label_job: label_job, job_sessions: job_sessions)
   end
 
   def edit(conn, %{"id" => id}) do

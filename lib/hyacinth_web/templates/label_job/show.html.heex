@@ -24,12 +24,33 @@
       <span class="text-gray-400 font-medium">Updated At:</span>
       <%= Calendar.strftime(@label_job.updated_at, "%c") %>
     </li>
-    <li class="mt-2">
-      <%= link "View Blueprint", to: Routes.label_session_path(@conn, :show, @label_job.blueprint) %>
-    </li>
   </ul>
-  <div class="mt-4">
+
+  <div class="mt-6">
     <%= link "New Session", to: Routes.label_session_path(@conn, :new, @label_job), class: "link-btn btn-blue" %>
+  </div>
+
+  <div class="mt-8">
+    <div class="flex items-center space-x-2">
+      <h2 class="text-2xl text-gray-400 font-medium">Sessions</h2>
+      <%= link "[View Blueprint]", to: Routes.label_session_path(@conn, :show, @label_job.blueprint) %>
+    </div>
+    <table class="mt-2 table">
+      <thead>
+        <th>User</th>
+        <th>Created At</th>
+        <th />
+      </thead>
+      <tbody>
+        <%= for session <- @job_sessions do %>
+          <tr>
+            <td><%= session.user.email %></td>
+            <td><%= Calendar.strftime(session.inserted_at, "%c") %></td>
+            <td class="text-sm"><%= link "View", to: Routes.label_session_path(@conn, :show, session) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   </div>
 </main>
 

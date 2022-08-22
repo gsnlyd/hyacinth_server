@@ -132,6 +132,19 @@ defmodule Hyacinth.Labeling do
 
 
   @doc """
+  Lists all (non-blueprint) sessions for the given LabelJob.
+  """
+  def list_job_sessions(%LabelJob{} = job) do
+    Repo.all(
+      from ls in LabelSession,
+      where: (ls.job_id == ^job.id) and (not ls.blueprint),
+      select: ls,
+      preload: :user,
+      order_by: ls.inserted_at
+    )
+  end
+
+  @doc """
   Gets a single LabelSession.
   """
   def get_label_session!(id), do: Repo.get!(LabelSession, id)
