@@ -1,7 +1,7 @@
 <header>
   <h1 class="text-4xl">Session id=<%= @label_session.id %></h1>
   <div class="text-xl">
-    <%= link "Label", to: Routes.label_session_path(@conn, :index, @label_session, 0) %>
+    <%= link "Label", to: Routes.label_session_path(@conn, :label, @label_session, 0) %>
   </div>
 </header>
 

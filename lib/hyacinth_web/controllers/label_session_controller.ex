@@ -16,7 +16,7 @@ defmodule HyacinthWeb.LabelSessionController do
     render(conn, "show.html", label_session: label_session)
   end
 
-  def index(conn, %{"label_session_id" => label_session_id, "element_index" => element_index}) do
+  def label(conn, %{"label_session_id" => label_session_id, "element_index" => element_index}) do
     label_session = Labeling.get_label_session!(label_session_id)
     if label_session.blueprint, do: raise "Cannot label a blueprint session"  # Sanity
 
@@ -33,6 +33,6 @@ defmodule HyacinthWeb.LabelSessionController do
 
     _label_entry = Labeling.create_label_entry!(element, conn.assigns.current_user, label_value)
 
-    redirect(conn, to: Routes.label_session_path(conn, :index, session, element.element_index))
+    redirect(conn, to: Routes.label_session_path(conn, :label, session, element.element_index))
   end
 end

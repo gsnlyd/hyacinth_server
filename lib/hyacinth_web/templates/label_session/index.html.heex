@@ -42,7 +42,7 @@
   </div>
 
   <div class="mt-4">
-    <a class="" href={Routes.label_session_path(@conn, :index, @label_session, @element.element_index - 1)}>Prev</a>
-    <a class="" href={Routes.label_session_path(@conn, :index, @label_session, @element.element_index + 1)}>Next</a>
+    <a class="" href={Routes.label_session_path(@conn, :label, @label_session, @element.element_index - 1)}>Prev</a>
+    <a class="" href={Routes.label_session_path(@conn, :label, @label_session, @element.element_index + 1)}>Next</a>
   </div>
 </main>
