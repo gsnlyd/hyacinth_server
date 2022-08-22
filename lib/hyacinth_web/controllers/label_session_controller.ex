@@ -24,7 +24,7 @@ defmodule HyacinthWeb.LabelSessionController do
     element = Labeling.get_label_element!(label_session, element_index)
     labels = Labeling.list_element_labels(element)
 
-    render(conn, "index.html", label_session: label_session, label_job: label_job, element: element, labels: labels)
+    render(conn, "label.html", label_session: label_session, label_job: label_job, element: element, labels: labels)
   end
 
   def set_label(conn, %{"element_id" => element_id, "label_value" => label_value}) do
