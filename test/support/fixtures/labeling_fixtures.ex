@@ -7,6 +7,10 @@ defmodule Hyacinth.LabelingFixtures do
   alias Hyacinth.AccountsFixtures
   alias Hyacinth.WarehouseFixtures
 
+  alias Hyacinth.Labeling
+  alias Hyacinth.Accounts.User
+  alias Hyacinth.Labeling.{LabelJob, LabelSession}
+
   @doc """
   Generate a label_job.
   """
@@ -25,5 +29,15 @@ defmodule Hyacinth.LabelingFixtures do
       |> Hyacinth.Labeling.create_label_job(user)
 
     label_job
+  end
+
+  @doc """
+  Generates a LabelSession.
+  """
+  def label_session_fixture(job \\ nil, user \\ nil) do
+    job = if job, do: %LabelJob{} = job, else: label_job_fixture()
+    user = if user, do: %User{} = user, else: AccountsFixtures.user_fixture()
+
+    %LabelSession{} = Labeling.create_label_session(job, user)
   end
 end
