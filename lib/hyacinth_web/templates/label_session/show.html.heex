@@ -1,12 +1,41 @@
 <header>
-  <h1 class="text-4xl">Session id=<%= @label_session.id %></h1>
-  <div class="text-xl">
-    <%= link "Label", to: Routes.label_session_path(@conn, :label, @label_session, 0) %>
-  </div>
+  <h1>Session</h1>
+  <ul>
+    <li>
+      <span class="text-gray-400 font-medium">Job:</span>
+      <%= link @label_session.job.name, to: Routes.label_job_path(@conn, :show, @label_session.job) %>
+    </li>
+    <li>
+      <span class="text-gray-400 font-medium">Dataset:</span>
+      <%= @label_session.job.dataset.name %>
+    </li>
+    <li>
+      <span class="text-gray-400 font-medium">Created at:</span>
+      <%= Calendar.strftime(@label_session.inserted_at, "%c") %>
+    </li>
+    <%= if @label_session.blueprint do %>
+      <li class="mt-2">
+        <span class="text-sm text-gray-400 font-medium">This is a Blueprint Session</span>
+      </li>
+    <% else %>
+      <li>
+        <span class="text-gray-400 font-medium">User:</span>
+        <%= @label_session.user.email %>
+        <%= if @label_session.user == @current_user do %>
+          <span class="text-blue-600">(you)</span>
+        <% end %>
+      </li>
+      <%= if @label_session.user == @current_user do %>
+        <div class="mt-4">
+          <%= link "Start Labeling", to: Routes.label_session_path(@conn, :label, @label_session, 0), class: "link-btn btn-blue" %>
+        </div>
+      <% end %>
+    <% end %>
+  </ul>
 </header>
 
-<main class="mt-2">
-  <table class="table">
+<main class="mt-4">
+  <table class="table w-full text-xs">
     <thead>
       <tr>
         <th>Element id</th>

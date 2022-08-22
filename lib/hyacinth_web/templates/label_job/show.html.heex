@@ -14,7 +14,7 @@
     </li>
     <li>
       <span class="text-gray-400 font-medium">Dataset:</span>
-      <%= @label_job.dataset.name %> (id=<%= @label_job.dataset.id %>)
+      <%= @label_job.dataset.name %>
     </li>
     <li class="mt-2">
       <span class="text-gray-400 font-medium">Created At:</span>
@@ -24,37 +24,16 @@
       <span class="text-gray-400 font-medium">Updated At:</span>
       <%= Calendar.strftime(@label_job.updated_at, "%c") %>
     </li>
+    <li class="mt-2">
+      <%= link "View Blueprint", to: Routes.label_session_path(@conn, :show, @label_job.blueprint) %>
+    </li>
   </ul>
-
   <div class="mt-4">
-    <div>
-      <span class="text-gray-400 font-medium">Blueprint:</span>
-    </div>
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Element id</th>
-          <th># of Objects</th>
-          <th>Object ids</th>
-          <th>Object names</th>
-        </tr>
-      </thead>
-      <tbody class="text-gray-400">
-        <%= for element <- @label_job.blueprint.elements do %>
-          <tr>
-            <td><%= element.id %></td>
-            <td><%= length(element.objects) %></td>
-            <td>[<%= Enum.join(Enum.map(element.objects, fn o -> o.id end), ", ") %>]</td>
-            <td>[<%= Enum.join(Enum.map(element.objects, fn o -> Path.basename(o.path) end), ", ") %>]</td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <%= link "New Session", to: Routes.label_session_path(@conn, :new, @label_job), class: "link-btn btn-blue" %>
   </div>
 </main>
 
-<div class="mt-2">
+<div class="mt-12">
   <span><%= link "Edit", to: Routes.label_job_path(@conn, :edit, @label_job) %></span> |
   <span><%= link "Back", to: Routes.label_job_path(@conn, :index) %></span>
 </div>
