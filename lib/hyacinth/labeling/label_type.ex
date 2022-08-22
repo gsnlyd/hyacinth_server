@@ -11,4 +11,5 @@ defmodule Hyacinth.Labeling.LabelType do
   def group_objects(%LabelJob{} = job, objects), do: module_for(job).group_objects(objects)
 
   defp module_for(%LabelJob{label_type: :classification}), do: Hyacinth.Labeling.LabelType.Classification
+  defp module_for(%LabelJob{label_type: :comparison_exhaustive}), do: Hyacinth.Labeling.LabelType.ComparisonExhaustive
 end
