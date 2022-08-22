@@ -31,6 +31,13 @@ a:not(.link-btn) {
     @apply focus:outline-none;
 }
 
+.btn-dark-blue {
+    @apply text-blue-50 font-medium;
+    @apply bg-blue-700 hover:bg-blue-600;
+    @apply focus:ring-blue-700 focus:hover:ring-blue-600;
+    @apply focus:outline-none;
+}
+
 
 /* Table */
 .table th {

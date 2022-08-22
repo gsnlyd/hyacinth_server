@@ -1,6 +1,16 @@
-<header>
-  <h1>Element: id=<%= @element.id %> element_index=<%= @element.element_index %></h1>
-  <h2>Session: id=<%= @label_session.id %></h2>
+<header class="mt-4 px-4 py-1 w-full bg-gray-800 rounded border border-gray-700 flex justify-between items-center">
+  <div>
+    <%= link "Back to session", to: Routes.label_session_path(@conn, :show, @label_session) %>
+  </div>
+  <div class="flex items-center">
+    <a href={Routes.label_session_path(@conn, :label, @label_session, @element.element_index - 1)}>Prev</a>
+    <div class="w-24 text-4xl font-bold text-center">
+      <%= @element.element_index + 1 %>
+    </div>
+    <a href={Routes.label_session_path(@conn, :label, @label_session, @element.element_index + 1)}>Next</a>
+  </div>
+  <div>
+  </div>
 </header>
 
 <main class="mt-8">
@@ -9,31 +19,34 @@
       <%= for object <- @element.objects do %>
         <div>
           <div class="aspect-square flex justify-center items-center" style="height: calc(100vh - 16rem);">
-            <img class="w-full" src={Routes.image_path(@conn, :show, object.id)} />
+            <img class="w-full rounded" src={Routes.image_path(@conn, :show, object.id)} />
           </div>
           <div class="mt-2 p-2 text-lg text-gray-300 font-medium text-center bg-gray-800 rounded border border-gray-700">
             <span><%= Path.basename(object.path) %></span>
-            <span>(<%= object.id %>)</span>
           </div>
         </div>
       <% end %>
     </div>
 
-    <div class="flex flex-col space-y-2">
-      <%= for label_val <- @label_job.label_options do %>
-        <%= link label_val, class: "link-btn btn-lg btn-blue", to: Routes.label_session_path(@conn, :set_label, @element, label_val), method: :post %>
-      <% end %>
+    <div class="w-64">
+      <div class="text-sm text-gray-400 font-medium">Label Options</div>
+      <div class="mt-1 space-y-2 flex flex-col">
+        <%= for label_val <- @label_job.label_options do %>
+          <%= link label_val, class: ["link-btn btn-lg text-center", if(@current_value == label_val, do: "btn-dark-blue", else: "btn-blue")], to: Routes.label_session_path(@conn, :set_label, @element, label_val), method: :post %>
+        <% end %>
+      </div>
     </div>
 
     <div>
-      <table class="table">
+      <div class="text-sm text-gray-400 font-medium">Label History</div>
+      <table class="mt-1 table w-64 text-sm text-gray-400">
         <thead>
           <th>Value</th>
           <th>Timestamp</th>
         </thead>
         <tbody>
-          <%= for label <- @labels do %>
-            <tr>
+          <%= for {label, i} <- Enum.with_index(@labels) do %>
+            <tr class={i == 0 && "text-gray-200"}>
               <td><%= label.label_value %></td>
               <td><%= Calendar.strftime(label.inserted_at, "%c") %></td>
             </tr>
@@ -41,10 +54,5 @@
         </tbody>
       </table>
     </div>
-  </div>
-
-  <div class="mt-4">
-    <a class="" href={Routes.label_session_path(@conn, :label, @label_session, @element.element_index - 1)}>Prev</a>
-    <a class="" href={Routes.label_session_path(@conn, :label, @label_session, @element.element_index + 1)}>Next</a>
   </div>
 </main>
