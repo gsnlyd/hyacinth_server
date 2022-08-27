@@ -1,11 +1,12 @@
 defmodule Hyacinth.Warehouse.DatasetObject do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Changeset
 
-  schema "dataset_objects" do
+  alias Hyacinth.Warehouse.{Dataset, Object}
 
-    field :dataset_id, :id
-    field :object_id, :id
+  schema "dataset_objects" do
+    belongs_to :dataset, Dataset
+    belongs_to :object, Object
 
     timestamps()
   end
