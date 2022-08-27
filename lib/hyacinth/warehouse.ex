@@ -7,7 +7,7 @@ defmodule Hyacinth.Warehouse do
   alias Ecto.Multi
 
   alias Hyacinth.Repo
-  alias Hyacinth.Warehouse.{Dataset, Object}
+  alias Hyacinth.Warehouse.{Dataset, Object, DatasetObject}
 
   @doc """
   Returns the list of datasets.
@@ -62,13 +62,21 @@ defmodule Hyacinth.Warehouse do
   def create_root_dataset(name, object_paths) when is_binary(name) and is_list(object_paths) do
     Multi.new()
     |> Multi.insert(:dataset, %Dataset{name: name, dataset_type: :root})
-    |> Multi.run(:objects, fn _repo, %{dataset: %Dataset{} = dataset} ->
+    |> Multi.run(:objects, fn _repo, _values ->
       objects =
         object_paths
-        |> Enum.map(fn path -> %Object{path: path, type: "png", dataset_id: dataset.id} end)
+        |> Enum.map(fn path -> %Object{path: path, type: "png"} end)
         |> Enum.map(&Repo.insert!/1)
 
       {:ok, objects}
+    end)
+    |> Multi.run(:dataset_objects, fn _repo, %{dataset: %Dataset{} = dataset, objects: objects} ->
+      dataset_objects =
+        objects
+        |> Enum.map(fn %Object{} = object -> %DatasetObject{dataset_id: dataset.id, object_id: object.id} end)
+        |> Enum.map(&Repo.insert/1)
+
+      {:ok, dataset_objects}
     end)
     |> Repo.transaction()
   end
@@ -127,8 +135,10 @@ defmodule Hyacinth.Warehouse do
   """
   def list_dataset_objects(dataset_id) do
     Repo.all(
-      from o in Object,
-      where: o.dataset_id == ^dataset_id,
+      from dobj in DatasetObject,
+      inner_join: o in assoc(dobj, :object),
+      where: dobj.dataset_id == ^dataset_id,
+      select: o,
       order_by: o.id
     )
   end

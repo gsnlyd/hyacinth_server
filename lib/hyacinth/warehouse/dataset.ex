@@ -2,7 +2,7 @@ defmodule Hyacinth.Warehouse.Dataset do
   use Hyacinth.Schema
   import Ecto.Changeset
 
-  alias Hyacinth.Warehouse.Dataset
+  alias Hyacinth.Warehouse.{Dataset, DatasetObject}
   alias Hyacinth.Accounts.User
 
   schema "datasets" do
@@ -11,6 +11,9 @@ defmodule Hyacinth.Warehouse.Dataset do
 
     belongs_to :parent_dataset, Dataset
     belongs_to :created_by_user, User
+
+    has_many :dataset_objects, DatasetObject
+    has_many :objects, through: [:dataset_objects, :object]
 
     timestamps()
   end

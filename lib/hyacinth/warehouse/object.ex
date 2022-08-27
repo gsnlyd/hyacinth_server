@@ -2,14 +2,16 @@ defmodule Hyacinth.Warehouse.Object do
   use Hyacinth.Schema
   import Ecto.Changeset
 
-  alias Hyacinth.Warehouse.{Dataset, Object}
+  alias Hyacinth.Warehouse.{Object, DatasetObject}
 
   schema "objects" do
     field :path, :string
     field :type, :string
 
-    belongs_to :dataset, Dataset
     belongs_to :parent, Object
+
+    has_many :dataset_objects, DatasetObject
+    has_many :datasets, through: [:dataset_objects, :dataset]
 
     timestamps()
   end
@@ -17,7 +19,7 @@ defmodule Hyacinth.Warehouse.Object do
   @doc false
   def changeset(object, attrs) do
     object
-    |> cast(attrs, [:path, :type, :dataset_id, :parent_id])
-    |> validate_required([:path, :type, :dataset_id])
+    |> cast(attrs, [:path, :type, :parent_id])
+    |> validate_required([:path, :type])
   end
 end
