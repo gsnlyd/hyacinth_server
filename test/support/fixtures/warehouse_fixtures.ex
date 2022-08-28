@@ -8,21 +8,6 @@ defmodule Hyacinth.WarehouseFixtures do
   alias Hyacinth.Warehouse.{Dataset}
 
   @doc """
-  Generate a dataset.
-  """
-  def dataset_fixture(attrs \\ %{}) do
-    {:ok, dataset} =
-      attrs
-      |> Enum.into(%{
-        dataset_type: :root,
-        name: "some name"
-      })
-      |> Hyacinth.Warehouse.create_dataset()
-
-    dataset
-  end
-
-  @doc """
   Generate a root dataset with objects.
   """
   def root_dataset_fixture(name \\ nil, num_objects \\ 3) do

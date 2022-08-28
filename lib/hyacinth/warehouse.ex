@@ -39,24 +39,6 @@ defmodule Hyacinth.Warehouse do
   def get_dataset!(id), do: Repo.get!(Dataset, id)
 
   @doc """
-  Creates a dataset.
-
-  ## Examples
-
-      iex> create_dataset(%{field: value})
-      {:ok, %Dataset{}}
-
-      iex> create_dataset(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_dataset(attrs \\ %{}) do
-    %Dataset{}
-    |> Dataset.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
   Creates a root dataset (a dataset with no parent).
   """
   def create_root_dataset(name, object_paths) when is_binary(name) and is_list(object_paths) do
@@ -79,53 +61,6 @@ defmodule Hyacinth.Warehouse do
       {:ok, dataset_objects}
     end)
     |> Repo.transaction()
-  end
-
-  @doc """
-  Updates a dataset.
-
-  ## Examples
-
-      iex> update_dataset(dataset, %{field: new_value})
-      {:ok, %Dataset{}}
-
-      iex> update_dataset(dataset, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_dataset(%Dataset{} = dataset, attrs) do
-    dataset
-    |> Dataset.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a dataset.
-
-  ## Examples
-
-      iex> delete_dataset(dataset)
-      {:ok, %Dataset{}}
-
-      iex> delete_dataset(dataset)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_dataset(%Dataset{} = dataset) do
-    Repo.delete(dataset)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking dataset changes.
-
-  ## Examples
-
-      iex> change_dataset(dataset)
-      %Ecto.Changeset{data: %Dataset{}}
-
-  """
-  def change_dataset(%Dataset{} = dataset, attrs \\ %{}) do
-    Dataset.changeset(dataset, attrs)
   end
 
 
