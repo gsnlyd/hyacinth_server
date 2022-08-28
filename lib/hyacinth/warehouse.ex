@@ -131,16 +131,10 @@ defmodule Hyacinth.Warehouse do
 
 
   @doc """
-  Lists all objects for a dataset.
+  Lists all objects which belong to the given dataset.
   """
-  def list_dataset_objects(dataset_id) do
-    Repo.all(
-      from dobj in DatasetObject,
-      inner_join: o in assoc(dobj, :object),
-      where: dobj.dataset_id == ^dataset_id,
-      select: o,
-      order_by: o.id
-    )
+  def list_objects(%Dataset{} = dataset) do
+    Repo.all Ecto.assoc(dataset, :objects)
   end
 
   @doc """
