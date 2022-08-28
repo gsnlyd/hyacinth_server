@@ -1,10 +1,13 @@
 defmodule Hyacinth.Assembly.Pipeline do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Changeset
+
+  alias Hyacinth.Accounts.User
 
   schema "pipelines" do
     field :name, :string
-    field :creator_id, :id
+
+    belongs_to :creator, User
 
     timestamps()
   end

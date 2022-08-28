@@ -1,14 +1,18 @@
 defmodule Hyacinth.Assembly.Transform do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Changeset
 
+  alias Hyacinth.Warehouse.Dataset
+  alias Hyacinth.Assembly.Pipeline
+
   schema "transforms" do
-    field :arguments, :map
-    field :driver, :string
     field :order_index, :integer
-    field :pipeline_id, :id
-    field :input_id, :id
-    field :output_id, :id
+    field :driver, :string
+    field :arguments, :map
+
+    belongs_to :pipeline, Pipeline
+    belongs_to :input, Dataset
+    belongs_to :output, Dataset
 
     timestamps()
   end
