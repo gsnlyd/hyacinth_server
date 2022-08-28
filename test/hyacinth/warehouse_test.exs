@@ -31,9 +31,7 @@ defmodule Hyacinth.WarehouseTest do
       {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset("Some Dataset", paths)
 
       assert dataset.name == "Some Dataset"
-      assert dataset.dataset_type == :root
-      assert dataset.parent_dataset_id == nil
-      assert dataset.created_by_user_id == nil
+      assert dataset.type == :root
 
       objects = Warehouse.list_objects(dataset)
       assert length(objects) == 3

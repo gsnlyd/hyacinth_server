@@ -43,7 +43,7 @@ defmodule Hyacinth.Warehouse do
   """
   def create_root_dataset(name, object_paths) when is_binary(name) and is_list(object_paths) do
     Multi.new()
-    |> Multi.insert(:dataset, %Dataset{name: name, dataset_type: :root})
+    |> Multi.insert(:dataset, %Dataset{name: name, type: :root})
     |> Multi.run(:objects, fn _repo, _values ->
       objects =
         object_paths

@@ -1,15 +1,11 @@
 defmodule Hyacinth.Warehouse.Dataset do
   use Hyacinth.Schema
 
-  alias Hyacinth.Warehouse.{Dataset, DatasetObject}
-  alias Hyacinth.Accounts.User
+  alias Hyacinth.Warehouse.DatasetObject
 
   schema "datasets" do
     field :name, :string
-    field :dataset_type, Ecto.Enum, values: [:root, :derived]
-
-    belongs_to :parent_dataset, Dataset
-    belongs_to :created_by_user, User
+    field :type, Ecto.Enum, values: [:root, :derived]
 
     has_many :dataset_objects, DatasetObject
     has_many :objects, through: [:dataset_objects, :object]
