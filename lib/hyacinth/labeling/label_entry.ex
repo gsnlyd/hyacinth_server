@@ -1,6 +1,5 @@
 defmodule Hyacinth.Labeling.LabelEntry do
   use Hyacinth.Schema
-  import Ecto.Changeset
 
   alias Hyacinth.Labeling.LabelElement
 
@@ -10,12 +9,5 @@ defmodule Hyacinth.Labeling.LabelEntry do
     belongs_to :element, LabelElement
 
     timestamps()
-  end
-
-  @doc false
-  def changeset(label_entry, attrs) do
-    label_entry
-    |> cast(attrs, [:label_value])
-    |> validate_required([:label_value])
   end
 end

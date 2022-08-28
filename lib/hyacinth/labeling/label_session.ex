@@ -1,6 +1,5 @@
 defmodule Hyacinth.Labeling.LabelSession do
   use Hyacinth.Schema
-  import Ecto.Changeset
 
   alias Hyacinth.Accounts.User
   alias Hyacinth.Labeling.{LabelJob, LabelElement}
@@ -14,12 +13,5 @@ defmodule Hyacinth.Labeling.LabelSession do
     has_many :elements, LabelElement, foreign_key: :session_id
 
     timestamps()
-  end
-
-  @doc false
-  def changeset(label_session, attrs) do
-    label_session
-    |> cast(attrs, [:blueprint])
-    |> validate_required([:blueprint])
   end
 end
