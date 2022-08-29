@@ -3,8 +3,9 @@ defmodule Hyacinth.Repo.Migrations.CreateObjects do
 
   def change do
     create table(:objects) do
-      add :path, :string, null: false
       add :type, :string, null: false
+      add :rel_path, :string, null: false
+      add :hash, :string, null: false
 
       add :parent_id, references(:objects, on_delete: :restrict, on_update: :restrict)
 
