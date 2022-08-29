@@ -68,6 +68,7 @@ a:not(.link-btn) {
 }
 
 .form-content input[type="text"],
+.form-content input[type="number"],
 .form-content input[type="password"] {
     @apply px-2 py-1;
     @apply placeholder-gray-500;

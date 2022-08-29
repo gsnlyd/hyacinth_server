@@ -31,6 +31,8 @@ defmodule HyacinthWeb.Router do
     post "/set_label/:element_id/:label_value", LabelSessionController, :set_label
 
     get "/object-image/:object_id", ImageController, :show
+
+    live "/pipelines/new", PipelineLive.New
   end
 
   # Other scopes may use custom stacks.
