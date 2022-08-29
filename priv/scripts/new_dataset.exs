@@ -25,7 +25,14 @@ defmodule Hyacinth.Scripts.NewDataset do
     object_paths = get_object_paths(dataset_path)
     if length(object_paths) == 0, do: raise "No objects found"
 
-    {:ok, %{dataset: %Dataset{} = dataset, objects: objects}} = Warehouse.create_root_dataset(name, object_paths)
+    object_tuples = Enum.map(object_paths, fn path ->
+      hash = Warehouse.Store.ingest_file!(path)
+      rel_path = Path.relative_to(path, dataset_path)
+
+      {rel_path, hash}
+    end)
+
+    {:ok, %{dataset: %Dataset{} = dataset, objects: objects}} = Warehouse.create_root_dataset(name, object_tuples)
 
     Logger.info ~s/Created dataset "#{dataset.name}" with #{length(objects)} objects/
   end

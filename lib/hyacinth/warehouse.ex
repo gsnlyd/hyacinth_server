@@ -41,13 +41,13 @@ defmodule Hyacinth.Warehouse do
   @doc """
   Creates a root dataset (a dataset with no parent).
   """
-  def create_root_dataset(name, object_paths) when is_binary(name) and is_list(object_paths) do
+  def create_root_dataset(name, object_tuples) when is_binary(name) and is_list(object_tuples) do
     Multi.new()
     |> Multi.insert(:dataset, %Dataset{name: name, type: :root})
     |> Multi.run(:objects, fn _repo, _values ->
       objects =
-        object_paths
-        |> Enum.map(fn path -> %Object{path: path, type: "png"} end)
+        object_tuples
+        |> Enum.map(fn {rel_path, hash} -> %Object{type: "png", rel_path: rel_path, hash: hash} end)
         |> Enum.map(&Repo.insert!/1)
 
       {:ok, objects}
