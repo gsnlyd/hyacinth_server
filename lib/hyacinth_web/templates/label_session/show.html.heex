@@ -51,7 +51,7 @@
       <%= for element <- @label_session.elements do %>
         <tr>
           <td><%= element.element_index + 1%></td>
-          <td>[<%= Enum.join(Enum.map(element.objects, fn o -> Path.basename(o.path) end), ", ") %>]</td>
+          <td>[<%= Enum.join(Enum.map(element.objects, fn o -> o.rel_path end), ", ") %>]</td>
           <%= if length(element.labels) > 0 do %>
             <td><%= hd(element.labels).label_value %></td>
             <td><%= Calendar.strftime(hd(element.labels).inserted_at, "%c") %></td>

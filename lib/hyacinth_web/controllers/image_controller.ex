@@ -6,7 +6,7 @@ defmodule HyacinthWeb.ImageController do
   def show(conn, %{"object_id" => object_id}) do
     object = Warehouse.get_object!(object_id)
 
-    if Path.extname(object.path) != ".png", do: raise "invalid object path"  # TODO: sanity, remove later
-    Plug.Conn.send_file(conn, 200, object.path)
+    path = Warehouse.Store.get_object_path_from_hash(object.hash)
+    Phoenix.Controller.send_download(conn, {:file, path}, content_type: "image/png", disposition: :inline)
   end
 end
