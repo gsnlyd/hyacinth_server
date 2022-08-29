@@ -40,6 +40,9 @@ npm-debug.log
 # Elixir LSP
 .elixir_ls/
 
+# App Warehouse Objects
+/priv/warehouse_objects/
+
 # Test Data (for development)
 /priv/data/
 
