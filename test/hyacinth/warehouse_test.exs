@@ -22,20 +22,21 @@ defmodule Hyacinth.WarehouseTest do
 
   describe "create_root_dataset/2" do
     test "creates a root dataset" do
-      paths = [
-        "/tmp/some/path/object1.png",
-        "/tmp/some/path/object2.png",
-        "/tmp/some/path/object3.png",
+      object_tuples = [
+        {"object1.png", hash_fixture("obj1")},
+        {"object2.png", hash_fixture("obj2")},
+        {"object3.png", hash_fixture("obj3")},
       ]
 
-      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset("Some Dataset", paths)
+      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset("Some Dataset", object_tuples)
 
       assert dataset.name == "Some Dataset"
       assert dataset.type == :root
 
       objects = Warehouse.list_objects(dataset)
       assert length(objects) == 3
-      assert Enum.map(objects, fn %Object{} = o -> o.path end) == paths
+      assert Enum.map(objects, fn %Object{} = o -> o.rel_path end) == ["object1.png", "object2.png", "object3.png"]
+      assert Enum.map(objects, fn %Object{} = o -> o.hash end) == [hash_fixture("obj1"), hash_fixture("obj2"), hash_fixture("obj3")]
     end
   end
 
