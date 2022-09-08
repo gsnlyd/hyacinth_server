@@ -35,7 +35,7 @@ defmodule Hyacinth.WarehouseTest do
 
       objects = Warehouse.list_objects(dataset)
       assert length(objects) == 3
-      assert Enum.map(objects, fn %Object{} = o -> o.rel_path end) == ["object1.png", "object2.png", "object3.png"]
+      assert Enum.map(objects, fn %Object{} = o -> o.name end) == ["object1.png", "object2.png", "object3.png"]
       assert Enum.map(objects, fn %Object{} = o -> o.hash end) == [hash_fixture("obj1"), hash_fixture("obj2"), hash_fixture("obj3")]
     end
   end

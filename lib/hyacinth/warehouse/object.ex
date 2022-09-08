@@ -4,9 +4,11 @@ defmodule Hyacinth.Warehouse.Object do
   alias Hyacinth.Warehouse.{Object, DatasetObject}
 
   schema "objects" do
-    field :type, :string
-    field :rel_path, :string
     field :hash, :string
+    field :type, Ecto.Enum, values: [:blob, :tree]
+
+    field :name, :string
+    field :file_type, :string
 
     belongs_to :parent, Object
 

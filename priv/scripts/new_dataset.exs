@@ -27,9 +27,9 @@ defmodule Hyacinth.Scripts.NewDataset do
 
     object_tuples = Enum.map(object_paths, fn path ->
       hash = Warehouse.Store.ingest_file!(path)
-      rel_path = Path.relative_to(path, dataset_path)
+      object_name = Path.relative_to(path, dataset_path)
 
-      {rel_path, hash}
+      {object_name, hash}
     end)
 
     {:ok, %{dataset: %Dataset{} = dataset, objects: objects}} = Warehouse.create_root_dataset(name, object_tuples)

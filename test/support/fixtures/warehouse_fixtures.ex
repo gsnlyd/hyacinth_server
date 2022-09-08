@@ -22,9 +22,9 @@ defmodule Hyacinth.WarehouseFixtures do
 
     object_tuples = Enum.map(1..num_objects, fn i ->
       hash = hash_fixture("object#{i}")
-      rel_path = "object#{i}.png"
+      name = "object#{i}.png"
 
-      {rel_path, hash}
+      {name, hash}
     end)
 
     {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset(name, object_tuples)
