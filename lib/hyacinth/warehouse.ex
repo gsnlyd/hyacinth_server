@@ -47,7 +47,7 @@ defmodule Hyacinth.Warehouse do
     |> Multi.run(:objects, fn _repo, _values ->
       objects =
         object_tuples
-        |> Enum.map(fn {name, hash} -> %Object{hash: hash, type: :blob, name: name, file_type: "png"} end)
+        |> Enum.map(fn {name, hash} -> %Object{hash: hash, type: :blob, name: name, file_type: :png} end)
         |> Enum.map(&Repo.insert!/1)
 
       {:ok, objects}
