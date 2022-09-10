@@ -21,14 +21,14 @@ defmodule Hyacinth.WarehouseTest do
   end
 
   describe "create_root_dataset/2" do
-    test "creates a root dataset" do
+    test "creates a flat (png) root dataset" do
       object_tuples = [
-        {"object1.png", hash_fixture("obj1")},
-        {"object2.png", hash_fixture("obj2")},
-        {"object3.png", hash_fixture("obj3")},
+        {hash_fixture("obj1"), "object1.png"},
+        {hash_fixture("obj2"), "object2.png"},
+        {hash_fixture("obj3"), "object3.png"},
       ]
 
-      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset("Some Dataset", object_tuples)
+      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset("Some Dataset", :png, object_tuples)
 
       assert dataset.name == "Some Dataset"
       assert dataset.type == :root
@@ -37,6 +37,44 @@ defmodule Hyacinth.WarehouseTest do
       assert length(objects) == 3
       assert Enum.map(objects, fn %Object{} = o -> o.name end) == ["object1.png", "object2.png", "object3.png"]
       assert Enum.map(objects, fn %Object{} = o -> o.hash end) == [hash_fixture("obj1"), hash_fixture("obj2"), hash_fixture("obj3")]
+    end
+
+    test "creates a container (dicom) root dataset" do
+      children1 = [
+        {hash_fixture("o1s1"), "object1_slice1.dcm"},
+        {hash_fixture("o1s2"), "object1_slice2.dcm"},
+        {hash_fixture("o1s3"), "object1_slice3.dcm"},
+      ]
+
+      children2 = [
+        {hash_fixture("o2s1"), "object2_slice1.dcm"},
+        {hash_fixture("o2s2"), "object2_slice2.dcm"},
+      ]
+
+      children3 = [
+        {hash_fixture("o3s1"), "object3_slice1.dcm"},
+        {hash_fixture("o3s2"), "object3_slice2.dcm"},
+        {hash_fixture("o3s3"), "object3_slice3.dcm"},
+        {hash_fixture("o3s4"), "object3_slice4.dcm"},
+      ]
+
+      object_tuples = [
+        {Warehouse.Store.hash_hashes(Enum.map(children1, &elem(&1, 0))), "object1", children1},
+        {Warehouse.Store.hash_hashes(Enum.map(children2, &elem(&1, 0))), "object2", children2},
+        {Warehouse.Store.hash_hashes(Enum.map(children3, &elem(&1, 0))), "object3", children3},
+      ]
+
+      {:ok, %{dataset: dataset}} = Warehouse.create_root_dataset("Some Dataset", :dicom, object_tuples)
+
+      assert dataset.name == "Some Dataset"
+      assert dataset.type == :root
+
+      objects = Warehouse.list_objects(dataset)
+      assert length(objects) == 3
+      assert Enum.map(objects, fn %Object{} = o -> o.hash end) == Enum.map(object_tuples, &elem(&1, 0))
+      assert Enum.map(objects, fn %Object{} = o -> o.type end) == [:tree, :tree, :tree]
+      assert Enum.map(objects, fn %Object{} = o -> o.name end) == ["object1", "object2", "object3"]
+      assert Enum.map(objects, fn %Object{} = o -> o.file_type end) == [:dicom, :dicom, :dicom]
     end
   end
 

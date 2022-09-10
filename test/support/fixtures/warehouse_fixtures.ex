@@ -11,7 +11,7 @@ defmodule Hyacinth.WarehouseFixtures do
 
   def hash_fixture(data) when is_binary(data) do
     hash = :crypto.hash(@hash_fixture_algorithm, data)
-    Atom.to_string(@hash_fixture_algorithm) <> ":" <> hash
+    Atom.to_string(@hash_fixture_algorithm) <> ":" <> Base.encode16(hash, case: :lower)
   end
 
   @doc """
@@ -24,10 +24,10 @@ defmodule Hyacinth.WarehouseFixtures do
       hash = hash_fixture("object#{i}")
       name = "object#{i}.png"
 
-      {name, hash}
+      {hash, name}
     end)
 
-    {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset(name, object_tuples)
+    {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset(name, :png, object_tuples)
     dataset
   end
 end

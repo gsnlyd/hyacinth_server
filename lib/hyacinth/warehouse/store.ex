@@ -24,6 +24,23 @@ defmodule Hyacinth.Warehouse.Store do
   end
 
   @doc """
+  Returns the hash of a list of child hashes.
+  """
+  def hash_hashes(hashes) when is_list(hashes) do
+    hashes_concat =
+      hashes
+      |> Enum.map(fn hash ->
+        {_algo, hash} = split_hash(hash)
+        hash
+      end)
+      |> Enum.sort()
+      |> Enum.join()
+
+    hash = :crypto.hash(@hash_algorithm, hashes_concat)
+    Atom.to_string(@hash_algorithm) <> ":" <> Base.encode16(hash, case: :lower)
+  end
+
+  @doc """
   Splits a hash into its algorithm and value.
   """
   def split_hash(hash) when is_binary(hash) do

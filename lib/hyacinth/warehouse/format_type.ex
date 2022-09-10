@@ -46,7 +46,7 @@ defmodule Hyacinth.Warehouse.FormatType do
     iex> container?(:dicom)
     true
   """
-  def container(format), do: module_for(format).container?()
+  def container?(format), do: module_for(format).container?()
 
   defp module_for(:png), do: FormatType.PNG
   defp module_for(:dicom), do: FormatType.DICOM
