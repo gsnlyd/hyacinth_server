@@ -1,29 +1,8 @@
 defmodule HyacinthWeb.PipelineLive.New do
   use HyacinthWeb, :live_view
 
-  alias Hyacinth.Assembly.Pipeline
-
-  defmodule TransformArgs do
-    # TODO: this schema is for testing, remove later
-    use Hyacinth.Schema
-    import Ecto.Changeset
-
-    embedded_schema do
-      field :name, :string
-      field :object_count, :integer, default: 100
-      field :random_seed, :string, default: "100"
-    end
-
-    @doc false
-    def changeset(transform_args, attrs) do
-      transform_args
-      |> cast(attrs, [:name, :object_count, :random_seed])
-      |> validate_required([:name, :object_count, :random_seed])
-      |> validate_length(:name, min: 1, max: 10)
-      |> validate_number(:object_count, greater_than: 0, less_than: 20)
-      |> validate_length(:random_seed, min: 1, max: 10)
-    end
-  end
+  alias Hyacinth.Assembly
+  alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
 
   def mount(_params, _session, socket) do
     socket = assign(socket, %{
@@ -47,8 +26,12 @@ defmodule HyacinthWeb.PipelineLive.New do
   end
 
   def handle_event("add_transform", _value, socket) do
-    transforms = socket.assigns.transforms ++ [TransformArgs.changeset(%TransformArgs{}, %{})]
+    transform_changeset = Assembly.change_transform(%Transform{})
+    options_changeset = Driver.options_changeset(transform_changeset.data.driver)
+
+    transforms = socket.assigns.transforms ++ [{transform_changeset, options_changeset}]
     socket = assign(socket, :transforms, transforms)
+
     {:noreply, socket}
   end
 

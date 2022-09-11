@@ -1,6 +1,6 @@
 <main class="mt-6 mx-auto max-w-screen-lg">
   <div class="p-2 bg-gray-800 border border-gray-700 rounded">
-    <h2 class="text-3xl text-gray-300">Pipeline</h2>
+    <h2 class="text-3xl text-gray-300">New Pipeline</h2>
     <div class="mt-2">
       <.form let={f} for={@pipeline_changeset} phx-change="validate_pipeline">
         <div class="form-content">
@@ -14,36 +14,28 @@
     </div>
   </div>
 
-  <div class="mt-2">
-    <div class="space-y-2">
-      <%= for {args_changeset, i} <- Enum.with_index(@transforms) do %>
-        <div class="p-2 bg-gray-800 border border-gray-700 rounded">
-          <div class="flex justify-between">
-            <h2 class="text-xl text-gray-300">Transform #<%= i + 1%></h2>
-            <button class="mr-1 text-4xl font-mono text-gray-400 hover:text-white" phx-click="remove_transform" phx-value-transform-index={i}>&times;</button>
-          </div>
+  <div class="mt-4">
+    <div class="space-y-4">
+      <%= for {{transform_cs, options_cs}, i} <- Enum.with_index(@transforms) do %>
+        <div class="p-2 bg-gray-800 rounded border border-gray-700">
           <div>
-            <.form let={f} for={args_changeset}>
-              <div class="form-content">
-                <p>
-                  <%= label f, :name %>
-                  <%= text_input f, :name, placeholder: "Transform name" %>
-                  <%= error_tag f, :name %>
-                </p>
-                
-                <p>
-                  <%= label f, :object_count %>
-                  <%= number_input f, :object_count %>
-                  <%= error_tag f, :object_count %>
-                </p>
-
-                <p>
-                  <%= label f, :random_seed %>
-                  <%= text_input f, :random_seed %>
-                  <%= error_tag f, :random_seed %>
-                </p>
-              </div>
-            </.form>
+            <h2 class="text-xl text-gray-300">Transform #<%= i + 1%></h2>
+          </div>
+          <div class="mt-2 space-y-4">
+            <div>
+              <.form let={f} for={transform_cs}>
+                <div class="form-content">
+                  <p>
+                    <%= label f, :driver %>
+                    <%= select f, :driver, Ecto.Enum.values(Transform, :driver) %>
+                    <%= error_tag f, :driver %>
+                  </p>
+                </div>
+              </.form>
+            </div>
+            <div>
+              <Driver.render_form driver={:slicer} changeset={options_cs} />
+            </div>
           </div>
         </div>
       <% end %>
