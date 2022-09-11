@@ -52,8 +52,7 @@ defmodule Hyacinth.Warehouse do
               tree_object = Repo.insert! %Object{hash: tree_hash, type: :tree, name: tree_name, file_type: format}
 
               Enum.map(child_tuples, fn {hash, name} ->
-                # TODO: relate child to tree
-                Repo.insert! %Object{hash: hash, type: :blob, name: name, file_type: format}
+                Repo.insert! %Object{hash: hash, type: :blob, name: name, file_type: format, parent_tree_id: tree_object.id}
               end)
 
               tree_object
@@ -84,7 +83,11 @@ defmodule Hyacinth.Warehouse do
   Lists all objects which belong to the given dataset.
   """
   def list_objects(%Dataset{} = dataset) do
-    Repo.all Ecto.assoc(dataset, :objects)
+    Repo.all(
+      from o in Ecto.assoc(dataset, :objects),
+      select: o,
+      preload: :children
+    )
   end
 
   @doc """

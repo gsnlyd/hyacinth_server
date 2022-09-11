@@ -9,11 +9,11 @@ defmodule Hyacinth.Repo.Migrations.CreateObjects do
       add :name, :string, null: false
       add :file_type, :string, null: false
 
-      add :parent_id, references(:objects, on_delete: :restrict, on_update: :restrict)
+      add :parent_tree_id, references(:objects, on_delete: :restrict, on_update: :restrict)
 
       timestamps()
     end
 
-    create index(:objects, [:parent_id])
+    create index(:objects, [:parent_tree_id])
   end
 end

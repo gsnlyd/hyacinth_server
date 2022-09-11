@@ -10,7 +10,9 @@ defmodule Hyacinth.Warehouse.Object do
     field :name, :string
     field :file_type, Ecto.Enum, values: [:png, :dicom]
 
-    belongs_to :parent, Object
+    belongs_to :parent_tree, Object
+
+    has_many :children, Object, foreign_key: :parent_tree_id
 
     has_many :dataset_objects, DatasetObject
     has_many :datasets, through: [:dataset_objects, :dataset]

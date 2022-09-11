@@ -75,6 +75,16 @@ defmodule Hyacinth.WarehouseTest do
       assert Enum.map(objects, fn %Object{} = o -> o.type end) == [:tree, :tree, :tree]
       assert Enum.map(objects, fn %Object{} = o -> o.name end) == ["object1", "object2", "object3"]
       assert Enum.map(objects, fn %Object{} = o -> o.file_type end) == [:dicom, :dicom, :dicom]
+
+      assert length(Enum.at(objects, 0).children) == 3
+      assert length(Enum.at(objects, 1).children) == 2
+      assert length(Enum.at(objects, 2).children) == 4
+
+      object3slice2 = Enum.at(Enum.at(objects, 2).children, 1)
+      assert object3slice2.hash == hash_fixture("o3s2")
+      assert object3slice2.type == :blob
+      assert object3slice2.name == "object3_slice2.dcm"
+      assert object3slice2.file_type == :dicom
     end
   end
 
