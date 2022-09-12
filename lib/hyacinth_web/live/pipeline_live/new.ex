@@ -14,19 +14,22 @@ defmodule HyacinthWeb.PipelineLive.New do
   end
 
   def handle_event("validate_pipeline", %{"pipeline" => pipeline_params}, socket) do
-    IO.inspect pipeline_params
     changeset =
       %Pipeline{}
       |> Pipeline.changeset(pipeline_params)
       |> Map.put(:action, :insert)
-    IO.inspect changeset
 
     socket = assign(socket, :pipeline_changeset, changeset)
     {:noreply, socket}
   end
 
   def handle_event("add_transform", _value, socket) do
-    transform_changeset = Assembly.change_transform(%Transform{})
+    new_index = length(socket.assigns.transforms)
+
+    transform_changeset =
+      %Transform{order_index: new_index}
+      |> Assembly.change_transform()
+      |> Map.put(:action, :insert)
     options_changeset = Driver.options_changeset(transform_changeset.data.driver)
 
     transforms = socket.assigns.transforms ++ [{transform_changeset, options_changeset}]
@@ -35,10 +38,35 @@ defmodule HyacinthWeb.PipelineLive.New do
     {:noreply, socket}
   end
 
-  def handle_event("remove_transform", %{"transform-index" => transform_index}, socket) do
-    transform_index = String.to_integer(transform_index)
-    transforms = List.delete_at(socket.assigns.transforms, transform_index)
+  def handle_event("remove_last_transform", _value, socket) do
+    socket = assign(socket, :transforms, List.delete_at(socket.assigns.transforms, -1))
+    {:noreply, socket}
+  end
+
+  def handle_event("validate_transform", %{"transform" => transform_params}, socket) do
+    transform_changeset = Assembly.change_transform(%Transform{}, transform_params)
+    options_changeset = Driver.options_changeset(Ecto.Changeset.get_field(transform_changeset, :driver))
+
+    index = Ecto.Changeset.get_change(transform_changeset, :order_index)
+    transforms = List.replace_at(socket.assigns.transforms, index, {transform_changeset, options_changeset})
     socket = assign(socket, :transforms, transforms)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("validate_transform_options", %{"options" => options_pararms}, socket) do
+    transform_index = String.to_integer(options_pararms["transform_index"])
+    {transform_changeset, _} = Enum.at(socket.assigns.transforms, transform_index)
+
+    options_changeset =
+      transform_changeset
+      |> Ecto.Changeset.get_field(:driver)
+      |> Driver.options_changeset(options_pararms)
+      |> Map.put(:action, :insert)
+
+    transforms = List.replace_at(socket.assigns.transforms, transform_index, {transform_changeset, options_changeset})
+    socket = assign(socket, :transforms, transforms)
+
     {:noreply, socket}
   end
 end

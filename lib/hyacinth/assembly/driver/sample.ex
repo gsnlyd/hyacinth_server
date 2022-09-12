@@ -1,26 +1,28 @@
-defmodule Hyacinth.Assembly.Driver.Slicer do
+defmodule Hyacinth.Assembly.Driver.Sample do
   alias Hyacinth.Assembly.Driver
 
-  defmodule SlicerOptions do
+  defmodule SampleOptions do
     use Ecto.Schema
     import Ecto.Changeset
 
     embedded_schema do
-      field :orientation, Ecto.Enum, values: [:sagittal, :coronal, :axial]
+      field :object_count, :integer, default: 20
+      field :random_seed, :integer, default: 123
     end
 
     @doc false
     def changeset(schema, params) do
       schema
-      |> cast(params, [:orientation])
-      |> validate_required([:orientation])
+      |> cast(params, [:object_count, :random_seed])
+      |> validate_required([:object_count, :random_seed])
+      |> validate_number(:object_count, greater_than: 0)
     end
   end
 
   @behaviour Driver
 
   @impl Driver
-  def options_changeset(params), do: SlicerOptions.changeset(%SlicerOptions{}, params)
+  def options_changeset(params), do: SampleOptions.changeset(%SampleOptions{}, params)
 
   @impl Driver
   def render_form(assigns) do
@@ -33,9 +35,15 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
       <%= hidden_input f, :transform_index, value: @transform_index %>
       <div class="form-content">
         <p>
-          <%= label f, :orientation %>
-          <%= select f, :orientation, Ecto.Enum.values(SlicerOptions, :orientation) %>
-          <%= error_tag f, :orientation %>
+          <%= label f, :object_count %>
+          <%= number_input f, :object_count %>
+          <%= error_tag f, :object_count %>
+        </p>
+
+        <p>
+          <%= label f, :random_seed %>
+          <%= number_input f, :random_seed %>
+          <%= error_tag f, :random_seed %>
         </p>
       </div>
     </.form>

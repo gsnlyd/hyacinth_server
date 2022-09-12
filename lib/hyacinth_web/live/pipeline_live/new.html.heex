@@ -23,7 +23,8 @@
           </div>
           <div class="mt-2 space-y-4">
             <div>
-              <.form let={f} for={transform_cs}>
+              <.form id={"transform_form_#{i}"} let={f} for={transform_cs} phx-change="validate_transform">
+                <%= hidden_input f, :order_index %>
                 <div class="form-content">
                   <p>
                     <%= label f, :driver %>
@@ -34,15 +35,21 @@
               </.form>
             </div>
             <div>
-              <Driver.render_form driver={:slicer} changeset={options_cs} />
+              <Driver.render_form
+                driver={Ecto.Changeset.get_field(transform_cs, :driver)}
+                transform_index={i}
+                changeset={options_cs}
+                change_event="validate_transform_options"
+              />
             </div>
           </div>
         </div>
       <% end %>
     </div>
 
-    <div class="mt-4">
+    <div class="mt-4 space-x-1">
       <button class="btn btn-blue" phx-click="add_transform">Add Transform</button>
+      <button class="btn btn-blue" phx-click="remove_last_transform">Remove Transform</button>
     </div>
   </div>
 </main>
