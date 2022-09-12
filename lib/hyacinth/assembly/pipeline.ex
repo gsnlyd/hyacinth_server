@@ -7,6 +7,8 @@ defmodule Hyacinth.Assembly.Pipeline do
   schema "pipelines" do
     field :name, :string
 
+    field :dataset_id, :integer, virtual: true
+
     belongs_to :creator, User
 
     timestamps()
@@ -15,8 +17,8 @@ defmodule Hyacinth.Assembly.Pipeline do
   @doc false
   def changeset(pipeline, attrs) do
     pipeline
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:name, :dataset_id])
+    |> validate_required([:name, :dataset_id])
     |> validate_length(:name, min: 1, max: 10)
   end
 end

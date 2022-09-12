@@ -9,6 +9,12 @@
             <%= text_input f, :name, placeholder: "Pipeline name" %>
             <%= error_tag f, :name %>
           </p>
+
+          <p>
+            <%= label f, :dataset_id %>
+            <%= select f, :dataset_id, Enum.map(@datasets, fn d -> {d.name, d.id} end), prompt: "Choose a value" %>
+            <%= error_tag f, :dataset_id %>
+          </p>
         </div>
       </.form>
     </div>
@@ -50,6 +56,10 @@
     <div class="mt-4 space-x-1">
       <button class="btn btn-blue" phx-click="add_transform">Add Transform</button>
       <button class="btn btn-blue" phx-click="remove_last_transform">Remove Transform</button>
+    </div>
+
+    <div class="mt-4 space-x-1">
+      <button class="btn btn-blue" phx-click="save_pipeline">Save Pipeline</button>
     </div>
   </div>
 </main>

@@ -1,16 +1,28 @@
 defmodule HyacinthWeb.PipelineLive.New do
   use HyacinthWeb, :live_view
 
-  alias Hyacinth.Assembly
+  alias Hyacinth.{Accounts, Warehouse, Assembly}
   alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     socket = assign(socket, %{
-      pipeline_changeset: Ecto.Changeset.change(%Pipeline{}),
+      datasets: Warehouse.list_datasets(),
+      pipeline_changeset: Ecto.Changeset.change(%Pipeline{}, %{name: "My Pipeline"}), # TODO: remove default name
       transforms: [],
+
+      # TODO: move this to an on_mount
+      current_user: Accounts.get_user_by_session_token(session["user_token"]),
     })
 
     {:ok, socket}
+  end
+
+  def handle_event("save_pipeline", _value, socket) do
+    name = Ecto.Changeset.get_field(socket.assigns.pipeline_changeset, :name)
+    dataset_id = Ecto.Changeset.get_field(socket.assigns.pipeline_changeset, :dataset_id)
+    Assembly.create_pipeline(socket.assigns.current_user, name, dataset_id, socket.assigns.transforms)
+
+    {:noreply, socket}
   end
 
   def handle_event("validate_pipeline", %{"pipeline" => pipeline_params}, socket) do

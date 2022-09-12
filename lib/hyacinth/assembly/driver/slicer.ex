@@ -5,8 +5,9 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
     use Ecto.Schema
     import Ecto.Changeset
 
+    @primary_key false
     embedded_schema do
-      field :orientation, Ecto.Enum, values: [:sagittal, :coronal, :axial]
+      field :orientation, Ecto.Enum, values: [:sagittal, :coronal, :axial], default: :sagittal
     end
 
     @doc false

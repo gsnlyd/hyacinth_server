@@ -5,6 +5,7 @@ defmodule Hyacinth.Assembly.Driver.Sample do
     use Ecto.Schema
     import Ecto.Changeset
 
+    @primary_key false
     embedded_schema do
       field :object_count, :integer, default: 20
       field :random_seed, :integer, default: 123
