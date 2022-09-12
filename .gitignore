@@ -46,6 +46,9 @@ npm-debug.log
 # Test Data (for development)
 /priv/data/
 
+# Python Slicer Venv
+/priv/drivers/python_slicer/venv/
+
 # OS
 .DS_Store
 .DS_Store?

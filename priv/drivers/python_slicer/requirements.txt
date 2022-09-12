@@ -1,0 +1,5 @@
+nibabel==4.0.2
+numpy==1.23.3
+packaging==21.3
+Pillow==9.2.0
+pyparsing==3.0.9
