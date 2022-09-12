@@ -1,8 +1,49 @@
-<main class="mt-6 mx-auto max-w-screen-lg">
-  <div>
-    <h1>Pipeline <%= @pipeline.id %></h1>
-  </div>
-  <div class="mt-4">
+<header class="mt-6 mx-auto max-w-screen-lg">
+  <div class="w-full flex justify-between items-center">
+    <h1 class="text-4xl"><%= @pipeline.name %></h1>
     <button class="btn btn-blue" phx-click="run_pipeline">Run Pipeline</button>
+  </div>
+</header>
+
+<main class="mt-4 mx-auto max-w-screen-lg">
+  <div class="space-y-4">
+    <%= for {transform, i} <- Enum.with_index(@transforms) do %>
+      <div class="p-2 text-sm bg-gray-800 rounded border border-gray-700">
+        <h2 class="text-xl text-gray-300">Transform #<%= i + 1 %></h2>
+        <ul class="mt-2">
+          <li>
+            <span class="text-gray-400">Driver:</span>
+            <span><%= transform.driver %></span>
+          </li>
+          <li>
+            <span class="text-gray-400">Run:</span>
+            <span><%= transform.input_id != nil %></span>
+          </li>
+          <%= if transform.input do %>
+            <li class="mt-2">
+              <span class="text-gray-400">Input Dataset:</span>
+              <span><%= transform.input.name %></span>
+            </li>
+          <% end %>
+          <%= if transform.output do %>
+            <li>
+              <span class="text-gray-400">Output Dataset:</span>
+              <span><%= transform.output.name %></span>
+            </li>
+          <% end %>
+        </ul>
+        <div class="mt-4">
+          <h3 class="text-base text-gray-400">Driver Options</h3>
+          <ul>
+            <%= for {key, value} <- transform.arguments do %>
+              <li>
+                <span class="text-gray-400"><%= key %>:</span>
+                <span><%= value %></span>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
   </div>
 </main>

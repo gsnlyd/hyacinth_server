@@ -5,8 +5,11 @@ defmodule HyacinthWeb.PipelineLive.Show do
   alias Hyacinth.Assembly.Runner
 
   def mount(params, _session, socket) do
+    pipeline = Assembly.get_pipeline!(params["pipeline_id"])
+
     socket = assign(socket, %{
-      pipeline: Assembly.get_pipeline!(params["pipeline_id"]),
+      pipeline: pipeline,
+      transforms: Assembly.list_transforms(pipeline),
     })
 
     {:ok, socket}
