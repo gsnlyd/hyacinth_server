@@ -42,6 +42,8 @@ npm-debug.log
 
 # App Warehouse Objects
 /priv/warehouse_objects/
+# App Transform Temp
+/priv/transform_tmp/
 
 # Test Data (for development)
 /priv/data/
