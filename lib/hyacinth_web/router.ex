@@ -31,9 +31,15 @@ defmodule HyacinthWeb.Router do
     post "/set_label/:element_id/:label_value", LabelSessionController, :set_label
 
     get "/object-image/:object_id", ImageController, :show
+  end
 
-    live "/pipelines/new", PipelineLive.New
-    live "/pipelines/:pipeline_id", PipelineLive.Show
+  live_session :authenticated, on_mount: {HyacinthWeb.UserLiveAuth, :user} do
+    scope "/", HyacinthWeb do
+      pipe_through [:browser, :require_authenticated_user]
+
+      live "/pipelines/new", PipelineLive.New
+      live "/pipelines/:pipeline_id", PipelineLive.Show
+    end
   end
 
   # Other scopes may use custom stacks.
