@@ -3,6 +3,7 @@ defmodule Hyacinth.Assembly.Pipeline do
   import Ecto.Changeset
 
   alias Hyacinth.Accounts.User
+  alias Hyacinth.Assembly.Transform
 
   schema "pipelines" do
     field :name, :string
@@ -10,6 +11,8 @@ defmodule Hyacinth.Assembly.Pipeline do
     field :dataset_id, :integer, virtual: true
 
     belongs_to :creator, User
+
+    has_many :transforms, Transform
 
     timestamps()
   end

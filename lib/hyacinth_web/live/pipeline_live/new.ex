@@ -20,9 +20,9 @@ defmodule HyacinthWeb.PipelineLive.New do
   def handle_event("save_pipeline", _value, socket) do
     name = Ecto.Changeset.get_field(socket.assigns.pipeline_changeset, :name)
     dataset_id = Ecto.Changeset.get_field(socket.assigns.pipeline_changeset, :dataset_id)
-    Assembly.create_pipeline(socket.assigns.current_user, name, dataset_id, socket.assigns.transforms)
+    {:ok, %{pipeline: %Pipeline{} = pipeline}} = Assembly.create_pipeline(socket.assigns.current_user, name, dataset_id, socket.assigns.transforms)
 
-    {:noreply, socket}
+    {:noreply, push_redirect(socket, to: Routes.live_path(socket, HyacinthWeb.PipelineLive.Show, pipeline.id))}
   end
 
   def handle_event("validate_pipeline", %{"pipeline" => pipeline_params}, socket) do

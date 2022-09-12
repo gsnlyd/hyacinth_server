@@ -45,4 +45,18 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
 
   @impl Driver
   def filter_objects(_options, objects), do: objects
+
+  @impl Driver
+  def command_args(_options, file_path) do
+    binary_path = Path.join File.cwd!(), "priv/drivers/python_slicer/venv/bin/python"
+    args = [
+      Path.join(File.cwd!(), "priv/drivers/python_slicer/slicer.py"),
+      file_path,
+    ]
+
+    {binary_path, args}
+  end
+
+  @impl Driver
+  def results_glob(_options), do: "output/*.png"
 end

@@ -103,6 +103,35 @@ defmodule Hyacinth.Assembly.Driver do
     module_for(driver).filter_objects(options, objects)
   end
 
+  @doc """
+  Callback that returns a command and arguments to run this driver.
+
+  See `command_args/3` for details.
+  """
+  @callback command_args(%{required(atom) => term()}, binary()) :: {binary(), [binary()]}
+
+  @doc """
+  Returns a command and arguments to run the given driver.
+  """
+  def command_args(driver, options, file_path), do: module_for(driver).command_args(options, file_path)
+
+  @doc """
+  Callback that returns a glob which locates the results of this driver.
+
+  See `results_glob/2` for details.
+  """
+  @callback results_glob(%{required(atom) => term()}) :: binary()
+
+  @doc """
+  Returns a glob which locates the results of this driver.
+
+  ## Examples
+
+      results_glob(:slicer, my_options)
+      "output/*.png"
+  """
+  def results_glob(driver, options), do: module_for(driver).results_glob(options)
+
   defp module_for(:sample), do: Driver.Sample
   defp module_for(:slicer), do: Driver.Slicer
 end

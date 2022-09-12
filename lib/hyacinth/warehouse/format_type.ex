@@ -50,4 +50,5 @@ defmodule Hyacinth.Warehouse.FormatType do
 
   defp module_for(:png), do: FormatType.PNG
   defp module_for(:dicom), do: FormatType.DICOM
+  defp module_for(:nifti), do: FormatType.Nifti
 end

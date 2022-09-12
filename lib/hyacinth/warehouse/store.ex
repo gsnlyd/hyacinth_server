@@ -105,4 +105,38 @@ defmodule Hyacinth.Warehouse.Store do
 
     hash
   end
+
+  @doc """
+  Returns the transform temp dir.
+  """
+  def get_transform_temp_dir do
+    Path.join File.cwd!(), "priv/transform_tmp"
+  end
+
+  @doc """
+  Returns a subdirectory under the main transform temp dir for the given UUID.
+  """
+  def get_temp_dir_from_uuid(uuid) when is_binary(uuid) do
+    Path.join get_transform_temp_dir(), uuid
+  end
+
+  @doc """
+  Unpacks an object from the object store into a temporary UUID-named directory
+  under the transform tmp dir.
+
+  Returns a tuple containing the temp dir's path and the unpacked object's path.
+  """
+  def unpack!(hash, file_name) when is_binary(hash) and is_binary(file_name) do
+    path = get_object_path_from_hash(hash)
+    if not File.exists?(path), do: raise "Object with hash #{hash} does not exist in the store!"
+
+    temp_dir = get_temp_dir_from_uuid(Ecto.UUID.generate())
+    File.mkdir!(temp_dir)
+
+    dest_path = Path.join(temp_dir, file_name)
+    bytes_copied = File.copy!(path, dest_path)
+    Logger.info "Successfully unpacked #{bytes_copied} bytes from #{path} to #{dest_path}"
+
+    {temp_dir, dest_path}
+  end
 end

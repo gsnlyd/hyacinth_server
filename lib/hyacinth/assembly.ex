@@ -16,6 +16,22 @@ defmodule Hyacinth.Assembly do
   alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
 
   @doc """
+  Gets a single Pipeline.
+
+  Raises `Ecto.NoResultsError` if the Pipeline does not exist.
+
+  ## Examples
+    
+      get_pipeline!(123)
+      %Pipeline{...}
+
+      get_pipeline!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_pipeline!(id), do: Repo.get!(Pipeline, id)
+
+  @doc """
   Creates a pipeline.
 
   ## Examples
@@ -66,6 +82,23 @@ defmodule Hyacinth.Assembly do
   end
 
   @doc """
+  Returns a list of all Transforms which belong to the given Pipeline.
+
+  ## Examples
+
+      list_transforms(%Pipeline{...})
+      [%Transform{}, %Transform{}, ...]
+
+  """
+  def list_transforms(%Pipeline{} = pipeline) do
+    Repo.all(
+      from t in Ecto.assoc(pipeline, :transforms),
+      select: t,
+      preload: [:input, :output]
+    )
+  end
+
+  @doc """
   Returns an `Ecto.Changeset` for tracking Transform changes.
 
   ## Examples
@@ -76,5 +109,33 @@ defmodule Hyacinth.Assembly do
   """
   def change_transform(%Transform{} = transform, attrs \\ %{}) do
     Transform.changeset(transform, attrs)
+  end
+
+  @doc """
+  Completes a Transform.
+  """
+  def complete_transform(%Transform{} = transform, object_tuples) do
+    Multi.new()
+    |> Multi.run(:transform, fn _repo, _changes ->
+      # Refresh transform within transaction
+      {:ok, Repo.get!(Transform, transform.id)}
+    end)
+    |> Multi.run(:validate_transform_has_no_output, fn _repo, %{transform: %Transform{} = transform} ->
+      if transform.output_id == nil do
+        {:ok, true}
+      else
+        {:error, false}
+      end
+    end)
+    |> Multi.run(:dataset, fn _repo, _changes ->
+      # TODO: create a derived dataset instead, properly
+      {:ok, %{dataset: dataset}} = Warehouse.create_root_dataset("dataset output", :png, object_tuples)
+      {:ok, dataset}
+    end)
+    |> Multi.run(:update_transform, fn _repo, %{transform: %Transform{} = transform, dataset: %Dataset{} = dataset} ->
+      %Transform{} = updated_transform = Repo.update! Ecto.Changeset.change(transform, %{output_id: dataset.id})
+      {:ok, updated_transform}
+    end)
+    |> Repo.transaction()
   end
 end

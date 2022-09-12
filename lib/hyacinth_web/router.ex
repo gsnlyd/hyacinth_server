@@ -33,6 +33,7 @@ defmodule HyacinthWeb.Router do
     get "/object-image/:object_id", ImageController, :show
 
     live "/pipelines/new", PipelineLive.New
+    live "/pipelines/:pipeline_id", PipelineLive.Show
   end
 
   # Other scopes may use custom stacks.

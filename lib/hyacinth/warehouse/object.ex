@@ -8,7 +8,7 @@ defmodule Hyacinth.Warehouse.Object do
     field :type, Ecto.Enum, values: [:blob, :tree]
 
     field :name, :string
-    field :file_type, Ecto.Enum, values: [:png, :dicom]
+    field :file_type, Ecto.Enum, values: [:png, :dicom, :nifti]
 
     belongs_to :parent_tree, Object
 
