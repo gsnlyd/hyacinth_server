@@ -8,7 +8,7 @@ defmodule Hyacinth.Assembly.Driver do
 
   See `options_changeset/2` for details.
   """
-  @callback options_changeset(%{required(atom()) => term() | Keyword.t()}) :: %Ecto.Changeset{}
+  @callback options_changeset(params :: %{atom => term} | Keyword.t()) :: %Ecto.Changeset{}
 
   @doc """
   Returns an options changeset for the given driver.
@@ -24,6 +24,7 @@ defmodule Hyacinth.Assembly.Driver do
       %Ecto.Changeset{...}
 
   """
+  @spec options_changeset(driver :: atom, params :: %{atom => term} | Keyword.t()) :: %Ecto.Changeset{}
   def options_changeset(driver, params \\ %{}), do: module_for(driver).options_changeset(params)
 
   @doc """
@@ -32,7 +33,7 @@ defmodule Hyacinth.Assembly.Driver do
 
   See `render_form/2` for details.
   """
-  @callback render_form(%{required(atom()) => term()}) :: any()
+  @callback render_form(assigns :: %{atom => term}) :: any
 
   @doc ~S'''
   Phoenix function component which returns a rendered options form for the given driver.
@@ -72,6 +73,7 @@ defmodule Hyacinth.Assembly.Driver do
       end
 
   '''
+  @spec render_form(assigns :: %{atom => term}) :: any
   def render_form(assigns), do: module_for(assigns[:driver]).render_form(assigns)
 
   @doc """
@@ -79,7 +81,7 @@ defmodule Hyacinth.Assembly.Driver do
 
   See `filter_objects/3` for details.
   """
-  @callback filter_objects(%{required(atom) => term()}, [%Object{}]) :: [%Object{}]
+  @callback filter_objects(options :: %{String.t => term}, objects :: [%Object{}]) :: [%Object{}]
 
   @doc """
   Returns a list of objects filtered for the given driver.
@@ -117,8 +119,10 @@ defmodule Hyacinth.Assembly.Driver do
   A pure driver is one which only samples existing objects
   and does not create any new objects.
 
-  Pure drivers do not have to implement `command_args/3` and
-  `results_glob/2`.
+  Pure drivers do NOT have to implement the following functions:
+
+    * `command_args/3`
+    * `results_glob/2`
 
   ## Examples
 
@@ -135,30 +139,47 @@ defmodule Hyacinth.Assembly.Driver do
   @doc """
   Callback that returns a command and arguments to run this driver.
 
+  This callback should not be implemented for pure drivers (see `pure?/1`).
+
   See `command_args/3` for details.
   """
-  @callback command_args(%{required(atom) => term()}, binary()) :: {binary(), [binary()]}
+  @callback command_args(options :: %{String.t => term}, file_path :: String.t) :: {String.t, [String.t]}
 
   @doc """
   Returns a command and arguments to run the given driver.
+
+  This function is not implemented for pure drivers (see `pure?/1`).
+
+  ## Examples
+
+      iex> command_args(:slicer, %{"orientation" => "sagittal"}, "/path/to/img.nii.gz")
+      {"/path/to/python", ["/path/to/slicer.py", "/path/to/img.nii.gz"]}
+
   """
+  @spec command_args(driver :: atom, options :: %{String.t => term}, file_path :: String.t) :: {String.t, [String.t]}
   def command_args(driver, options, file_path), do: module_for(driver).command_args(options, file_path)
 
   @doc """
   Callback that returns a glob which locates the results of this driver.
 
+  This callback should not be implemented for pure drivers (see `pure?/1`).
+
   See `results_glob/2` for details.
   """
-  @callback results_glob(%{required(atom) => term()}) :: binary()
+  @callback results_glob(options :: %{String.t => term}) :: String.t
 
   @doc """
   Returns a glob which locates the results of this driver.
+
+  This function is not implemented for pure drivers (see `pure?/1`).
 
   ## Examples
 
       results_glob(:slicer, my_options)
       "output/*.png"
+
   """
+  @spec results_glob(driver :: atom, options :: %{String.t => term}) :: String.t
   def results_glob(driver, options), do: module_for(driver).results_glob(options)
 
   @optional_callbacks command_args: 2, results_glob: 1
