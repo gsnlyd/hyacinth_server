@@ -47,6 +47,9 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
   def filter_objects(_options, objects), do: objects
 
   @impl Driver
+  def pure?, do: false
+
+  @impl Driver
   def command_args(_options, file_path) do
     binary_path = Path.join File.cwd!(), "priv/drivers/python_slicer/venv/bin/python"
     args = [

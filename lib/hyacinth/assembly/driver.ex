@@ -8,7 +8,7 @@ defmodule Hyacinth.Assembly.Driver do
 
   See `options_changeset/2` for details.
   """
-  @callback options_changeset(%{required(atom()) => term() | Keyword.t()}) :: binary()
+  @callback options_changeset(%{required(atom()) => term() | Keyword.t()}) :: %Ecto.Changeset{}
 
   @doc """
   Returns an options changeset for the given driver.
@@ -32,7 +32,7 @@ defmodule Hyacinth.Assembly.Driver do
 
   See `render_form/2` for details.
   """
-  @callback render_form(%{required(atom()) => term()}) :: binary()
+  @callback render_form(%{required(atom()) => term()}) :: any()
 
   @doc ~S'''
   Phoenix function component which returns a rendered options form for the given driver.
@@ -99,9 +99,38 @@ defmodule Hyacinth.Assembly.Driver do
       [%Object{}, %Object{}, ...]
 
   """
+  @spec filter_objects(driver :: atom, options :: %{atom => term}, objects :: [%Object{}]) :: [%Object{}]
   def filter_objects(driver, options, objects) when is_map(options) and is_list(objects) do
     module_for(driver).filter_objects(options, objects)
   end
+
+  @doc """
+  Callback that returns true if this driver is pure, false otherwise.
+
+  See `pure?/1` for details.
+  """
+  @callback pure?() :: boolean
+
+  @doc """
+  Returns true if the given driver is pure, false otherwise.
+
+  A pure driver is one which only samples existing objects
+  and does not create any new objects.
+
+  Pure drivers do not have to implement `command_args/3` and
+  `results_glob/2`.
+
+  ## Examples
+
+      iex> pure?(:sample)
+      true
+
+      iex> pure?(:slicer)
+      false
+
+  """
+  @spec pure?(driver :: atom) :: boolean
+  def pure?(driver), do: module_for(driver).pure?()
 
   @doc """
   Callback that returns a command and arguments to run this driver.
@@ -131,6 +160,8 @@ defmodule Hyacinth.Assembly.Driver do
       "output/*.png"
   """
   def results_glob(driver, options), do: module_for(driver).results_glob(options)
+
+  @optional_callbacks command_args: 2, results_glob: 1
 
   defp module_for(:sample), do: Driver.Sample
   defp module_for(:slicer), do: Driver.Slicer

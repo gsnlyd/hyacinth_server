@@ -52,5 +52,11 @@ defmodule Hyacinth.Assembly.Driver.Sample do
   end
 
   @impl Driver
-  def filter_objects(_options, objects), do: objects
+  def filter_objects(options, objects) do
+    # TODO: use seed
+    Enum.take_random(objects, options["object_count"])
+  end
+
+  @impl Driver
+  def pure?, do: true
 end

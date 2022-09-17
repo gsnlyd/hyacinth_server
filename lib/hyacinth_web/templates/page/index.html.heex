@@ -1,3 +1,4 @@
-<main>
+<main class="flex flex-col">
   <%= link "Label Jobs", to: Routes.label_job_path(@conn, :index) %>
+  <%= link "New Pipeline", to: Routes.live_path(@conn, HyacinthWeb.PipelineLive.New) %>
 </main>

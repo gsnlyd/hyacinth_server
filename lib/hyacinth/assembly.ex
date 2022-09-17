@@ -99,6 +99,29 @@ defmodule Hyacinth.Assembly do
   end
 
   @doc """
+  Returns a single Transform with its input and output datasets
+  preloaded.
+
+  ## Examples
+
+      iex> get_transform_with_datasets(123)
+      %Transform{...}
+
+      iex> get_transform_with_datasets(456)
+      nil
+
+  """
+  @spec get_transform_with_datasets(id :: any) :: %Transform{}
+  def get_transform_with_datasets(id) do
+    Repo.one(
+      from t in Transform,
+      where: t.id == ^id,
+      select: t,
+      preload: [:input, :output]
+    )
+  end
+
+  @doc """
   Returns an `Ecto.Changeset` for tracking Transform changes.
 
   ## Examples
@@ -132,9 +155,23 @@ defmodule Hyacinth.Assembly do
       {:ok, %{dataset: dataset}} = Warehouse.create_root_dataset("dataset output", :png, object_tuples)
       {:ok, dataset}
     end)
-    |> Multi.run(:update_transform, fn _repo, %{transform: %Transform{} = transform, dataset: %Dataset{} = dataset} ->
+    |> Multi.run(:updated_transform, fn _repo, %{transform: %Transform{} = transform, dataset: %Dataset{} = dataset} ->
       %Transform{} = updated_transform = Repo.update! Ecto.Changeset.change(transform, %{output_id: dataset.id})
       {:ok, updated_transform}
+    end)
+    |> Multi.run(:updated_next_transform, fn _repo, %{updated_transform: %Transform{} = transform} ->
+      next_transform = Repo.one(
+        from t in Transform,
+        where: t.pipeline_id == ^transform.pipeline_id and t.order_index == ^transform.order_index + 1,
+        select: t
+      )
+
+      if next_transform do
+        next_transform = Repo.update! Ecto.Changeset.change(next_transform, %{input_id: transform.output_id})
+        {:ok, next_transform}
+      else
+        {:ok, nil}
+      end
     end)
     |> Repo.transaction()
   end
