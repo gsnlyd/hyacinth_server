@@ -10,30 +10,26 @@ defmodule Hyacinth.Assembly.Runner do
   alias Hyacinth.Warehouse.{Object, Store}
   alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
 
-  @type object_tuple :: {binary, binary}
+  @type object_tuple :: {String.t, String.t}
 
-  @spec run_driver_commands(transform :: %Transform{}, objects :: [%Object{}]) :: [object_tuple]
-  defp run_driver_commands(%Transform{} = transform, objects) when is_list(objects) do
-    objects
-    |> Enum.map(fn %Object{} = object ->
-      {temp_dir, unpacked_path} = Store.unpack!(object.hash, Path.basename(object.name))
-      {command, command_args} = Driver.command_args(transform.driver, transform.arguments, unpacked_path)
+  @spec run_command(transform :: %Transform{}, object :: %Object{}) :: [object_tuple]
+  defp run_command(%Transform{} = transform, %Object{} = object) do
+    {temp_dir, unpacked_path} = Store.unpack!(object.hash, Path.basename(object.name))
+    {command, command_args} = Driver.command_args(transform.driver, transform.arguments, unpacked_path)
 
-      Logger.debug "Running command #{command} with args: #{command_args}"
-      {stdout, exit_code} = System.cmd(command, command_args)
-      Logger.debug "Ran command for driver #{transform.driver} with exit code #{exit_code}. Stdout: #{stdout}"
+    Logger.debug "Running command #{command} with args: #{command_args}"
+    {stdout, exit_code} = System.cmd(command, command_args)
+    Logger.debug "Ran command for driver #{transform.driver} with exit code #{exit_code}. Stdout: #{stdout}"
 
-      results_glob_path = Path.join(temp_dir, Driver.results_glob(transform.driver, transform.arguments))
-      results_paths = Path.wildcard(results_glob_path)
+    results_glob_path = Path.join(temp_dir, Driver.results_glob(transform.driver, transform.arguments))
+    results_paths = Path.wildcard(results_glob_path)
 
-      Enum.map(results_paths, fn path ->
-        hash = Store.ingest_file!(path)
-        name = Path.relative_to(path, temp_dir)
+    Enum.map(results_paths, fn path ->
+      hash = Store.ingest_file!(path)
+      name = Path.relative_to(path, temp_dir)
 
-        {hash, name}
-      end)
+      {hash, name}
     end)
-    |> Enum.concat()
   end
 
   @spec run_transform(transform :: %Transform{}) :: any()
@@ -56,7 +52,9 @@ defmodule Hyacinth.Assembly.Runner do
           {object.hash, object.name}
         end)
       else
-        run_driver_commands(transform, objects)
+        objects
+        |> Enum.map(fn o -> run_command(transform, o) end)
+        |> Enum.concat()
       end
 
     IO.inspect Assembly.complete_transform(transform, object_tuples)
