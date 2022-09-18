@@ -22,14 +22,16 @@ defmodule Hyacinth.WarehouseFixtures do
 
     params = %{name: name, type: :root}
 
-    object_tuples = Enum.map(1..num_objects, fn i ->
-      hash = hash_fixture("object#{i}")
-      name = "object#{i}.png"
-
-      {hash, name}
+    object_params = Enum.map(1..num_objects, fn i ->
+      %{
+        hash: hash_fixture("object#{i}"),
+        type: :blob,
+        name: "object#{i}.png",
+        file_type: :png,
+      }
     end)
 
-    {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(params, :png, object_tuples)
+    {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(params, object_params)
     dataset
   end
 end

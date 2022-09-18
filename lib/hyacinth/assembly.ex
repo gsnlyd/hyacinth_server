@@ -137,8 +137,8 @@ defmodule Hyacinth.Assembly do
   @doc """
   Completes a Transform.
   """
-  @spec complete_transform(transform :: %Transform{}, object_tuples :: [Warehouse.parent_tuple] | [Warehouse.object_tuple] | [%Object{}]) :: any
-  def complete_transform(%Transform{} = transform, object_tuples) do
+  @spec complete_transform(%Transform{}, [%Object{}] | [map]) :: any
+  def complete_transform(%Transform{} = transform, objects_or_params) do
     Multi.new()
     |> Multi.run(:transform, fn _repo, _changes ->
       # Refresh transform within transaction
@@ -153,7 +153,7 @@ defmodule Hyacinth.Assembly do
     end)
     |> Multi.run(:dataset, fn _repo, %{transform: %Transform{} = transform} ->
       dataset_params = %{name: "Derived from pipeline #{transform.pipeline_id} transform no #{transform.order_index}", type: :derived}
-      {:ok, %{dataset: dataset}} = Warehouse.create_dataset(dataset_params, :png, object_tuples)
+      {:ok, %{dataset: dataset}} = Warehouse.create_dataset(dataset_params, objects_or_params)
       {:ok, dataset}
     end)
     |> Multi.run(:updated_transform, fn _repo, %{transform: %Transform{} = transform, dataset: %Dataset{} = dataset} ->

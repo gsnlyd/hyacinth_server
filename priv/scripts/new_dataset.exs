@@ -19,37 +19,45 @@ defmodule Hyacinth.Scripts.NewDataset do
   def new_dataset() do
     {name, format, dataset_path} = get_inputs!()
 
-    object_tuples =
+    object_params =
       case Warehouse.Glob.find_files(dataset_path, format) do
         {:containers, groups} ->
           Enum.map(groups, fn {container_path, child_paths} ->
-            child_tuples =
+            children =
               Enum.map(child_paths, fn path ->
                 hash = Warehouse.Store.ingest_file!(path)
-                name = Path.relative_to(path, container_path)
-                {hash, name}
+                %{
+                  hash: hash,
+                  type: :blob,
+                  name: Path.relative_to(path, container_path),
+                  file_type: format,
+                }
               end)
 
-            container_hash =
-              child_tuples
-              |> Enum.map(fn {hash, _name} -> hash end)
-              |> Warehouse.Store.hash_hashes()
-            container_name = Path.relative_to(container_path, dataset_path)
-
-            {container_hash, container_name, child_tuples}
+            %{
+              hash: Warehouse.Store.hash_hashes(Enum.map(children, &(&1.hash))),
+              type: :tree,
+              name: Path.relative_to(container_path, dataset_path),
+              file_type: format,
+              children: children,
+            }
           end)
 
         {:files, file_paths} ->
           Enum.map(file_paths, fn path ->
             hash = Warehouse.Store.ingest_file!(path)
-            name = Path.relative_to(path, dataset_path)
-            {hash, name}
+            %{
+              hash: hash,
+              type: :blob,
+              name: Path.relative_to(path, dataset_path),
+              file_type: format,
+            }
           end)
       end
 
-    if length(object_tuples) == 0, do: raise "No objects found"
+    if length(object_params) == 0, do: raise "No objects found"
 
-    {:ok, %{dataset: %Dataset{} = dataset, objects: objects}} = Warehouse.create_dataset(%{name: name, type: :root}, format, object_tuples)
+    {:ok, %{dataset: %Dataset{} = dataset, objects: objects}} = Warehouse.create_dataset(%{name: name, type: :root}, object_params)
 
     Logger.info ~s/Created dataset "#{dataset.name}" with #{length(objects)} objects/
   end

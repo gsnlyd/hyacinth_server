@@ -12,7 +12,7 @@ defmodule Hyacinth.Assembly.Runner do
 
   @type object_tuple :: {String.t, String.t}
 
-  @spec run_command(transform :: %Transform{}, object :: %Object{}) :: [object_tuple]
+  @spec run_command(%Transform{}, %Object{}) :: [map]
   defp run_command(%Transform{} = transform, %Object{} = object) do
     {temp_dir, unpacked_path} = Store.unpack!(object.hash, Path.basename(object.name))
     {command, command_args} = Driver.command_args(transform.driver, transform.arguments, unpacked_path)
@@ -26,9 +26,13 @@ defmodule Hyacinth.Assembly.Runner do
 
     Enum.map(results_paths, fn path ->
       hash = Store.ingest_file!(path)
-      name = Path.relative_to(path, temp_dir)
 
-      {hash, name}
+      %{
+        hash: hash,
+        type: :blob,  # TODO: handle tree
+        name: Path.relative_to(path, temp_dir),
+        file_type: :png,  # TODO: use driver output type
+      }
     end)
   end
 
@@ -45,19 +49,16 @@ defmodule Hyacinth.Assembly.Runner do
     objects = Warehouse.list_objects(transform.input)
     objects = Driver.filter_objects(transform.driver, transform.arguments, objects)
 
-    object_tuples =
+    objects_or_params =
       if Driver.pure?(transform.driver) do
-        # TODO: reuse objects instead of creating new ones
-        Enum.map(objects, fn %Object{} = object ->
-          {object.hash, object.name}
-        end)
+        objects
       else
         objects
         |> Enum.map(fn o -> run_command(transform, o) end)
         |> Enum.concat()
       end
 
-    IO.inspect Assembly.complete_transform(transform, object_tuples)
+    IO.inspect Assembly.complete_transform(transform, objects_or_params)
   end
 
   def run_pipeline(%Pipeline{} = pipeline) do

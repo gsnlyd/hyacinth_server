@@ -44,33 +44,23 @@ defmodule Hyacinth.Warehouse do
   @doc """
   Creates a root dataset (a dataset with no parent).
   """
-  @spec create_dataset(params :: %{atom => term}, format :: atom, object_tuples :: [parent_tuple] | [object_tuple] | [%Object{}]) :: any
-  def create_dataset(params, format, object_tuples) when is_map(params) and is_list(object_tuples) do
+  @spec create_dataset(%{atom => term}, [map] | [%Object{}]) :: any
+  def create_dataset(params, objects_or_params) when is_map(params) and is_list(objects_or_params) do
     Multi.new()
     |> Multi.insert(:dataset, Dataset.create_changeset(%Dataset{}, params))
     |> Multi.run(:objects, fn _repo, _values ->
       objects =
-        case object_tuples do
-          [{_hash, _name, _children} | _] ->
-            Enum.map(object_tuples, fn {tree_hash, tree_name, child_tuples} ->
-              tree_object = Repo.insert! %Object{hash: tree_hash, type: :tree, name: tree_name, file_type: format}
-
-              Enum.map(child_tuples, fn {hash, name} ->
-                Repo.insert! %Object{hash: hash, type: :blob, name: name, file_type: format, parent_tree_id: tree_object.id}
-              end)
-
-              tree_object
-            end)
-
-          [{_hash, _name} | _] ->
-            Enum.map(object_tuples, fn {hash, name} ->
-              Repo.insert! %Object{hash: hash, type: :blob, name: name, file_type: format}
-            end)
-
+        case objects_or_params do
+          # Re-use existing objects
           [%Object{} | _] ->
-            object_tuples
-        end
+            objects_or_params
 
+          # Create new objects (note: object params can contain nested child params)
+          [%{} | _] ->
+            Enum.map(objects_or_params, fn params ->
+              Repo.insert! Object.create_changeset(%Object{}, params)
+            end)
+        end
       {:ok, objects}
     end)
     |> Multi.run(:dataset_objects, fn _repo, %{dataset: %Dataset{} = dataset, objects: objects} ->

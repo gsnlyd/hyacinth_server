@@ -94,10 +94,10 @@ defmodule Hyacinth.AssemblyTest do
       pipeline = pipeline_fixture()
       [%Transform{} = transform1, %Transform{} = transform2] = Assembly.list_transforms(pipeline)
 
-      object_tuples = [
-        {hash_fixture("derived_image1"), "path/to/image1.png"},
-        {hash_fixture("derived_image2"), "path/to/image2.png"},
-        {hash_fixture("derived_image3"), "path/to/image3.png"},
+      object_params = [
+        %{hash: hash_fixture("derived_image1"), type: :blob, name: "path/to/image1.png", file_type: :png},
+        %{hash: hash_fixture("derived_image2"), type: :blob, name: "path/to/image2.png", file_type: :png},
+        %{hash: hash_fixture("derived_image3"), type: :blob, name: "path/to/image3.png", file_type: :png},
       ]
 
       assert transform1.input_id != nil
@@ -106,7 +106,7 @@ defmodule Hyacinth.AssemblyTest do
       assert transform2.output_id == nil
       assert length(Warehouse.list_datasets()) == 1
 
-      {:ok, _changes} = Assembly.complete_transform(transform1, object_tuples)
+      {:ok, _changes} = Assembly.complete_transform(transform1, object_params)
 
       [%Transform{} = transform1, %Transform{} = transform2] = Assembly.list_transforms(pipeline)
 
@@ -125,14 +125,14 @@ defmodule Hyacinth.AssemblyTest do
       pipeline = pipeline_fixture()
       transform = hd(Assembly.list_transforms(pipeline))
 
-      object_tuples = [
-        {hash_fixture("derived_image1"), "path/to/image1.png"},
-        {hash_fixture("derived_image2"), "path/to/image2.png"},
-        {hash_fixture("derived_image3"), "path/to/image3.png"},
+      object_params = [
+        %{hash: hash_fixture("derived_image1"), type: :blob, name: "path/to/image1.png", file_type: :png},
+        %{hash: hash_fixture("derived_image2"), type: :blob, name: "path/to/image2.png", file_type: :png},
+        %{hash: hash_fixture("derived_image3"), type: :blob, name: "path/to/image3.png", file_type: :png},
       ]
 
-      {:ok, _changes} = Assembly.complete_transform(transform, object_tuples)
-      {:error, :validate_transform_has_no_output, false, _changes} = Assembly.complete_transform(transform, object_tuples)
+      {:ok, _changes} = Assembly.complete_transform(transform, object_params)
+      {:error, :validate_transform_has_no_output, false, _changes} = Assembly.complete_transform(transform, object_params)
     end
   end
 end

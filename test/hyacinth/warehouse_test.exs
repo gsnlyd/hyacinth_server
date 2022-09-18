@@ -22,13 +22,13 @@ defmodule Hyacinth.WarehouseTest do
 
   describe "create_dataset/2" do
     test "creates a flat (png) root dataset" do
-      object_tuples = [
-        {hash_fixture("obj1"), "object1.png"},
-        {hash_fixture("obj2"), "object2.png"},
-        {hash_fixture("obj3"), "object3.png"},
+      object_params = [
+        %{hash: hash_fixture("obj1"), type: :blob, name: "object1.png", file_type: :png},
+        %{hash: hash_fixture("obj2"), type: :blob, name: "object2.png", file_type: :png},
+        %{hash: hash_fixture("obj3"), type: :blob, name: "object3.png", file_type: :png},
       ]
 
-      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :root}, :png, object_tuples)
+      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :root}, object_params)
 
       assert dataset.name == "Some Dataset"
       assert dataset.type == :root
@@ -41,37 +41,55 @@ defmodule Hyacinth.WarehouseTest do
 
     test "creates a container (dicom) root dataset" do
       children1 = [
-        {hash_fixture("o1s1"), "object1_slice1.dcm"},
-        {hash_fixture("o1s2"), "object1_slice2.dcm"},
-        {hash_fixture("o1s3"), "object1_slice3.dcm"},
+        %{hash: hash_fixture("o1s1"), type: :blob, name: "object1_slice1.dcm", file_type: :dicom},
+        %{hash: hash_fixture("o1s2"), type: :blob, name: "object1_slice2.dcm", file_type: :dicom},
+        %{hash: hash_fixture("o1s3"), type: :blob, name: "object1_slice3.dcm", file_type: :dicom},
       ]
 
       children2 = [
-        {hash_fixture("o2s1"), "object2_slice1.dcm"},
-        {hash_fixture("o2s2"), "object2_slice2.dcm"},
+        %{hash: hash_fixture("o2s1"), type: :blob, name: "object2_slice1.dcm", file_type: :dicom},
+        %{hash: hash_fixture("o2s2"), type: :blob, name: "object2_slice2.dcm", file_type: :dicom},
       ]
 
       children3 = [
-        {hash_fixture("o3s1"), "object3_slice1.dcm"},
-        {hash_fixture("o3s2"), "object3_slice2.dcm"},
-        {hash_fixture("o3s3"), "object3_slice3.dcm"},
-        {hash_fixture("o3s4"), "object3_slice4.dcm"},
+        %{hash: hash_fixture("o3s1"), type: :blob, name: "object3_slice1.dcm", file_type: :dicom},
+        %{hash: hash_fixture("o3s2"), type: :blob, name: "object3_slice2.dcm", file_type: :dicom},
+        %{hash: hash_fixture("o3s3"), type: :blob, name: "object3_slice3.dcm", file_type: :dicom},
+        %{hash: hash_fixture("o3s4"), type: :blob, name: "object3_slice4.dcm", file_type: :dicom},
       ]
 
-      object_tuples = [
-        {Warehouse.Store.hash_hashes(Enum.map(children1, &elem(&1, 0))), "object1", children1},
-        {Warehouse.Store.hash_hashes(Enum.map(children2, &elem(&1, 0))), "object2", children2},
-        {Warehouse.Store.hash_hashes(Enum.map(children3, &elem(&1, 0))), "object3", children3},
+      object_params = [
+        %{
+          hash: Warehouse.Store.hash_hashes(Enum.map(children1, &(&1.hash))),
+          type: :tree,
+          name: "object1",
+          file_type: :dicom,
+          children: children1,
+        },
+        %{
+          hash: Warehouse.Store.hash_hashes(Enum.map(children2, &(&1.hash))),
+          type: :tree,
+          name: "object2",
+          file_type: :dicom,
+          children: children2,
+        },
+        %{
+          hash: Warehouse.Store.hash_hashes(Enum.map(children3, &(&1.hash))),
+          type: :tree,
+          name: "object3",
+          file_type: :dicom,
+          children: children3,
+        },
       ]
 
-      {:ok, %{dataset: dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :root}, :dicom, object_tuples)
+      {:ok, %{dataset: dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :root}, object_params)
 
       assert dataset.name == "Some Dataset"
       assert dataset.type == :root
 
       objects = Warehouse.list_objects(dataset)
       assert length(objects) == 3
-      assert Enum.map(objects, fn %Object{} = o -> o.hash end) == Enum.map(object_tuples, &elem(&1, 0))
+      assert Enum.map(objects, fn %Object{} = o -> o.hash end) == Enum.map(object_params, &(&1.hash))
       assert Enum.map(objects, fn %Object{} = o -> o.type end) == [:tree, :tree, :tree]
       assert Enum.map(objects, fn %Object{} = o -> o.name end) == ["object1", "object2", "object3"]
       assert Enum.map(objects, fn %Object{} = o -> o.file_type end) == [:dicom, :dicom, :dicom]
@@ -88,13 +106,13 @@ defmodule Hyacinth.WarehouseTest do
     end
 
     test "creates a derived dataset" do
-      object_tuples = [
-        {hash_fixture("obj1"), "object1.png"},
-        {hash_fixture("obj2"), "object2.png"},
-        {hash_fixture("obj3"), "object3.png"},
+      object_params = [
+        %{hash: hash_fixture("obj1"), type: :blob, name: "object1.png", file_type: :png},
+        %{hash: hash_fixture("obj2"), type: :blob, name: "object2.png", file_type: :png},
+        %{hash: hash_fixture("obj3"), type: :blob, name: "object3.png", file_type: :png},
       ]
 
-      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :derived}, :png, object_tuples)
+      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :derived}, object_params)
 
       assert dataset.name == "Some Dataset"
       assert dataset.type == :derived
@@ -109,7 +127,7 @@ defmodule Hyacinth.WarehouseTest do
       existing_dataset = root_dataset_fixture()
       existing_objects = Warehouse.list_objects(existing_dataset)
 
-      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :derived}, :png, existing_objects)
+      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :derived}, existing_objects)
 
       assert dataset.name == "Some Dataset"
       assert dataset.type == :derived
