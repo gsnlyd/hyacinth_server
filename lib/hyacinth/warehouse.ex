@@ -7,7 +7,10 @@ defmodule Hyacinth.Warehouse do
   alias Ecto.Multi
 
   alias Hyacinth.Repo
-  alias Hyacinth.Warehouse.{Dataset, Object, DatasetObject, FormatType}
+  alias Hyacinth.Warehouse.{Dataset, Object, DatasetObject}
+
+  @type object_tuple :: {String.t, String.t}
+  @type parent_tuple :: {String.t, String.t, [object_tuple]}
 
   @doc """
   Returns the list of datasets.
@@ -41,13 +44,14 @@ defmodule Hyacinth.Warehouse do
   @doc """
   Creates a root dataset (a dataset with no parent).
   """
-  def create_root_dataset(name, format, object_tuples) when is_binary(name) and is_list(object_tuples) do
+  @spec create_dataset(params :: %{atom => term}, format :: atom, object_tuples :: [parent_tuple] | [object_tuple] | [%Object{}]) :: any
+  def create_dataset(params, format, object_tuples) when is_map(params) and is_list(object_tuples) do
     Multi.new()
-    |> Multi.insert(:dataset, %Dataset{name: name, type: :root})
+    |> Multi.insert(:dataset, Dataset.create_changeset(%Dataset{}, params))
     |> Multi.run(:objects, fn _repo, _values ->
       objects =
-        case FormatType.container?(format) do
-          true ->
+        case object_tuples do
+          [{_hash, _name, _children} | _] ->
             Enum.map(object_tuples, fn {tree_hash, tree_name, child_tuples} ->
               tree_object = Repo.insert! %Object{hash: tree_hash, type: :tree, name: tree_name, file_type: format}
 
@@ -58,10 +62,13 @@ defmodule Hyacinth.Warehouse do
               tree_object
             end)
 
-          false ->
+          [{_hash, _name} | _] ->
             Enum.map(object_tuples, fn {hash, name} ->
               Repo.insert! %Object{hash: hash, type: :blob, name: name, file_type: format}
             end)
+
+          [%Object{} | _] ->
+            object_tuples
         end
 
       {:ok, objects}

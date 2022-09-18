@@ -1,5 +1,6 @@
 defmodule Hyacinth.Warehouse.Dataset do
   use Hyacinth.Schema
+  import Ecto.Changeset
 
   alias Hyacinth.Warehouse.DatasetObject
 
@@ -11,5 +12,12 @@ defmodule Hyacinth.Warehouse.Dataset do
     has_many :objects, through: [:dataset_objects, :object]
 
     timestamps()
+  end
+
+  @doc false
+  def create_changeset(dataset, attrs) do
+    dataset
+    |> cast(attrs, [:name, :type])
+    |> validate_required([:name, :type])
   end
 end

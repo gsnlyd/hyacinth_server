@@ -20,7 +20,7 @@ defmodule Hyacinth.WarehouseTest do
     end
   end
 
-  describe "create_root_dataset/2" do
+  describe "create_dataset/2" do
     test "creates a flat (png) root dataset" do
       object_tuples = [
         {hash_fixture("obj1"), "object1.png"},
@@ -28,7 +28,7 @@ defmodule Hyacinth.WarehouseTest do
         {hash_fixture("obj3"), "object3.png"},
       ]
 
-      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset("Some Dataset", :png, object_tuples)
+      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :root}, :png, object_tuples)
 
       assert dataset.name == "Some Dataset"
       assert dataset.type == :root
@@ -64,7 +64,7 @@ defmodule Hyacinth.WarehouseTest do
         {Warehouse.Store.hash_hashes(Enum.map(children3, &elem(&1, 0))), "object3", children3},
       ]
 
-      {:ok, %{dataset: dataset}} = Warehouse.create_root_dataset("Some Dataset", :dicom, object_tuples)
+      {:ok, %{dataset: dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :root}, :dicom, object_tuples)
 
       assert dataset.name == "Some Dataset"
       assert dataset.type == :root
@@ -85,6 +85,37 @@ defmodule Hyacinth.WarehouseTest do
       assert object3slice2.type == :blob
       assert object3slice2.name == "object3_slice2.dcm"
       assert object3slice2.file_type == :dicom
+    end
+
+    test "creates a derived dataset" do
+      object_tuples = [
+        {hash_fixture("obj1"), "object1.png"},
+        {hash_fixture("obj2"), "object2.png"},
+        {hash_fixture("obj3"), "object3.png"},
+      ]
+
+      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :derived}, :png, object_tuples)
+
+      assert dataset.name == "Some Dataset"
+      assert dataset.type == :derived
+
+      objects = Warehouse.list_objects(dataset)
+      assert length(objects) == 3
+      assert Enum.map(objects, fn %Object{} = o -> o.name end) == ["object1.png", "object2.png", "object3.png"]
+      assert Enum.map(objects, fn %Object{} = o -> o.hash end) == [hash_fixture("obj1"), hash_fixture("obj2"), hash_fixture("obj3")]
+    end
+
+    test "creates a derived dataset from existing objects" do
+      existing_dataset = root_dataset_fixture()
+      existing_objects = Warehouse.list_objects(existing_dataset)
+
+      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(%{name: "Some Dataset", type: :derived}, :png, existing_objects)
+
+      assert dataset.name == "Some Dataset"
+      assert dataset.type == :derived
+
+      objects = Warehouse.list_objects(dataset)
+      assert objects == existing_objects
     end
   end
 

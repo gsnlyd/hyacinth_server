@@ -16,14 +16,6 @@ defmodule Hyacinth.Scripts.NewDataset do
     {name, format, dataset_path}
   end
 
-  def get_object_paths(dataset_path) do
-    # TODO: support many file types
-    dataset_path
-    |> File.ls!()
-    |> Enum.filter(fn filename -> Path.extname(filename) == ".png" end)
-    |> Enum.map(fn filename -> Path.join(dataset_path, filename) end)
-  end
-
   def new_dataset() do
     {name, format, dataset_path} = get_inputs!()
 
@@ -57,7 +49,7 @@ defmodule Hyacinth.Scripts.NewDataset do
 
     if length(object_tuples) == 0, do: raise "No objects found"
 
-    {:ok, %{dataset: %Dataset{} = dataset, objects: objects}} = Warehouse.create_root_dataset(name, format, object_tuples)
+    {:ok, %{dataset: %Dataset{} = dataset, objects: objects}} = Warehouse.create_dataset(%{name: name, type: :root}, format, object_tuples)
 
     Logger.info ~s/Created dataset "#{dataset.name}" with #{length(objects)} objects/
   end

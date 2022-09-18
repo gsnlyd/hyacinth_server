@@ -20,6 +20,8 @@ defmodule Hyacinth.WarehouseFixtures do
   def root_dataset_fixture(name \\ nil, num_objects \\ 3) do
     name = if name != nil, do: name, else: "Dataset #{System.unique_integer()}"
 
+    params = %{name: name, type: :root}
+
     object_tuples = Enum.map(1..num_objects, fn i ->
       hash = hash_fixture("object#{i}")
       name = "object#{i}.png"
@@ -27,7 +29,7 @@ defmodule Hyacinth.WarehouseFixtures do
       {hash, name}
     end)
 
-    {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_root_dataset(name, :png, object_tuples)
+    {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(params, :png, object_tuples)
     dataset
   end
 end

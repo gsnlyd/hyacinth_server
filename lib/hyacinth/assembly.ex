@@ -12,7 +12,7 @@ defmodule Hyacinth.Assembly do
   alias Hyacinth.Warehouse
 
   alias Hyacinth.Accounts.User
-  alias Hyacinth.Warehouse.Dataset
+  alias Hyacinth.Warehouse.{Dataset, Object}
   alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
 
   @doc """
@@ -137,6 +137,7 @@ defmodule Hyacinth.Assembly do
   @doc """
   Completes a Transform.
   """
+  @spec complete_transform(transform :: %Transform{}, object_tuples :: [Warehouse.parent_tuple] | [Warehouse.object_tuple] | [%Object{}]) :: any
   def complete_transform(%Transform{} = transform, object_tuples) do
     Multi.new()
     |> Multi.run(:transform, fn _repo, _changes ->
@@ -150,9 +151,9 @@ defmodule Hyacinth.Assembly do
         {:error, false}
       end
     end)
-    |> Multi.run(:dataset, fn _repo, _changes ->
-      # TODO: create a derived dataset instead, properly
-      {:ok, %{dataset: dataset}} = Warehouse.create_root_dataset("dataset output", :png, object_tuples)
+    |> Multi.run(:dataset, fn _repo, %{transform: %Transform{} = transform} ->
+      dataset_params = %{name: "Derived from pipeline #{transform.pipeline_id} transform no #{transform.order_index}", type: :derived}
+      {:ok, %{dataset: dataset}} = Warehouse.create_dataset(dataset_params, :png, object_tuples)
       {:ok, dataset}
     end)
     |> Multi.run(:updated_transform, fn _repo, %{transform: %Transform{} = transform, dataset: %Dataset{} = dataset} ->
