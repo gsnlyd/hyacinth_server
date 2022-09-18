@@ -146,4 +146,101 @@ defmodule Hyacinth.WarehouseTest do
       end
     end
   end
+
+  describe "Object.create_changeset/2" do
+    test "valid for blob object" do
+      %Ecto.Changeset{} = changeset =
+        Object.create_changeset(%Object{}, %{
+          hash: hash_fixture("image1"),
+          type: :blob,
+          name: "path/to/image1.png",
+          file_type: :png,
+        })
+
+      assert changeset.valid? == true
+    end
+
+    test "valid for nested tree object" do
+      %Ecto.Changeset{} = changeset =
+        Object.create_changeset(%Object{}, %{
+          hash: hash_fixture("image1"),
+          type: :tree,
+          name: "path/to/image1",
+          file_type: :png,
+          children: [
+            %{hash: hash_fixture("c1"), type: :blob, name: "c1.png", file_type: :png},
+            %{hash: hash_fixture("c2"), type: :blob, name: "c2.png", file_type: :png},
+            %{hash: hash_fixture("c3"), type: :blob, name: "c3.png", file_type: :png},
+          ],
+        })
+
+      assert changeset.valid? == true
+    end
+
+    test "invalid for tree object with nil children" do
+      %Ecto.Changeset{} = changeset =
+        Object.create_changeset(%Object{}, %{
+          hash: hash_fixture("image1"),
+          type: :tree,
+          name: "path/to/image1",
+          file_type: :png,
+        })
+
+      assert changeset.valid? == false
+      assert changeset.errors == [{:type, {"must be blob if object has no children", []}}]
+    end
+
+    test "invalid for tree object with empty children" do
+      %Ecto.Changeset{} = changeset =
+        Object.create_changeset(%Object{}, %{
+          hash: hash_fixture("image1"),
+          type: :tree,
+          name: "path/to/image1",
+          file_type: :png,
+          children: [],
+        })
+
+      assert changeset.valid? == false
+      assert changeset.errors == [{:type, {"must be blob if object has no children", []}}]
+    end
+
+    test "invalid for blob object with nested children" do
+      %Ecto.Changeset{} = changeset =
+        Object.create_changeset(%Object{}, %{
+          hash: hash_fixture("image1"),
+          type: :blob,
+          name: "path/to/image1",
+          file_type: :png,
+          children: [
+            %{hash: hash_fixture("c1"), type: :blob, name: "c1.png", file_type: :png},
+            %{hash: hash_fixture("c2"), type: :blob, name: "c2.png", file_type: :png},
+            %{hash: hash_fixture("c3"), type: :blob, name: "c3.png", file_type: :png},
+          ],
+        })
+
+      assert changeset.valid? == false
+      assert changeset.errors == [{:type, {"must be tree if object has children", []}}]
+    end
+
+    test "invalid for nested tree object with nil children" do
+      %Ecto.Changeset{} = changeset =
+        Object.create_changeset(%Object{}, %{
+          hash: hash_fixture("image1"),
+          type: :tree,
+          name: "path/to/image1",
+          file_type: :png,
+          children: [
+            %{hash: hash_fixture("c1"), type: :blob, name: "c1.png", file_type: :png},
+            %{hash: hash_fixture("c2"), type: :tree, name: "c2.png", file_type: :png},
+            %{hash: hash_fixture("c3"), type: :blob, name: "c3.png", file_type: :png},
+          ],
+        })
+
+      assert changeset.valid? == false
+      assert Enum.at(changeset.changes.children, 0).valid? == true
+      assert Enum.at(changeset.changes.children, 1).valid? == false
+      assert Enum.at(changeset.changes.children, 2).valid? == true
+      assert Enum.at(changeset.changes.children, 1).errors == [{:type, {"must be blob if object has no children", []}}]
+    end
+  end
 end
