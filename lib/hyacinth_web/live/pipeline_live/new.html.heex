@@ -1,65 +1,73 @@
 <main class="mt-6 mx-auto max-w-screen-lg">
-  <div class="p-2 bg-gray-800 border border-gray-700 rounded">
-    <h2 class="text-3xl text-gray-300">New Pipeline</h2>
-    <div class="mt-2">
-      <.form let={f} for={@pipeline_changeset} phx-change="validate_pipeline">
+  <div>
+    <.form let={f} for={@pipeline_changeset} phx-change="validate_pipeline" phx-submit="save_pipeline">
+      <div class="p-2 bg-gray-800 rounded border border-gray-700">
         <div class="form-content">
           <p>
             <%= label f, :name %>
             <%= text_input f, :name, placeholder: "Pipeline name" %>
             <%= error_tag f, :name %>
           </p>
-
-          <p>
-            <%= label f, :dataset_id %>
-            <%= select f, :dataset_id, Enum.map(@datasets, fn d -> {d.name, d.id} end), prompt: "Choose a value" %>
-            <%= error_tag f, :dataset_id %>
-          </p>
         </div>
-      </.form>
-    </div>
-  </div>
+      </div>
 
-  <div class="mt-4">
-    <div class="space-y-4">
-      <%= for {{transform_cs, options_cs}, i} <- Enum.with_index(@transforms) do %>
-        <div class="p-2 bg-gray-800 rounded border border-gray-700">
-          <div>
-            <h2 class="text-xl text-gray-300">Transform #<%= i + 1%></h2>
-          </div>
-          <div class="mt-2 space-y-4">
-            <div>
-              <.form id={"transform_form_#{i}"} let={f} for={transform_cs} phx-change="validate_transform">
-                <%= hidden_input f, :order_index %>
-                <div class="form-content">
-                  <p>
-                    <%= label f, :driver %>
-                    <%= select f, :driver, Ecto.Enum.values(Transform, :driver) %>
-                    <%= error_tag f, :driver %>
-                  </p>
-                </div>
-              </.form>
+      <div class="mt-6 space-y-4">
+        <%= for {ft, i} <- Enum.with_index(inputs_for(f, :transforms)) do %>
+          <div class="p-2 bg-gray-800 rounded border border-gray-700">
+            <%= hidden_input ft, :order_index %>
+            <div class="form-content">
+              <%= if Ecto.Changeset.get_field(ft.source, :order_index) == 0 do %>
+                <p>
+                  <%= label ft, :input_id, "Input Dataset" %>
+                  <%= select ft, :input_id, Enum.map(@datasets, fn d -> {d.name, d.id} end), prompt: "Choose a value" %>
+                  <%= error_tag ft, :input_id %>
+                </p>
+              <% end %>
+
+              <p>
+                <%= label ft, :driver %>
+                <%= select ft, :driver, Ecto.Enum.values(Transform, :driver) %>
+                <%= error_tag ft, :driver %>
+              </p>
             </div>
-            <div>
-              <Driver.render_form
-                driver={Ecto.Changeset.get_field(transform_cs, :driver)}
-                transform_index={i}
-                changeset={options_cs}
-                change_event="validate_transform_options"
-              />
+            <div class="mt-6">
+              <div class="flex items-center space-x-1">
+                <h3>Options</h3>
+                <button type="button" class="btn btn-xs btn-blue" phx-click="edit_transform_options" phx-value-index={i}>Edit</button>
+              </div>
+              <div class="mt-2">
+                <%= for {k, v} <- Ecto.Changeset.get_field(ft.source, :arguments) do %>
+                  <div>
+                    <span class="text-gray-400"><%= humanize(k) %>:</span>
+                    <span><%= v %></span>
+                  </div>
+                <% end %>
+              </div>
             </div>
           </div>
+        <% end %>
+      </div>
+
+      <div class="mt-4 flex justify-between items-center space-x-2">
+        <div class="flex items-center space-x-2">
+          <button type="button" class="btn btn-blue" phx-click="add_transform">Add Transform</button>
+          <button type="button" class="btn btn-blue" phx-click="remove_last_transform">Remove Transform</button>
         </div>
-      <% end %>
-    </div>
-
-    <div class="mt-4 space-x-1">
-      <button class="btn btn-blue" phx-click="add_transform">Add Transform</button>
-      <button class="btn btn-blue" phx-click="remove_last_transform">Remove Transform</button>
-    </div>
-
-    <div class="mt-4 space-x-1">
-      <button class="btn btn-blue" phx-click="save_pipeline">Save Pipeline</button>
-    </div>
+        <%= submit "Save Pipeline", class: "btn btn-blue" %>
+      </div>
+    </.form>
   </div>
 </main>
+<div>
+  <%= case @modal do %>
+  <% {:transform_options, {index, driver, options_params}} -> %>
+    <.live_component
+      module={HyacinthWeb.PipelineLive.TransformOptionsModal}
+      id="transform_options_modal"
+      index={index}
+      driver={driver}
+      options_params={options_params}
+    />
+  <% nil -> %>
+  <% end %>
+</div>

@@ -13,7 +13,7 @@ defmodule Hyacinth.Assembly do
 
   alias Hyacinth.Accounts.User
   alias Hyacinth.Warehouse.{Dataset, Object}
-  alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
+  alias Hyacinth.Assembly.{Pipeline, Transform}
 
   @doc """
   Gets a single Pipeline.
@@ -40,45 +40,9 @@ defmodule Hyacinth.Assembly do
       {:ok, %Pipeline{...}}
 
   """
-  def create_pipeline(%User{} = user, name, dataset_id, transform_changesets) when is_binary(name) and is_list(transform_changesets) do
-    Multi.new()
-    |> Multi.insert(:pipeline, %Pipeline{name: name, creator_id: user.id})
-    |> Multi.run(:dataset, fn _repo, _changes ->
-      dataset = Warehouse.get_dataset!(dataset_id)
-      {:ok, dataset}
-    end)
-    |> Multi.run(:transforms, fn _repo, %{pipeline: %Pipeline{} = pipeline, dataset: %Dataset{} = dataset} ->
-      transforms =
-        transform_changesets
-        |> Enum.with_index()
-        |> Enum.map(fn {{transform_cs, options_cs}, i} ->
-          driver = Ecto.Changeset.get_field(transform_cs, :driver)
-          options =
-            options_cs
-            |> Ecto.Changeset.apply_action!(:insert)
-            |> Map.from_struct()
-
-          # Set input of first transform to dataset
-          input_id = if i == 0, do: dataset.id, else: nil
-
-          Repo.insert! %Transform{order_index: i, driver: driver, arguments: options, pipeline_id: pipeline.id, input_id: input_id}
-        end)
-
-      {:ok, transforms}
-    end)
-    |> Multi.run(:sanity_validate_transform_options, fn _repo, %{transforms: transforms} ->
-      valid = Enum.all?(transforms, fn %Transform{} = transform ->
-        %Ecto.Changeset{} = changeset = Driver.options_changeset(transform.driver, transform.arguments)
-        changeset.valid?
-      end)
-
-      if valid do
-        {:ok, true}
-      else
-        {:error, false}
-      end
-    end)
-    |> Repo.transaction()
+  @spec create_pipeline(%User{}, map | Keyword.t) :: {:ok, %Pipeline{}} | {:error, %Ecto.Changeset{}}
+  def create_pipeline(%User{} = user, params) do
+    Repo.insert Pipeline.changeset(%Pipeline{creator_id: user.id}, params)
   end
 
   @doc """

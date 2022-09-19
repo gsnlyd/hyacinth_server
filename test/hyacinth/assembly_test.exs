@@ -7,12 +7,12 @@ defmodule Hyacinth.AssemblyTest do
 
   alias Hyacinth.Accounts.User
   alias Hyacinth.Warehouse.Dataset
-  alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
+  alias Hyacinth.Assembly.{Pipeline, Transform}
 
   describe "get_pipeline!/1" do
     test "returns pipeline if it exists" do
       pipeline = pipeline_fixture()
-      assert Assembly.get_pipeline!(pipeline.id) == pipeline
+      assert (%Pipeline{} = Assembly.get_pipeline!(pipeline.id)).id == pipeline.id
     end
 
     test "raises if pipeline does not exist" do
@@ -27,18 +27,24 @@ defmodule Hyacinth.AssemblyTest do
       %User{} = user = user_fixture()
       %Dataset{} = dataset = root_dataset_fixture()
 
-      transform_changesets = [
-        {
-          Transform.changeset(%Transform{}, %{order_index: 0, driver: :slicer}),
-          Driver.options_changeset(:slicer, %{orientation: :axial})
-        },
-        {
-          Transform.changeset(%Transform{}, %{order_index: 0, driver: :sample}),
-          Driver.options_changeset(:sample, %{object_count: 100})
-        },
-      ]
+      params = %{
+        name: "Some Pipeline",
+        transforms: [
+          %{
+            order_index: 0,
+            driver: :slicer,
+            arguments: %{orientation: :axial},
+            input_id: dataset.id,
+          },
+          %{
+            order_index: 1,
+            driver: :sample,
+            arguments: %{object_count: 100},
+          },
+        ],
+      }
 
-      {:ok, %{pipeline: %Pipeline{} = pipeline}} = Assembly.create_pipeline(user, "Some Pipeline", dataset.id, transform_changesets)
+      {:ok, %Pipeline{} = pipeline} = Assembly.create_pipeline(user, params)
       assert pipeline.name == "Some Pipeline"
       assert pipeline.creator_id == user.id
 
@@ -54,6 +60,88 @@ defmodule Hyacinth.AssemblyTest do
       assert transform2.arguments["object_count"] == 100
       assert transform2.input_id == nil
       assert transform2.output_id == nil
+    end
+
+    test "error if transforms are out of order" do
+      %User{} = user = user_fixture()
+      %Dataset{} = dataset = root_dataset_fixture()
+
+      params = %{
+        name: "Some Pipeline",
+        transforms: [
+          %{order_index: 0, driver: :slicer, arguments: %{}, input_id: dataset.id},
+          %{order_index: 2, driver: :sample, arguments: %{}},
+        ],
+      }
+
+      {:error, %Ecto.Changeset{} = changeset} = Assembly.create_pipeline(user, params)
+      assert changeset.errors == [transforms: {"can't be out of order", []}]
+    end
+
+    test "error if first transform is missing input_id" do
+      %User{} = user = user_fixture()
+
+      params = %{
+        name: "Some Pipeline",
+        transforms: [
+          %{order_index: 0, driver: :slicer, arguments: %{}},
+          %{order_index: 1, driver: :sample, arguments: %{}},
+        ],
+      }
+
+      {:error, %Ecto.Changeset{} = changeset} = Assembly.create_pipeline(user, params)
+
+      refute changeset.valid?
+      refute Enum.at(changeset.changes.transforms, 0).valid?
+      assert Enum.at(changeset.changes.transforms, 1).valid?
+
+      assert changeset.errors == []
+      assert Enum.at(changeset.changes.transforms, 0).errors == [input_id: {"can't be blank for the first transform", []}]
+
+    end
+
+    test "error if second transform has input_id" do
+      %User{} = user = user_fixture()
+      %Dataset{} = dataset = root_dataset_fixture()
+
+      params = %{
+        name: "Some Pipeline",
+        transforms: [
+          %{order_index: 0, driver: :slicer, arguments: %{}, input_id: dataset.id},
+          %{order_index: 1, driver: :sample, arguments: %{}, input_id: dataset.id},
+        ],
+      }
+
+      {:error, %Ecto.Changeset{} = changeset} = Assembly.create_pipeline(user, params)
+
+      refute changeset.valid?
+      assert Enum.at(changeset.changes.transforms, 0).valid?
+      refute Enum.at(changeset.changes.transforms, 1).valid?
+
+      assert changeset.errors == []
+      assert Enum.at(changeset.changes.transforms, 1).errors == [input_id: {"can only be set for the first transform", []}]
+    end
+
+    test "error if options are invalid" do
+      %User{} = user = user_fixture()
+      %Dataset{} = dataset = root_dataset_fixture()
+
+      params = %{
+        name: "Some Pipeline",
+        transforms: [
+          %{order_index: 0, driver: :slicer, arguments: %{orientation: "invalid value"}, input_id: dataset.id},
+          %{order_index: 1, driver: :sample, arguments: %{}},
+        ],
+      }
+
+      {:error, %Ecto.Changeset{} = changeset} = Assembly.create_pipeline(user, params)
+
+      refute changeset.valid?
+      refute Enum.at(changeset.changes.transforms, 0).valid?
+      assert Enum.at(changeset.changes.transforms, 1).valid?
+
+      assert changeset.errors == []
+      assert Enum.at(changeset.changes.transforms, 0).errors == [arguments: {"options are not valid for driver slicer", []}]
     end
   end
 

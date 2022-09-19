@@ -30,16 +30,13 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
     import HyacinthWeb.ErrorHelpers
 
     ~H"""
-    <.form id={"options_form_#{@transform_index}"} let={f} for={@changeset} as="options" phx-change={@change_event}>
-      <%= hidden_input f, :transform_index, value: @transform_index %>
-      <div class="form-content">
-        <p>
-          <%= label f, :orientation %>
-          <%= select f, :orientation, Ecto.Enum.values(SlicerOptions, :orientation) %>
-          <%= error_tag f, :orientation %>
-        </p>
-      </div>
-    </.form>
+    <div class="form-content">
+      <p>
+        <%= label @form, :orientation %>
+        <%= select @form, :orientation, Ecto.Enum.values(SlicerOptions, :orientation) %>
+        <%= error_tag @form, :orientation %>
+      </p>
+    </div>
     """
   end
 

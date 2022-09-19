@@ -32,22 +32,19 @@ defmodule Hyacinth.Assembly.Driver.Sample do
     import HyacinthWeb.ErrorHelpers
 
     ~H"""
-    <.form id={"options_form_#{@transform_index}"} let={f} for={@changeset} as="options" phx-change={@change_event}>
-      <%= hidden_input f, :transform_index, value: @transform_index %>
-      <div class="form-content">
-        <p>
-          <%= label f, :object_count %>
-          <%= number_input f, :object_count %>
-          <%= error_tag f, :object_count %>
-        </p>
+    <div class="form-content">
+      <p>
+        <%= label @form, :object_count %>
+        <%= number_input @form, :object_count %>
+        <%= error_tag @form, :object_count %>
+      </p>
 
-        <p>
-          <%= label f, :random_seed %>
-          <%= number_input f, :random_seed %>
-          <%= error_tag f, :random_seed %>
-        </p>
-      </div>
-    </.form>
+      <p>
+        <%= label @form, :random_seed %>
+        <%= number_input @form, :random_seed %>
+        <%= error_tag @form, :random_seed %>
+      </p>
+    </div>
     """
   end
 

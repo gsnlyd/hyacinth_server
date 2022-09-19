@@ -36,24 +36,16 @@ defmodule Hyacinth.Assembly.Driver do
   @callback render_form(assigns :: %{atom => term}) :: any
 
   @doc ~S'''
-  Phoenix function component which returns a rendered options form for the given driver.
+  Phoenix function component which returns rendered options form fields
+  for the given driver.
 
   This function component should be called within a template or LiveView
-  to render a form for the given driver's options.
-
-  The `assigns` map must contain a driver under the `driver` key
-  as well as a changeset under the `changeset` key which will be used to render
-  the form.
+  to render form fields for the given driver's options.
 
   The `assigns` map must contain the following keys:
 
-    * `driver` - the driver to render the form for.
-    * `transform_index` - a unique index which is returned as a parameter when the form
-    is changed. Also used to set the id of the form preventing conflicts in the DOM when
-    multiple forms are rendered.
-    * `changeset` - the options changeset for the given driver. See `options_changeset/2`
-    for details.
-    * `change_event` - the LiveView event which will be passed to phx-change on the form.
+    * `driver` - the driver
+    * `form` - the form to render fields for
 
   ## Examples
 
@@ -61,13 +53,9 @@ defmodule Hyacinth.Assembly.Driver do
         assign(assigns, :my_changeset, options_changeset(:slicer, %{}))
 
         ~H"""
-        <div>
-          <.render_form
-            driver={:slicer}
-            transform_index={0}
-            changeset={@my_changeset}
-            change_event="my_form_change_event"
-          />
+        <.form let={f} changeset={@my_changeset}>
+          <.render_form driver={:slicer} form={f} />
+          <%= submit, "Save" %>
         </div>
         """
       end
@@ -186,4 +174,24 @@ defmodule Hyacinth.Assembly.Driver do
 
   defp module_for(:sample), do: Driver.Sample
   defp module_for(:slicer), do: Driver.Slicer
+
+  @doc """
+  Converts a string to a driver atom.
+
+  ## Examples
+
+      iex> from_string!("sample")
+      :sample
+
+      iex> from_string!("some string")
+      ** (ArgumentError) Not a driver: some string
+  """
+  @spec from_string!(String.t) :: atom
+  def from_string!(string) when is_binary(string) do
+    case string do
+      "sample" -> :sample
+      "slicer" -> :slicer
+      _ -> raise ArgumentError, "Not a driver: #{string}"
+    end
+  end
 end

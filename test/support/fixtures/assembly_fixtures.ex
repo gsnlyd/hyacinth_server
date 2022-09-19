@@ -10,25 +10,39 @@ defmodule Hyacinth.AssemblyFixtures do
 
   alias Hyacinth.Accounts.User
   alias Hyacinth.Warehouse.Dataset
-  alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
+  alias Hyacinth.Assembly.{Pipeline, Driver}
+
+  @spec options_fixture(atom, map) :: map
+  def options_fixture(driver, params \\ %{}) do
+    driver
+    |> Driver.options_changeset(params)
+    |> Ecto.Changeset.apply_action!(:insert)
+    |> Map.from_struct()
+  end
 
   def pipeline_fixture(name \\ nil, user \\ nil, dataset \\ nil) do
     name = name || "Pipeline #{System.unique_integer()}"
     %User{} = user = user || user_fixture()
     %Dataset{} = dataset = dataset || root_dataset_fixture()
 
-    transform_changesets = [
-      {
-        Transform.changeset(%Transform{}, %{order_index: 0, driver: :slicer}),
-        Driver.options_changeset(:slicer, %{})
-      },
-      {
-        Transform.changeset(%Transform{}, %{order_index: 0, driver: :sample}),
-        Driver.options_changeset(:sample, %{})
-      },
-    ]
+    params = %{
+      name: name,
+      transforms: [
+        %{
+          order_index: 0,
+          driver: :slicer,
+          arguments: options_fixture(:slicer),
+          input_id: dataset.id,
+        },
+        %{
+          order_index: 1,
+          driver: :sample,
+          arguments: options_fixture(:sample),
+        },
+      ],
+    }
 
-    {:ok, %{pipeline: %Pipeline{} = pipeline}} = Assembly.create_pipeline(user, name, dataset.id, transform_changesets)
+    {:ok, %Pipeline{} = pipeline} = Assembly.create_pipeline(user, params)
     pipeline
   end
 end
