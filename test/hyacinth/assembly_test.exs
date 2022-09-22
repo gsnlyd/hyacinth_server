@@ -182,11 +182,7 @@ defmodule Hyacinth.AssemblyTest do
       pipeline = pipeline_fixture()
       [%Transform{} = transform1, %Transform{} = transform2] = Assembly.list_transforms(pipeline)
 
-      object_params = [
-        %{hash: hash_fixture("derived_image1"), type: :blob, name: "path/to/image1.png", file_type: :png},
-        %{hash: hash_fixture("derived_image2"), type: :blob, name: "path/to/image2.png", file_type: :png},
-        %{hash: hash_fixture("derived_image3"), type: :blob, name: "path/to/image3.png", file_type: :png},
-      ]
+      object_params = many_object_params_fixtures(3, "derived_image", :png)
 
       assert transform1.input_id != nil
       assert transform1.output_id == nil
@@ -213,11 +209,7 @@ defmodule Hyacinth.AssemblyTest do
       pipeline = pipeline_fixture()
       transform = hd(Assembly.list_transforms(pipeline))
 
-      object_params = [
-        %{hash: hash_fixture("derived_image1"), type: :blob, name: "path/to/image1.png", file_type: :png},
-        %{hash: hash_fixture("derived_image2"), type: :blob, name: "path/to/image2.png", file_type: :png},
-        %{hash: hash_fixture("derived_image3"), type: :blob, name: "path/to/image3.png", file_type: :png},
-      ]
+      object_params = many_object_params_fixtures(3, "derived_image", :png)
 
       {:ok, _changes} = Assembly.complete_transform(transform, object_params)
       {:error, :validate_transform_has_no_output, false, _changes} = Assembly.complete_transform(transform, object_params)
