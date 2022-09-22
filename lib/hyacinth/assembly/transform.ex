@@ -3,7 +3,7 @@ defmodule Hyacinth.Assembly.Transform do
   import Ecto.Changeset
 
   alias Hyacinth.Warehouse.Dataset
-  alias Hyacinth.Assembly.{Pipeline, Driver}
+  alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
 
   schema "transforms" do
     field :order_index, :integer
@@ -24,6 +24,22 @@ defmodule Hyacinth.Assembly.Transform do
     |> validate_required([:order_index, :driver, :arguments])
     |> validate_input_dataset()
     |> validate_driver_options()
+  end
+
+  @doc false
+  def update_input_changeset(%Transform{} = transform, attrs) do
+    transform
+    |> cast(attrs, [:input_id])
+    |> validate_required([:input_id])
+    |> foreign_key_constraint(:input_id)
+  end
+
+  @doc false
+  def update_output_changeset(%Transform{} = transform, attrs) do
+    transform
+    |> cast(attrs, [:output_id])
+    |> validate_required([:output_id])
+    |> foreign_key_constraint(:output_id)
   end
 
   defp validate_input_dataset(%Ecto.Changeset{} = changeset) do

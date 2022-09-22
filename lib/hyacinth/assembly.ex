@@ -104,38 +104,39 @@ defmodule Hyacinth.Assembly do
   @spec complete_transform(%Transform{}, [%Object{}] | [map]) :: any
   def complete_transform(%Transform{} = transform, objects_or_params) do
     Multi.new()
-    |> Multi.run(:transform, fn _repo, _changes ->
-      # Refresh transform within transaction
-      {:ok, Repo.get!(Transform, transform.id)}
-    end)
-    |> Multi.run(:validate_transform_has_no_output, fn _repo, %{transform: %Transform{} = transform} ->
-      if transform.output_id == nil do
-        {:ok, true}
-      else
-        {:error, false}
+    |> Multi.run(:validate_transform_has_no_output, fn _repo, _changes ->
+      # Must be checked within transaction
+      output_id = Repo.one! from(t in Transform, where: t.id == ^transform.id, select: t.output_id)
+      case output_id do
+        nil -> {:ok, output_id}
+        _ -> {:error, output_id}
       end
     end)
-    |> Multi.run(:dataset, fn _repo, %{transform: %Transform{} = transform} ->
-      dataset_params = %{name: "Derived from pipeline #{transform.pipeline_id} transform no #{transform.order_index}", type: :derived}
+    |> Multi.run(:dataset, fn _repo, _changes ->
+      %Pipeline{} = pipeline = get_pipeline!(transform.pipeline_id)
+      dataset_params = %{
+        name: "Derived from #{pipeline.name} T#{transform.order_index + 1}",
+        type: :derived,
+      }
       {:ok, %{dataset: dataset}} = Warehouse.create_dataset(dataset_params, objects_or_params)
       {:ok, dataset}
     end)
-    |> Multi.run(:updated_transform, fn _repo, %{transform: %Transform{} = transform, dataset: %Dataset{} = dataset} ->
-      %Transform{} = updated_transform = Repo.update! Ecto.Changeset.change(transform, %{output_id: dataset.id})
-      {:ok, updated_transform}
+    |> Multi.run(:update_transform_output, fn _repo, %{dataset: %Dataset{} = dataset} ->
+      Repo.update Transform.update_output_changeset(transform, %{output_id: dataset.id})
     end)
-    |> Multi.run(:updated_next_transform, fn _repo, %{updated_transform: %Transform{} = transform} ->
+    |> Multi.run(:update_next_transform_input, fn _repo, %{dataset: %Dataset{} = dataset} ->
       next_transform = Repo.one(
         from t in Transform,
         where: t.pipeline_id == ^transform.pipeline_id and t.order_index == ^transform.order_index + 1,
         select: t
       )
 
-      if next_transform do
-        next_transform = Repo.update! Ecto.Changeset.change(next_transform, %{input_id: transform.output_id})
-        {:ok, next_transform}
-      else
-        {:ok, nil}
+      case next_transform do
+        %Transform{} ->
+          Repo.update Transform.update_input_changeset(next_transform, %{input_id: dataset.id})
+
+        nil ->
+          {:ok, nil}
       end
     end)
     |> Repo.transaction()

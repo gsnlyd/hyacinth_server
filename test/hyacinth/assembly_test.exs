@@ -212,7 +212,7 @@ defmodule Hyacinth.AssemblyTest do
       object_params = many_object_params_fixtures(3, "derived_image", :png)
 
       {:ok, _changes} = Assembly.complete_transform(transform, object_params)
-      {:error, :validate_transform_has_no_output, false, _changes} = Assembly.complete_transform(transform, object_params)
+      {:error, :validate_transform_has_no_output, _value, _changes} = Assembly.complete_transform(transform, object_params)
     end
   end
 end
