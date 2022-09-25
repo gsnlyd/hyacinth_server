@@ -1,6 +1,10 @@
 defmodule Hyacinth.Warehouse.Store do
   @moduledoc """
-  Utilities for storing and retrieving object files from the object store.
+  Utilities for hashing, ingesting, and retrieving files from the object store.
+
+  This module consists of lower-level utilities which work directly on files.
+  See `Hyacinth.Warehouse.Packer` for higher-level utilities which work
+  with `Hyacinth.Warehouse.Object` structs.
   """
 
   require Logger
@@ -121,22 +125,35 @@ defmodule Hyacinth.Warehouse.Store do
   end
 
   @doc """
-  Unpacks an object from the object store into a temporary UUID-named directory
-  under the transform tmp dir.
-
-  Returns a tuple containing the temp dir's path and the unpacked object's path.
+  Creates a subdirectory under the transform temp root
+  named with a randomly-generated UUID. Returns the path
+  of the newly-created directory.
   """
-  def unpack!(hash, file_name) when is_binary(hash) and is_binary(file_name) do
+  @spec create_temp_dir() :: String.t
+  def create_temp_dir() do
+    temp_dir_path = get_temp_dir_from_uuid(Ecto.UUID.generate())
+    File.mkdir!(temp_dir_path)
+    Logger.debug "Created temporary dir: #{temp_dir_path}"
+
+    temp_dir_path
+  end
+
+  @doc """
+  Copies an object file from the object store to the
+  given destination path.
+  """
+  @spec retrieve!(String.t, String.t) :: :ok
+  def retrieve!(hash, dest_path) when is_binary(hash) and is_binary(dest_path) do
+    if File.exists?(dest_path), do: raise "File already exists at dest path: #{dest_path}"
+    # Sanity - TODO: improve this check, maybe with Path.expand and Path.relative_to
+    unless String.contains?(dest_path, "transform_tmp"), do: raise "Dest path is not in transform temp dir: #{dest_path}"
+
     path = get_object_path_from_hash(hash)
-    if not File.exists?(path), do: raise "Object with hash #{hash} does not exist in the store!"
+    if not File.exists?(path), do: raise "File with hash #{hash} does not exist in the store!"
 
-    temp_dir = get_temp_dir_from_uuid(Ecto.UUID.generate())
-    File.mkdir!(temp_dir)
-
-    dest_path = Path.join(temp_dir, file_name)
     bytes_copied = File.copy!(path, dest_path)
-    Logger.info "Successfully unpacked #{bytes_copied} bytes from #{path} to #{dest_path}"
+    Logger.debug "Successfully unpacked #{bytes_copied} bytes from #{path} to #{dest_path}"
 
-    {temp_dir, dest_path}
+    :ok
   end
 end

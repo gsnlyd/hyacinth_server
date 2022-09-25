@@ -7,14 +7,14 @@ defmodule Hyacinth.Assembly.Runner do
 
   alias Hyacinth.{Warehouse, Assembly}
 
-  alias Hyacinth.Warehouse.{Object, Store}
+  alias Hyacinth.Warehouse.{Object, Store, Packer}
   alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
 
   @type object_tuple :: {String.t, String.t}
 
   @spec run_command(%Transform{}, %Object{}) :: [map]
   defp run_command(%Transform{} = transform, %Object{} = object) do
-    {temp_dir, unpacked_path} = Store.unpack!(object.hash, Path.basename(object.name))
+    {temp_dir, unpacked_path} = Packer.retrieve_object!(object)
     {command, command_args} = Driver.command_args(transform.driver, transform.arguments, unpacked_path)
 
     Logger.debug "Running command #{command} with args: #{command_args}"
