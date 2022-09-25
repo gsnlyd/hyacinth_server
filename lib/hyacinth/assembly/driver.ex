@@ -174,6 +174,7 @@ defmodule Hyacinth.Assembly.Driver do
 
   defp module_for(:sample), do: Driver.Sample
   defp module_for(:slicer), do: Driver.Slicer
+  defp module_for(:dicom_to_nifti), do: Driver.DicomToNifti
 
   @doc """
   Converts a string to a driver atom.
@@ -191,6 +192,7 @@ defmodule Hyacinth.Assembly.Driver do
     case string do
       "sample" -> :sample
       "slicer" -> :slicer
+      "dicom_to_nifti" -> :dicom_to_nifti
       _ -> raise ArgumentError, "Not a driver: #{string}"
     end
   end

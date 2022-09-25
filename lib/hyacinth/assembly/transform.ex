@@ -7,7 +7,7 @@ defmodule Hyacinth.Assembly.Transform do
 
   schema "transforms" do
     field :order_index, :integer
-    field :driver, Ecto.Enum, values: [:sample, :slicer], default: :sample
+    field :driver, Ecto.Enum, values: [:sample, :slicer, :dicom_to_nifti], default: :sample
     field :arguments, :map
 
     belongs_to :pipeline, Pipeline
