@@ -22,3 +22,7 @@ jobs:
           elixir-version: 1.14
       - run: mix deps.get
       - run: MIX_ENV=prod mix release
+      - uses: actions/upload-artifact@v3
+        with:
+          name: hyacinth-release-linux
+          path: _build/prod/rel/hyacinth
