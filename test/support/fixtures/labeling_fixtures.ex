@@ -9,14 +9,16 @@ defmodule Hyacinth.LabelingFixtures do
 
   alias Hyacinth.Labeling
   alias Hyacinth.Accounts.User
+  alias Hyacinth.Warehouse.Dataset
   alias Hyacinth.Labeling.{LabelJob, LabelSession}
 
   @doc """
   Generate a label_job.
   """
-  def label_job_fixture(attrs \\ %{}) do
-    user = AccountsFixtures.user_fixture()
-    dataset = WarehouseFixtures.root_dataset_fixture()
+  @spec label_job_fixture(map, %Dataset{} | nil, %User{} | nil) :: %LabelJob{}
+  def label_job_fixture(attrs \\ %{}, dataset \\ nil, user \\ nil) do
+    dataset = dataset || WarehouseFixtures.root_dataset_fixture()
+    user = user || AccountsFixtures.user_fixture()
 
     {:ok, label_job} =
       attrs

@@ -1,0 +1,41 @@
+<header>
+  <div class="flex justify-between items-center">
+    <h1 class="text-3xl">Datasets</h1>
+    <div>
+      <.form let={f} for={@sort_changeset} phx-change="sort_updated">
+        <div class="filter-form-content flex items-center">
+          <%= label f, :sort_by %>
+          <%= select f, :sort_by, Ecto.Enum.values(HyacinthWeb.DatasetLive.Index.SortOptions, :sort_by), class: "basic-select" %>
+          <%= label f, :order %>
+          <%= select f, :order, Ecto.Enum.values(HyacinthWeb.DatasetLive.Index.SortOptions, :order) %>
+        </div>
+      </.form>
+    </div>
+  </div>
+</header>
+
+<main class="mt-4">
+  <div class="grid grid-cols-3 gap-4">
+    <%= for {dataset, object_count, job_count} <- sort_datasets(@datasets, @sort_by, @order) do %>
+      <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, dataset),
+          class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
+        <div class="flex justify-between items-start space-x-4">
+          <div class="shrink text-sm text-gray-300 font-medium"><%= dataset.name %></div>
+          <div class="shrink-0">
+            <%= case dataset.type do %>
+            <% :root -> %>
+              <div class="inline-block px-2 py-0.5 text-xs text-violet-400 bg-violet-400 bg-opacity-20 rounded-full">Root Dataset</div>
+            <% :derived -> %>
+              <div class="inline-block px-2 py-0.5 text-xs text-orange-400 bg-orange-400 bg-opacity-20 rounded-full">Derived Dataset</div>
+            <% end %>
+          </div>
+        </div>
+        <div class="text-gray-400">
+          <span><%= object_count %> objects</span>
+          &bull;
+          <span><%= job_count %> jobs</span>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</main>

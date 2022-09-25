@@ -3,6 +3,7 @@ defmodule Hyacinth.Warehouse.Dataset do
   import Ecto.Changeset
 
   alias Hyacinth.Warehouse.DatasetObject
+  alias Hyacinth.Labeling.LabelJob
 
   schema "datasets" do
     field :name, :string
@@ -10,6 +11,8 @@ defmodule Hyacinth.Warehouse.Dataset do
 
     has_many :dataset_objects, DatasetObject
     has_many :objects, through: [:dataset_objects, :object]
+
+    has_many :jobs, LabelJob
 
     timestamps()
   end

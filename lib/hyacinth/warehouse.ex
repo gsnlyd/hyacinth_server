@@ -26,6 +26,35 @@ defmodule Hyacinth.Warehouse do
   end
 
   @doc """
+  Returns a list of all datasets along with
+  the number of objects and jobs each has.
+
+  Returned data is a list of tuples containing
+  `{dataset, object_count, label_job_count}`.
+
+  ## Examples
+
+      iex> list_datasets_with_counts()
+      [
+        {%Dataset{...}, 100, 0},
+        {%Dataset{...}, 20, 2},
+        {%Dataset{...}, 30, 10},
+        ...
+      ]
+
+  """
+  @spec list_datasets_with_counts() :: [{%Dataset{}, pos_integer, pos_integer}]
+  def list_datasets_with_counts do
+    Repo.all(
+      from d in Dataset,
+      left_join: dobj in assoc(d, :dataset_objects),
+      left_join: lj in assoc(d, :jobs),
+      group_by: d.id,
+      select: {d, count(dobj.id, :distinct), count(lj.id, :distinct)}
+    )
+  end
+
+  @doc """
   Gets a single dataset.
 
   Raises `Ecto.NoResultsError` if the Dataset does not exist.

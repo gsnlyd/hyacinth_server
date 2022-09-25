@@ -2,6 +2,7 @@ defmodule Hyacinth.WarehouseTest do
   use Hyacinth.DataCase
 
   import Hyacinth.WarehouseFixtures
+  import Hyacinth.LabelingFixtures
 
   alias Hyacinth.Warehouse
   alias Hyacinth.Warehouse.{Dataset, Object}
@@ -10,6 +11,30 @@ defmodule Hyacinth.WarehouseTest do
     test "returns all datasets" do
       dataset = root_dataset_fixture()
       assert Warehouse.list_datasets() == [dataset]
+    end
+
+    test "returns empty list if there are no datasets" do
+      assert Warehouse.list_datasets() == []
+    end
+  end
+
+  describe "list_datasets_with_counts/0" do
+    test "returns all datasets with counts" do
+      dataset1 = root_dataset_fixture()
+      dataset2 = root_dataset_fixture(nil, 10)
+      dataset3 = root_dataset_fixture()
+      label_job_fixture(%{}, dataset3)
+      label_job_fixture(%{}, dataset3)
+
+      assert Warehouse.list_datasets_with_counts == [
+        {dataset1, 3, 0},
+        {dataset2, 10, 0},
+        {dataset3, 3, 2},
+      ]
+    end
+
+    test "returns empty list if there are no datasets" do
+      assert Warehouse.list_datasets_with_counts() == []
     end
   end
 

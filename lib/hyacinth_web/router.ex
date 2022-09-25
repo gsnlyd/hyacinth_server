@@ -37,6 +37,9 @@ defmodule HyacinthWeb.Router do
     scope "/", HyacinthWeb do
       pipe_through [:browser, :require_authenticated_user]
 
+      live "/datasets", DatasetLive.Index
+      live "/datasets/:dataset_id", DatasetLive.Show
+
       live "/pipelines/new", PipelineLive.New
       live "/pipelines/:pipeline_id", PipelineLive.Show
     end
