@@ -10,9 +10,7 @@ defmodule Hyacinth.Warehouse.NewDataset do
   alias Hyacinth.Warehouse.{Dataset}
 
   @spec parse_args({String.t, String.t, String.t}) :: {String.t, atom, String.t}
-  def parse_args(args) do
-    {name, raw_format, raw_path} = args
-
+  defp parse_args({name, raw_format, raw_path}) do
     # Note: String.to_atom/1 is generally unsafe because
     # it can crash the VM if the atom limit is hit.
     # However, this is a script, so this is only ever called once.
