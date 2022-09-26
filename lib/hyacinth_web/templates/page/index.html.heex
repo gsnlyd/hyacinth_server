@@ -1,5 +1,5 @@
 <main class="flex flex-col">
-  <%= link "Datasets", to: Routes.live_path(@conn, HyacinthWeb.DatasetLive.Index) %>
-  <%= link "Label Jobs", to: Routes.label_job_path(@conn, :index) %>
-  <%= link "New Pipeline", to: Routes.live_path(@conn, HyacinthWeb.PipelineLive.New) %>
+  <%= link "Datasets", to: Routes.live_path(@conn, HyacinthWeb.DatasetLive.Index), class: "link" %>
+  <%= link "Label Jobs", to: Routes.label_job_path(@conn, :index), class: "link" %>
+  <%= link "New Pipeline", to: Routes.live_path(@conn, HyacinthWeb.PipelineLive.New), class: "link" %>
 </main>

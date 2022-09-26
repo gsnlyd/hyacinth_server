@@ -1,6 +1,6 @@
 <header class="flex items-center space-x-2">
   <h1>Label Jobs</h1>
-  <%= link "[New Job]", to: Routes.label_job_path(@conn, :new) %>
+  <%= link "[New Job]", to: Routes.label_job_path(@conn, :new), class: "link" %>
 </header>
 
 <table class="table w-full mt-2">
@@ -25,10 +25,10 @@
         <td><%= label_job.created_by_user_id %></td>
 
         <td class="text-xs text-center space-x-2">
-          <span><%= link "New Session", to: Routes.label_session_path(@conn, :new, label_job.id) %></span>
-          <span><%= link "Show", to: Routes.label_job_path(@conn, :show, label_job) %></span>
-          <span><%= link "Edit", to: Routes.label_job_path(@conn, :edit, label_job) %></span>
-          <span><%= link "Delete", to: Routes.label_job_path(@conn, :delete, label_job), method: :delete, data: [confirm: "Are you sure?"] %></span>
+          <span><%= link "New Session", to: Routes.label_session_path(@conn, :new, label_job.id), class: "link" %></span>
+          <span><%= link "Show", to: Routes.label_job_path(@conn, :show, label_job), class: "link" %></span>
+          <span><%= link "Edit", to: Routes.label_job_path(@conn, :edit, label_job), class: "link" %></span>
+          <span><%= link "Delete", to: Routes.label_job_path(@conn, :delete, label_job), method: :delete, data: [confirm: "Are you sure?"], class: "link" %></span>
         </td>
       </tr>
     <% end %>

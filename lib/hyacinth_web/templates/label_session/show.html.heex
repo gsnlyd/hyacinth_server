@@ -3,7 +3,7 @@
   <ul>
     <li>
       <span class="text-gray-400 font-medium">Job:</span>
-      <%= link @label_session.job.name, to: Routes.label_job_path(@conn, :show, @label_session.job) %>
+      <%= link @label_session.job.name, to: Routes.label_job_path(@conn, :show, @label_session.job), class: "link" %>
     </li>
     <li>
       <span class="text-gray-400 font-medium">Dataset:</span>
@@ -60,7 +60,7 @@
             <td>-</td>
           <% end %>
           <%= if @label_session.user == @current_user do %>
-            <td class="text-center"><%= link "Edit", to: Routes.label_session_path(@conn, :label, @label_session, element.element_index) %></td>
+            <td class="text-center"><%= link "Edit", to: Routes.label_session_path(@conn, :label, @label_session, element.element_index), class: "link" %></td>
           <% end %>
         </tr>
       <% end %>
