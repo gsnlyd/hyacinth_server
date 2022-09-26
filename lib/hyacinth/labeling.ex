@@ -11,7 +11,7 @@ defmodule Hyacinth.Labeling do
   alias Hyacinth.Warehouse
 
   alias Hyacinth.Accounts.{User}
-  alias Hyacinth.Warehouse.{Object}
+  alias Hyacinth.Warehouse.{Dataset, Object}
   alias Hyacinth.Labeling.{LabelType, LabelJob, LabelSession, LabelElement, LabelElementObject, LabelEntry}
 
   @doc """
@@ -25,6 +25,15 @@ defmodule Hyacinth.Labeling do
   """
   def list_label_jobs do
     Repo.all(LabelJob)
+  end
+
+  @spec list_label_jobs(%Dataset{}) :: [%LabelJob{}]
+  def list_label_jobs(%Dataset{} = dataset) do
+    Repo.all(
+      from lj in LabelJob,
+      where: lj.dataset_id == ^dataset.id,
+      select: lj
+    )
   end
 
   @doc """

@@ -2,6 +2,54 @@
   <div>
     <h1><%= @dataset.name %></h1>
   </div>
+
+  <div class="mt-2 p-2 bg-gray-800 border border-gray-700 rounded">
+    <button class="" phx-click="set_tab" phx-value-tab="jobs">Jobs</button>
+    <button class="" phx-click="set_tab" phx-value-tab="objects">Objects</button>
+  </div>
 </header>
-<main>
+
+<main class="mt-4">
+  <%= case @tab do %>
+  <% :jobs -> %>
+    <div class="grid grid-cols-4 gap-4">
+      <%= for %LabelJob{} = job <- @jobs do %>
+        <%= live_redirect to: Routes.label_job_path(@socket, :show, job),
+            class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
+          <div>
+            <div class="text-sm text-gray-300 font-medium"><%= job.name %></div>
+            <div class="inline-block px-2 py-0.5 text-xs text-gray-300 bg-black bg-opacity-30 rounded-full"><%= job.label_type %></div>
+          </div>
+          <div class="mt-2">
+            <div class="text-gray-500 text-xs">Created <%= Calendar.strftime(job.inserted_at, "%c") %></div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+  <% :objects -> %>
+    <div>
+      <div class="text-lg font-medium"><%= length(@objects) %> Objects</div>
+      <table class="mt-1 w-full table">
+        <thead>
+          <th>Name</th>
+          <th>Format</th>
+          <th>Hash</th>
+          <th>Type</th>
+          <th>Created</th>
+        </thead>
+        <tbody class="text-gray-400 text-sm">
+          <%= for %Object{} = object <- @objects do %>
+            <tr>
+              <td><%= object.name %></td>
+              <td><%= object.file_type %></td>
+              <td class="text-xs"><%= object.hash %></td>
+              <td><%= object.type %></td>
+              <td><%= Calendar.strftime(object.inserted_at, "%c") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
 </main>
