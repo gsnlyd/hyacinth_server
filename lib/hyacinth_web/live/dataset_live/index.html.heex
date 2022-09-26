@@ -4,9 +4,9 @@
     <div>
       <.form let={f} for={@filter_changeset} phx-change="filter_updated">
         <div class="filter-form-content flex items-center">
-          <%= text_input f, :search, placeholder: "Search...", class: "mr-4" %>
+          <%= text_input f, :search, placeholder: "Search...", class: "mr-2" %>
           <%= label f, :type %>
-          <%= select f, :type, Ecto.Enum.values(FilterOptions, :type), class: "!pr-0" %>
+          <%= select f, :type, Ecto.Enum.values(FilterOptions, :type) %>
           <%= label f, :sort_by %>
           <%= select f, :sort_by, Ecto.Enum.values(FilterOptions, :sort_by), class: "basic-select" %>
           <%= label f, :order %>
