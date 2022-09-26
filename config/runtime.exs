@@ -76,4 +76,9 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+
+  # TODO: better config
+  config :hyacinth, python_path: System.get_env("PYTHON_PATH") || raise "environment variable PYTHON_PATH is missing"
+  config :hyacinth, slicer_path: System.get_env("SLICER_PATH") || raise "environment variable SLICER_PATH is missing"
+  config :hyacinth, dcm2niix_path: System.get_env("DCM2NIIX_PATH") || raise "environment variable DCM2NIIX_PATH is missing"
 end

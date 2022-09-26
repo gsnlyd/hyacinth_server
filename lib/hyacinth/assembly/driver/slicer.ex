@@ -48,9 +48,9 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
 
   @impl Driver
   def command_args(_options, file_path) do
-    binary_path = Path.join File.cwd!(), "priv/drivers/python_slicer/venv/bin/python"
+    binary_path = Application.get_env(:hyacinth, :python_path, Path.join(File.cwd!(), "priv/drivers/python_slicer/venv/bin/python"))
     args = [
-      Path.join(File.cwd!(), "priv/drivers/python_slicer/slicer.py"),
+      Application.get_env(:hyacinth, :slicer_path, Path.join(File.cwd!(), "priv/drivers/python_slicer/slicer.py")),
       file_path,
     ]
 
