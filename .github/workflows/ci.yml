@@ -20,7 +20,9 @@ jobs:
         with:
           otp-version: 25
           elixir-version: 1.14
-      - run: mix deps.get
+      - run: mix deps.get --only prod
+      - run: MIX_ENV=prod mix compile
+      - run: MIX_ENV=prod mix assets.deploy
       - run: MIX_ENV=prod mix release
       - uses: actions/upload-artifact@v3
         with:
