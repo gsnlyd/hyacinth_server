@@ -5,6 +5,14 @@ defmodule Hyacinth.Release do
   """
   @app :hyacinth
 
+  def new_dataset(a1, a2, a3) do
+    load_app()
+
+    Ecto.Migrator.with_repo(Hyacinth.Repo, fn _repo ->
+      Hyacinth.Warehouse.NewDataset.new_dataset({a1, a2, a3})
+    end)
+  end
+
   def migrate do
     load_app()
 
