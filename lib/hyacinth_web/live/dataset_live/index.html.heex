@@ -2,12 +2,15 @@
   <div class="flex justify-between items-center">
     <h1 class="text-3xl">Datasets</h1>
     <div>
-      <.form let={f} for={@sort_changeset} phx-change="sort_updated">
+      <.form let={f} for={@filter_changeset} phx-change="filter_updated">
         <div class="filter-form-content flex items-center">
+          <%= text_input f, :search, placeholder: "Search...", class: "mr-4" %>
+          <%= label f, :type %>
+          <%= select f, :type, Ecto.Enum.values(FilterOptions, :type), class: "!pr-0" %>
           <%= label f, :sort_by %>
-          <%= select f, :sort_by, Ecto.Enum.values(HyacinthWeb.DatasetLive.Index.SortOptions, :sort_by), class: "basic-select" %>
+          <%= select f, :sort_by, Ecto.Enum.values(FilterOptions, :sort_by), class: "basic-select" %>
           <%= label f, :order %>
-          <%= select f, :order, Ecto.Enum.values(HyacinthWeb.DatasetLive.Index.SortOptions, :order) %>
+          <%= select f, :order, Ecto.Enum.values(FilterOptions, :order) %>
         </div>
       </.form>
     </div>
@@ -16,7 +19,7 @@
 
 <main class="mt-4">
   <div class="grid grid-cols-3 gap-4">
-    <%= for {dataset, object_count, job_count} <- sort_datasets(@datasets, @sort_by, @order) do %>
+    <%= for {dataset, object_count, job_count} <- filter_datasets(@datasets, @filter_changeset) do %>
       <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, dataset),
           class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
         <div class="flex justify-between items-start space-x-4">
@@ -34,6 +37,9 @@
           <span><%= object_count %> objects</span>
           &bull;
           <span><%= job_count %> jobs</span>
+        </div>
+        <div class="mt-2">
+          <div class="text-gray-500 text-xs">Created <%= Calendar.strftime(dataset.inserted_at, "%c") %></div>
         </div>
       <% end %>
     <% end %>
