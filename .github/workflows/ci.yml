@@ -48,7 +48,6 @@ jobs:
           elixir --version
       - name: Checkout repository
         uses: actions/checkout@v3
-      - run: ls -al
       - name: Get dependencies
         run: mix deps.get --only prod
       - name: Compile app
@@ -57,7 +56,10 @@ jobs:
         run: MIX_ENV=prod mix assets.deploy
       - name: Build release
         run: MIX_ENV=prod mix release
-      - uses: actions/upload-artifact@v3
+      - name: Create release tarball
+        run: tar -cvf hyacinth-x64-debian10.tar _build/prod/rel/hyacinth
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: hyacinth-release-debian-buster
-          path: _build/prod/rel/hyacinth
+          name: hyacinth-x64-debian10
+          path: hyacinth-x64-debian10.tar
