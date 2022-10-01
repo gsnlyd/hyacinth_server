@@ -35,14 +35,15 @@ jobs:
       image: debian:buster
     steps:
       - name: Install erlang/elixir
-        run: apt-get update
-        run: apt-get -y install wget gnupg
-        run: wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
-        run: dpkg -i erlang-solutions_2.0_all.deb
-        run: apt-get update
-        run: apt-get -y install esl-erlang
-        run: apt-get -y install elixir
-        run: elixir --version
+        run: |
+          apt-get update
+          apt-get -y install wget gnupg
+          wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
+          dpkg -i erlang-solutions_2.0_all.deb
+          apt-get update
+          apt-get -y install esl-erlang
+          apt-get -y install elixir
+          elixir --version
       - name: Checkout repository
         uses: actions/checkout@v3
       - run: ls -al
