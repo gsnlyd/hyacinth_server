@@ -44,6 +44,7 @@ jobs:
           apt-get -y install esl-erlang
           apt-get -y install elixir
           mix local.hex --force
+          mix local.rebar --force
           elixir --version
       - name: Checkout repository
         uses: actions/checkout@v3
