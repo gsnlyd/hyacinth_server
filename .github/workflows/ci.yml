@@ -32,7 +32,7 @@ jobs:
   container-release-test:
     runs-on: ubuntu-latest
     container:
-      image: debian:latest
+      image: quay.io/centos/centos:stream8
     steps:
       - uses: actions/checkout@v3
       - run: ls -al
