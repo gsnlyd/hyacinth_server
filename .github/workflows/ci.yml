@@ -57,3 +57,7 @@ jobs:
         run: MIX_ENV=prod mix assets.deploy
       - name: Build release
         run: MIX_ENV=prod mix release
+      - uses: actions/upload-artifact@v3
+        with:
+          name: hyacinth-release-debian-buster
+          path: _build/prod/rel/hyacinth
