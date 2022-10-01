@@ -34,6 +34,7 @@ jobs:
     container:
       image: debian:buster
     steps:
+      - run: sudo apt-get install wget
       - run: wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
       - run: sudo dpkg -i erlang-solutions_2.0_all.deb
       - run: sudo apt-get update
