@@ -28,3 +28,11 @@ jobs:
         with:
           name: hyacinth-release-linux
           path: _build/prod/rel/hyacinth
+
+  container-release-test:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: ls
