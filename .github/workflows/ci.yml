@@ -47,3 +47,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - run: ls -al
+      - name: Get dependencies
+        run: mix deps.get --only prod
+      - name: Compile app
+        run: MIX_ENV=prod mix compile
+      - name: Prepare assets
+        run: MIX_ENV=prod mix assets.deploy
+      - name: Build release
+        run: MIX_ENV=prod mix release
