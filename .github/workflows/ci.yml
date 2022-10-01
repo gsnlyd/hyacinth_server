@@ -35,12 +35,12 @@ jobs:
       image: debian:buster
     steps:
       - run: apt-get update
-      - run: apt-get install wget
+      - run: apt-get -y install wget
       - run: wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
       - run: dpkg -i erlang-solutions_2.0_all.deb
       - run: apt-get update
-      - run: apt-get install esl-erlang
-      - run: apt-get install elixir
+      - run: apt-get -y install esl-erlang
+      - run: apt-get -y install elixir
       - run: elixir --version
       - uses: actions/checkout@v3
       - run: ls -al
