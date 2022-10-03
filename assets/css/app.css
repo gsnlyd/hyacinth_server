@@ -44,12 +44,19 @@ h1 {
 
 
 /* Table */
+.table tr {
+    @apply hover:text-gray-200;
+    @apply border-b border-gray-700;
+}
+.table tbody tr:last-child {
+    @apply border-b-0;
+}
+
 .table th {
-    @apply text-sm text-gray-400 font-medium;
+    @apply text-xs text-gray-400 font-medium;
 }
 .table th, .table td {
-    @apply px-2 py-1;
-    @apply border border-gray-500;
+    @apply px-2 py-1 text-center;
 }
 
 

@@ -19,11 +19,12 @@ defmodule HyacinthWeb.DatasetLive.Show do
 
   def tab_button(assigns) do
     button_class =
-      if Atom.to_string(assigns.cur_tab) == assigns.tab do
-        "px-1 text-white border-b-2 border-purple-400 transition"
-      else
-        "px-1 text-gray-300 hover:text-white border-purple-400 transition"
-      end
+      "px-2 pb-1 border-purple-400 transition" <>
+        if Atom.to_string(assigns.cur_tab) == assigns.tab do
+          "text-white border-b-2"
+        else
+          "px-1 text-gray-400 hover:text-white"
+        end
     assigns = assign(assigns, :button_class, button_class)
 
     ~H"""
