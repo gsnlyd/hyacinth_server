@@ -1,16 +1,25 @@
 <header>
   <div class="flex justify-between items-center">
-    <h1 class="text-3xl">Datasets</h1>
+    <h1 class="text-3xl"><%= length(@datasets) %> Datasets</h1>
     <div>
       <.form let={f} for={@filter_changeset} phx-change="filter_updated">
-        <div class="filter-form-content flex items-center">
-          <%= text_input f, :search, placeholder: "Search...", class: "mr-2" %>
-          <%= label f, :type %>
-          <%= select f, :type, Ecto.Enum.values(FilterOptions, :type) %>
-          <%= label f, :sort_by %>
-          <%= select f, :sort_by, Ecto.Enum.values(FilterOptions, :sort_by), class: "basic-select" %>
-          <%= label f, :order %>
-          <%= select f, :order, Ecto.Enum.values(FilterOptions, :order) %>
+        <div class="filter-form-content flex items-end space-x-2">
+          <p>
+            <%= label f, :search %>
+            <%= text_input f, :search, placeholder: "Search...", class: "mr-2" %>
+          </p>
+          <p>
+            <%= label f, :type %>
+            <%= select f, :type, Ecto.Enum.values(FilterOptions, :type) %>
+          </p>
+          <p>
+            <%= label f, :sort_by %>
+            <%= select f, :sort_by, Ecto.Enum.values(FilterOptions, :sort_by), class: "basic-select" %>
+          </p>
+          <p>
+            <%= label f, :order %>
+            <%= select f, :order, Ecto.Enum.values(FilterOptions, :order) %>
+          </p>
         </div>
       </.form>
     </div>

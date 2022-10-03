@@ -93,7 +93,7 @@ h1 {
 /* Filter/Sort Forms */
 
 .filter-form-content label {
-    @apply ml-3 text-sm text-gray-400 font-medium;
+    @apply block mb-0.5 text-xs text-gray-500 font-medium;
 }
 
 .filter-form-content input[type="text"],
@@ -105,16 +105,13 @@ h1 {
     @apply border-gray-500 hover:border-gray-300 focus:border-blue-500 focus:ring-blue-500;
 }
 
-
 .filter-form-content select {
-    background-image: none;
-    @apply p-0 mx-2 transition;
-    @apply text-gray-300 hover:text-gray-100 text-center;
-    @apply bg-transparent;
-    @apply border-t-0 border-l-0 border-r-0;
-    @apply border-b-2 border-violet-500 hover:border-violet-400;
-    @apply focus:ring-2 focus:ring-offset-4 ring-offset-gray-900;
+    @apply pl-1 pr-8 py-1;
+    @apply text-gray-300;
+    @apply bg-transparent rounded;
+    @apply border-gray-700 hover:border-white focus:border-blue-500 focus:ring-blue-500;
 }
+
 
 /* This file is for your main application CSS */
 
