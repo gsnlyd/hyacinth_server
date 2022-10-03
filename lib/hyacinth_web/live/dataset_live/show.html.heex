@@ -4,15 +4,15 @@
   </div>
 
   <div class="mt-2 p-2 bg-gray-800 border border-gray-700 rounded">
-    <button class="" phx-click="set_tab" phx-value-tab="jobs">Jobs</button>
-    <button class="" phx-click="set_tab" phx-value-tab="objects">Objects</button>
+    <.tab_button cur_tab={@tab} event="set_tab" tab="jobs">Jobs</.tab_button>
+    <.tab_button cur_tab={@tab} event="set_tab" tab="objects">Objects</.tab_button>
   </div>
 </header>
 
 <main class="mt-4">
   <%= case @tab do %>
   <% :jobs -> %>
-    <div class="grid grid-cols-4 gap-4">
+    <div class="grid grid-cols-3 gap-4">
       <%= for %LabelJob{} = job <- @jobs do %>
         <%= live_redirect to: Routes.label_job_path(@socket, :show, job),
             class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>

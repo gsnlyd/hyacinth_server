@@ -17,6 +17,22 @@ defmodule HyacinthWeb.DatasetLive.Show do
     {:ok, socket}
   end
 
+  def tab_button(assigns) do
+    button_class =
+      if Atom.to_string(assigns.cur_tab) == assigns.tab do
+        "px-1 text-white border-b-2 border-purple-400 transition"
+      else
+        "px-1 text-gray-300 hover:text-white border-purple-400 transition"
+      end
+    assigns = assign(assigns, :button_class, button_class)
+
+    ~H"""
+    <button class={@button_class} phx-click={@event} phx-value-tab={@tab}>
+      <%= render_slot(@inner_block) %>
+    </button>
+    """
+  end
+
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     tab = case tab do
       "jobs" -> :jobs
