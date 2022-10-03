@@ -12,7 +12,7 @@ defmodule HyacinthWeb.DatasetLive.Show do
       jobs: Labeling.list_label_jobs(dataset),
       objects: Warehouse.list_objects(dataset),
 
-      tab: :objects,
+      tab: :jobs,
     })
     {:ok, socket}
   end

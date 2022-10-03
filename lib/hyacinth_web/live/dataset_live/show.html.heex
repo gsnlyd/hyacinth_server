@@ -26,9 +26,16 @@
       <%= for %LabelJob{} = job <- @jobs do %>
         <%= live_redirect to: Routes.label_job_path(@socket, :show, job),
             class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
-          <div>
-            <div class="text-sm text-gray-300 font-medium"><%= job.name %></div>
-            <div class="inline-block px-2 py-0.5 text-xs text-gray-300 bg-black bg-opacity-30 rounded-full"><%= job.label_type %></div>
+          <div class="flex justify-between items-start space-x-4">
+            <div class="shrink text-sm text-gray-300 font-medium"><%= job.name %></div>
+            <div class="shrink-0">
+              <%= case job.label_type do %>
+              <% :classification -> %>
+                <div class="inline-block px-2 py-0.5 text-xs text-green-400 bg-green-400 bg-opacity-20 rounded-full">Classification</div>
+              <% :comparison_exhaustive -> %>
+                <div class="inline-block px-2 py-0.5 text-xs text-blue-400 bg-blue-400 bg-opacity-20 rounded-full">Comparison</div>
+              <% end %>
+            </div>
           </div>
           <div class="mt-2">
             <div class="text-gray-500 text-xs">Created <%= Calendar.strftime(job.inserted_at, "%c") %></div>
