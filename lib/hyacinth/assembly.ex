@@ -16,6 +16,28 @@ defmodule Hyacinth.Assembly do
   alias Hyacinth.Assembly.{Pipeline, Transform}
 
   @doc """
+  Returns a list of all Pipelines with their
+  relations preloaded.
+
+  The following relations are preloaded:
+
+    * creator
+    * transforms
+
+  ## Examples
+
+      iex> list_pipelines_preloaded()
+      [%Pipeline{}, %Pipeline{}, ...]
+
+  """
+  def list_pipelines_preloaded do
+    Repo.all(
+      from p in Pipeline,
+      preload: [:creator, :transforms]
+    )
+  end
+
+  @doc """
   Gets a single Pipeline.
 
   Raises `Ecto.NoResultsError` if the Pipeline does not exist.

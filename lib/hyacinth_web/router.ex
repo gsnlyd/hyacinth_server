@@ -40,6 +40,7 @@ defmodule HyacinthWeb.Router do
       live "/datasets", DatasetLive.Index
       live "/datasets/:dataset_id", DatasetLive.Show
 
+      live "/pipelines", PipelineLive.Index
       live "/pipelines/new", PipelineLive.New
       live "/pipelines/:pipeline_id", PipelineLive.Show
     end

@@ -9,6 +9,26 @@ defmodule Hyacinth.AssemblyTest do
   alias Hyacinth.Warehouse.Dataset
   alias Hyacinth.Assembly.{Pipeline, Transform}
 
+  describe "list_pipelines_preloaded/0" do
+    test "returns the list of pipelines" do
+      pipeline_fixture()
+      pipeline_fixture()
+      pipeline_fixture()
+
+      pipelines = Assembly.list_pipelines_preloaded()
+      assert length(pipelines) == 3
+
+      Enum.each(pipelines, fn %Pipeline{} = p ->
+        assert Ecto.assoc_loaded?(p.creator)
+        assert Ecto.assoc_loaded?(p.transforms)
+      end)
+    end
+
+    test "returns empty list if there are no pipelines" do
+      assert Assembly.list_pipelines_preloaded() == []
+    end
+  end
+
   describe "get_pipeline!/1" do
     test "returns pipeline if it exists" do
       pipeline = pipeline_fixture()

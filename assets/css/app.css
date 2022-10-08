@@ -42,6 +42,38 @@ h1 {
     @apply focus:outline-none;
 }
 
+/* Cards */
+
+.card {
+    @apply p-2;
+    @apply bg-gray-800 rounded;
+    @apply border border-gray-700;
+}
+
+.link-card {
+    @apply hover:border-gray-500 transition;
+}
+
+.pill {
+    @apply inline-block px-2 py-0.5 text-xs rounded-full;
+}
+
+.pill-violet {
+    @apply text-violet-400 bg-violet-400 bg-opacity-20;
+}
+
+.pill-orange {
+    @apply text-orange-400 bg-orange-400 bg-opacity-20;
+}
+
+.pill-green {
+    @apply text-green-400 bg-green-400 bg-opacity-20;
+}
+
+.pill-blue {
+    @apply text-blue-400 bg-blue-400 bg-opacity-20;
+}
+
 
 /* Table */
 .table tr {
