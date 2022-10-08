@@ -99,24 +99,30 @@ h1 {
 
 /* Filter/Sort Forms */
 
+.filter-form-content {
+    @apply p-2;
+    @apply bg-gray-800 rounded;
+    @apply border border-gray-700 border-opacity-50;
+}
+
 .filter-form-content label {
-    @apply block mb-0.5 text-xs text-gray-500 font-medium;
+    @apply mr-0.5 text-xs text-gray-400;
 }
 
 .filter-form-content input[type="text"],
 .filter-form-content input[type="number"],
 .filter-form-content input[type="password"] {
-    @apply px-2 py-1;
+    @apply px-2 py-1 w-80;
     @apply placeholder-gray-500;
     @apply bg-gray-800 rounded;
     @apply border-gray-500 hover:border-gray-300 focus:border-blue-500 focus:ring-blue-500;
 }
 
 .filter-form-content select {
-    @apply pl-1 pr-8 py-1;
-    @apply text-gray-300;
+    @apply pl-1 pr-8 py-1 text-sm;
+    @apply text-gray-400;
     @apply bg-transparent rounded;
-    @apply border-gray-700 hover:border-white focus:border-blue-500 focus:ring-blue-500;
+    @apply border-gray-600 hover:border-white focus:border-blue-500 focus:ring-blue-500;
 }
 
 

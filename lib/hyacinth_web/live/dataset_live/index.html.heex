@@ -1,32 +1,33 @@
 <header>
-  <div class="flex justify-between items-center">
-    <h1 class="text-3xl"><%= length(@datasets) %> Datasets</h1>
-    <div>
+  <div>
+    <h1 class="text-4xl">Datasets</h1>
+    <div class="mt-3">
       <.form let={f} for={@filter_changeset} phx-change="filter_updated">
-        <div class="filter-form-content flex items-end space-x-2">
+        <div class="filter-form-content flex justify-between items-center">
           <p>
-            <%= label f, :search %>
-            <%= text_input f, :search, placeholder: "Search...", class: "mr-2" %>
+            <%= text_input f, :search, placeholder: "Search datasets...", class: "mr-2" %>
           </p>
-          <p>
-            <%= label f, :type %>
-            <%= select f, :type, Ecto.Enum.values(FilterOptions, :type) %>
-          </p>
-          <p>
-            <%= label f, :sort_by %>
-            <%= select f, :sort_by, Ecto.Enum.values(FilterOptions, :sort_by), class: "basic-select" %>
-          </p>
-          <p>
-            <%= label f, :order %>
-            <%= select f, :order, Ecto.Enum.values(FilterOptions, :order) %>
-          </p>
+          <div class="flex items-center space-x-3">
+            <p>
+              <%= label f, :type %>
+              <%= select f, :type, Ecto.Enum.values(FilterOptions, :type) %>
+            </p>
+            <p>
+              <%= label f, :sort_by %>
+              <%= select f, :sort_by, Ecto.Enum.values(FilterOptions, :sort_by), class: "basic-select" %>
+            </p>
+            <p>
+              <%= label f, :order %>
+              <%= select f, :order, Ecto.Enum.values(FilterOptions, :order) %>
+            </p>
+          </div>
         </div>
       </.form>
     </div>
   </div>
 </header>
 
-<main class="mt-4">
+<main class="mt-6">
   <div class="grid grid-cols-3 gap-4">
     <%= for {dataset, object_count, job_count} <- filter_datasets(@datasets, @filter_changeset) do %>
       <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, dataset),

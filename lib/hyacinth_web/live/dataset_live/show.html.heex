@@ -22,8 +22,31 @@
 <main class="mt-4">
   <%= case @tab do %>
   <% :jobs -> %>
-    <div class="grid grid-cols-3 gap-4">
-      <%= for %LabelJob{} = job <- @jobs do %>
+    <div>
+      <.form let={f} for={@job_filter_changeset} phx-change="job_filter_updated">
+        <div class="filter-form-content flex justify-between items-center">
+          <p>
+            <%= text_input f, :search, placeholder: "Search jobs...", class: "mr-2 w-80" %>
+          </p>
+          <div class="flex items-center space-x-3">
+            <p>
+              <%= label f, :type %>
+              <%= select f, :type, Ecto.Enum.values(JobFilterOptions, :type) %>
+            </p>
+            <p>
+              <%= label f, :sort_by %>
+              <%= select f, :sort_by, Ecto.Enum.values(JobFilterOptions, :sort_by), class: "basic-select" %>
+            </p>
+            <p>
+              <%= label f, :order %>
+              <%= select f, :order, Ecto.Enum.values(JobFilterOptions, :order) %>
+            </p>
+          </div>
+        </div>
+      </.form>
+    </div>
+    <div class="mt-4 grid grid-cols-3 gap-4">
+      <%= for %LabelJob{} = job <- filter_jobs(@jobs, @job_filter_changeset) do %>
         <%= live_redirect to: Routes.label_job_path(@socket, :show, job),
             class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
           <div class="flex justify-between items-start space-x-4">
