@@ -63,6 +63,7 @@ jobs:
       - run: erl -version
       - run: dnf -y install unzip
       - run: wget https://github.com/elixir-lang/elixir/releases/download/v1.14.0/elixir-otp-24.zip
-      - run: unzip elixir-otp-24.zip
-      - run: ls -al
-      - run: ls -al elixir-otp-24/bin
+      - run: mkdir ~/elixir
+      - run: unzip elixir-otp-24.zip -d ~/elixir
+      - run: ls -al ~
+      - run: ls -al ~/elixir
