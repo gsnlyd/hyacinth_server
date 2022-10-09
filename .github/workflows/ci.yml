@@ -49,18 +49,15 @@ jobs:
           name: hyacinth-x64-debian10
           path: _build/prod/rel/hyacinth-x64-debian10.tar
 
-  check-debian10-versions:
-    runs-on: ubuntu-latest
-    container:
-      image: debian:buster
-    steps:
-      - run: ldd --version
-      - run: openssl version
-
-  check-centos-stream-8-versions:
+  build-release-x64-centos-stream-8:
     runs-on: ubuntu-latest
     container:
       image: quay.io/centos/centos:stream8
     steps:
-      - run: ldd --version
-      - run: openssl version
+      - run: dnf config-manager --set-enabled powertools
+      - run: dnf install epel-release epel-next-release
+      - run: yum -y install wget
+      - run: wget https://packages.erlang-solutions.com/erlang-solutions-2.0-1.noarch.rpm
+      - run: rpm -Uvh erlang-solutions-2.0-1.noarch.rpm
+      - run: yum install esl-erlang
+      - run: erl -version
