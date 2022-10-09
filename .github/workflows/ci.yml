@@ -56,8 +56,8 @@ jobs:
     steps:
       - run: dnf config-manager --set-enabled powertools
       - run: dnf -y install epel-release epel-next-release
-      - run: yum -y install wget
+      - run: dnf -y install wget
       - run: wget https://packages.erlang-solutions.com/erlang-solutions-2.0-1.noarch.rpm
-      - run: rpm -Uvh erlang-solutions-2.0-1.noarch.rpm
-      - run: yum -y install esl-erlang
+      - run: dnf -y install erlang-solutions-2.0-1.noarch.rpm
+      - run: dnf -y install esl-erlang
       - run: erl -version
