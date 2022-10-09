@@ -6,7 +6,11 @@
 /* Basic Elements */
 
 h1 {
-    @apply text-2xl text-gray-300 font-medium;
+    @apply text-4xl text-gray-300 font-medium;
+}
+
+h3 {
+    @apply text-xl text-gray-400;
 }
 
 .link {
@@ -19,24 +23,8 @@ h1 {
 .btn, .link-btn {
     @apply px-3 py-1.5 rounded focus:ring-2 ring-offset-2 ring-offset-gray-900 transition;
 }
-
-.btn-xs {
-    @apply px-1 py-0.5 text-xs font-medium;
-}
-
 .btn-lg {
     @apply px-4 py-2;
-}
-
-.btn-icon {
-    @apply pl-2 flex items-center space-x-1 font-medium;
-}
-
-.btn-icon.btn-xs {
-}
-
-.btn-icon.btn-lg {
-    @apply pl-2 space-x-2;
 }
 
 .btn-blue {
@@ -52,6 +40,21 @@ h1 {
     @apply focus:ring-blue-700 focus:hover:ring-blue-600;
     @apply focus:outline-none;
 }
+
+.btn-icon {
+    @apply pl-2 flex items-center space-x-1;
+}
+.btn-icon.btn-lg {
+    @apply pl-2 space-x-2;
+}
+
+.btn-icon-only {
+    @apply p-2;
+}
+.btn-icon-only.btn-sm {
+    @apply p-1;
+}
+
 
 /* Cards */
 

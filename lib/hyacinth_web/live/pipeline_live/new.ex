@@ -7,7 +7,7 @@ defmodule HyacinthWeb.PipelineLive.New do
   def mount(_params, _session, socket) do
     socket = assign(socket, %{
       datasets: Warehouse.list_datasets(),
-      pipeline_changeset: Ecto.Changeset.change(%Pipeline{}, %{name: "My Pipeline"}), # TODO: remove default name
+      pipeline_changeset: Ecto.Changeset.change(%Pipeline{}, %{}),
       transform_options: [],
       transforms: [],
 
