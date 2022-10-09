@@ -66,5 +66,7 @@ jobs:
       - run: mkdir ~/elixir
       - run: unzip elixir-otp-24.zip -d ~/elixir
       - run: export PATH="$PATH:$HOME/elixir/bin"
+      - run: echo $PATH
+      - run: compgen -c
       - run: elixir --version
       - run: mix --version
