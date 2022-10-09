@@ -65,6 +65,6 @@ jobs:
       - run: wget https://github.com/elixir-lang/elixir/releases/download/v1.14.0/elixir-otp-24.zip
       - run: mkdir ~/elixir
       - run: unzip elixir-otp-24.zip -d ~/elixir
-      - run: export PATH="$PATH:~/elixir/bin"
+      - run: export PATH="$PATH:$HOME/elixir/bin"
       - run: elixir --version
       - run: mix --version
