@@ -53,6 +53,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: quay.io/centos/centos:stream8
+      env:
+        LC_ALL: en_US.UTF-8
     steps:
       - run: dnf config-manager --set-enabled powertools
       - run: dnf -y install epel-release epel-next-release
