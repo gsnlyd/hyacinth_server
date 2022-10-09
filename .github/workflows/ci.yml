@@ -53,8 +53,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: quay.io/centos/centos:stream8
-      env:
-        LC_ALL: en_US.UTF-8
     steps:
       - run: dnf config-manager --set-enabled powertools
       - run: dnf -y install epel-release epel-next-release
@@ -69,3 +67,7 @@ jobs:
       - run: unzip elixir-otp-24.zip -d ~/elixir
       - run: ~/elixir/bin/elixir --version
       - run: locale
+      - run: |
+        localedef -c -f UTF-8 -i en_US en_US.UTF-8
+        export LC_ALL=en_US.UTF-8
+        ~/elixir/bin/elixir --version
