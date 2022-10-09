@@ -74,4 +74,6 @@ jobs:
       - name: Run elixir
         run: |
           export LC_ALL=en_US.UTF-8
-          ~/elixir/bin/elixir --version
+          export PATH="$PATH:$HOME/elixir/bin"
+          elixir --version
+          mix --version
