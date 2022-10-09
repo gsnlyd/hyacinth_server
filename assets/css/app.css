@@ -28,6 +28,17 @@ h1 {
     @apply px-4 py-2;
 }
 
+.btn-icon {
+    @apply pl-2 flex items-center space-x-1 font-medium;
+}
+
+.btn-icon.btn-xs {
+}
+
+.btn-icon.btn-lg {
+    @apply pl-2 space-x-2;
+}
+
 .btn-blue {
     @apply text-black font-medium;
     @apply bg-blue-300 hover:bg-blue-400;

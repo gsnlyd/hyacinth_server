@@ -1,6 +1,12 @@
 <header>
   <div>
-    <h1 class="text-4xl">Pipelines</h1>
+    <div class="flex justify-between items-center">
+      <h1 class="text-4xl">Pipelines</h1>
+      <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.PipelineLive.New), class: "link-btn btn-icon btn-blue" do %>
+        <Icons.plus_small_solid />
+        <span>New Pipeline</span>
+      <% end %>
+    </div>
     <div class="mt-3">
       <.form let={f} for={@filter_changeset} phx-change="filter_updated">
         <div class="filter-form-content flex justify-between items-center">

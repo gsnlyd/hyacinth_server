@@ -47,6 +47,8 @@ defmodule HyacinthWeb do
       use Phoenix.LiveView,
         layout: {HyacinthWeb.LayoutView, "live.html"}
 
+      alias HyacinthWeb.Components.Icons
+
       unquote(view_helpers())
     end
   end
