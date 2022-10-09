@@ -55,7 +55,7 @@ jobs:
       image: quay.io/centos/centos:stream8
     steps:
       - run: dnf config-manager --set-enabled powertools
-      - run: dnf install epel-release epel-next-release
+      - run: dnf -y install epel-release epel-next-release
       - run: yum -y install wget
       - run: wget https://packages.erlang-solutions.com/erlang-solutions-2.0-1.noarch.rpm
       - run: rpm -Uvh erlang-solutions-2.0-1.noarch.rpm
