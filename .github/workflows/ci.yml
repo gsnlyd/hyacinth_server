@@ -47,3 +47,19 @@ jobs:
         with:
           name: hyacinth-x64-debian10
           path: _build/prod/rel/hyacinth-x64-debian10.tar
+
+  check-debian10-versions:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:buster
+    steps:
+      - run: ldd --version
+      - run: openssl version
+
+  check-centos-stream-8-versions:
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/centos/centos:stream8
+    steps:
+      - run: ldd --version
+      - run: openssl version
