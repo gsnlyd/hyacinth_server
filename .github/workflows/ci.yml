@@ -67,7 +67,8 @@ jobs:
       - run: unzip elixir-otp-24.zip -d ~/elixir
       - run: ~/elixir/bin/elixir --version
       - run: locale
-      - run: |
+      - name: run elixir
+        run: |
         localedef -c -f UTF-8 -i en_US en_US.UTF-8
         export LC_ALL=en_US.UTF-8
         ~/elixir/bin/elixir --version
