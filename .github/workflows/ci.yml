@@ -67,8 +67,11 @@ jobs:
       - run: unzip elixir-otp-24.zip -d ~/elixir
       - run: ~/elixir/bin/elixir --version
       - run: locale
-      - name: run elixir
+      - name: Define locale
         run: |
+          dnf -y install glibc-locale-source glibc-langpack-en
           localedef -c -f UTF-8 -i en_US en_US.UTF-8
+      - name: Run elixir
+        run: |
           export LC_ALL=en_US.UTF-8
           ~/elixir/bin/elixir --version
