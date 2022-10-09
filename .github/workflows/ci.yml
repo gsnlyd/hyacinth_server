@@ -69,6 +69,6 @@ jobs:
       - run: locale
       - name: run elixir
         run: |
-        localedef -c -f UTF-8 -i en_US en_US.UTF-8
-        export LC_ALL=en_US.UTF-8
-        ~/elixir/bin/elixir --version
+          localedef -c -f UTF-8 -i en_US en_US.UTF-8
+          export LC_ALL=en_US.UTF-8
+          ~/elixir/bin/elixir --version
