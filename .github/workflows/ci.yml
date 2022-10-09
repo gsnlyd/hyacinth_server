@@ -69,7 +69,7 @@ jobs:
           dnf -y install glibc-locale-source glibc-langpack-en
           localedef -c -f UTF-8 -i en_US en_US.UTF-8
       - name: Install dev tools
-        run: dnf -y install gcc gcc-c++ kernel-devel
+        run: dnf -y group install 'Development Tools'
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Build release
