@@ -84,5 +84,10 @@ jobs:
           mix assets.deploy
           mix release
       - name: Create release tarball
-        run: tar -cvf hyacinth-x64-debian10.tar hyacinth
+        run: tar -cvf hyacinth-x64-centos-stream-8.tar hyacinth
         working-directory: _build/prod/rel
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: hyacinth-x64-centos-stream-8
+          path: _build/prod/rel/hyacinth-x64-centos-stream-8.tar
