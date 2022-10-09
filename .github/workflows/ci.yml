@@ -17,7 +17,7 @@ jobs:
     container:
       image: debian:buster
     steps:
-      - name: Install erlang/elixir
+      - name: Install Erlang/OTP and Elixir
         run: |
           apt-get update
           apt-get -y install wget gnupg build-essential
@@ -26,20 +26,17 @@ jobs:
           apt-get update
           apt-get -y install esl-erlang
           apt-get -y install elixir
-          mix local.hex --force
-          mix local.rebar --force
-          elixir --version
-          apt list --installed
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Get dependencies
-        run: mix deps.get --only prod
-      - name: Compile app
-        run: MIX_ENV=prod mix compile
-      - name: Prepare assets
-        run: MIX_ENV=prod mix assets.deploy
       - name: Build release
-        run: MIX_ENV=prod mix release
+        run: |
+          export MIX_ENV=prod
+          mix local.hex --force
+          mix local.rebar --force
+          mix deps.get --only prod
+          mix compile
+          mix assets.deploy
+          mix release
       - name: Create release tarball
         run: tar -cvf hyacinth-x64-debian10.tar hyacinth
         working-directory: _build/prod/rel
