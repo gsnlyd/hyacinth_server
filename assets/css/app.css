@@ -26,6 +26,13 @@ h3 {
 .btn-lg {
     @apply px-4 py-2;
 }
+.btn-xl {
+    @apply text-lg px-6 py-3;
+}
+
+.btn-round {
+    @apply p-0 rounded-full flex justify-center items-center;
+}
 
 .btn-blue {
     @apply text-black font-medium;
@@ -46,6 +53,9 @@ h3 {
 }
 .btn-icon.btn-lg {
     @apply pl-2 space-x-2;
+}
+.btn-icon.btn-xl {
+    @apply pl-5 space-x-3;
 }
 
 .btn-icon-only {
@@ -130,13 +140,14 @@ h3 {
     @apply px-2 py-1;
     @apply placeholder-gray-500;
     @apply bg-gray-700 rounded;
-    @apply border-gray-400 hover:border-white focus:border-blue-500 focus:ring-blue-500;
+    @apply border-gray-500 hover:border-gray-300 focus:border-blue-500 focus:ring-blue-500;
 }
 
 .form-content select {
     @apply w-60 px-2 py-1 pr-8;
+    @apply text-gray-300;
     @apply bg-gray-700 rounded;
-    @apply border-gray-400 hover:border-white focus:border-blue-500 focus:ring-blue-500;
+    @apply border-gray-500 hover:border-gray-300 focus:border-blue-500 focus:ring-blue-500;
 }
 
 .form-content button[type='submit'] {

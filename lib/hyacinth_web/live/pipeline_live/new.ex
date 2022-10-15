@@ -127,13 +127,15 @@ defmodule HyacinthWeb.PipelineLive.New do
     {:noreply, socket}
   end
 
-  def handle_event("remove_last_transform", _value, socket) do
+  def handle_event("delete_transform", %{"index" => index}, socket) do
+    index = String.to_integer(index)
+
     pipeline_changeset = socket.assigns.pipeline_changeset
     transform_changesets = Map.get(pipeline_changeset.changes, :transforms, [])
-    transform_changesets = List.delete_at(transform_changesets, -1)
+    transform_changesets = List.delete_at(transform_changesets, index)
     pipeline_changeset = Ecto.Changeset.put_assoc(pipeline_changeset, :transforms, transform_changesets)
 
-    transform_options = List.delete_at(socket.assigns.transform_options, -1)
+    transform_options = List.delete_at(socket.assigns.transform_options, index)
 
     socket = assign(socket, %{
       pipeline_changeset: pipeline_changeset,
