@@ -47,7 +47,7 @@
     </div>
     <div class="mt-4 grid grid-cols-3 gap-4">
       <%= for %LabelJob{} = job <- filter_jobs(@jobs, @job_filter_changeset) do %>
-        <%= live_redirect to: Routes.label_job_path(@socket, :show, job),
+        <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelJobLive.Show, job),
             class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
           <div class="flex justify-between items-start space-x-4">
             <div class="shrink text-sm text-gray-300 font-medium"><%= job.name %></div>

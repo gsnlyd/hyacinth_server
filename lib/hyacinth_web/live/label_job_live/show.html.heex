@@ -1,0 +1,22 @@
+<header>
+  <div class="flex items-center space-x-3">
+    <h1 class="text-3xl"><%= @job.name %></h1>
+    <%= case @job.label_type do %>
+      <% :classification -> %>
+        <div class="pill pill-lg pill-green">Classification</div>
+      <% :comparison_exhaustive -> %>
+        <div class="pill pill-lg pill-blue">Comparison</div>
+    <% end %>
+  </div>
+</header>
+
+<main>
+  <div class="grid grid-cols-3 gap-4">
+    <%= for sess <- @sessions do %>
+      <%= link to: Routes.label_session_path(@socket, :show, sess),
+          class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
+        <div>Label Session</div>
+      <% end %>
+    <% end %>
+  </div>
+</main>

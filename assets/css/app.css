@@ -82,6 +82,10 @@ h3 {
     @apply inline-block px-2 py-0.5 text-xs rounded-full;
 }
 
+.pill-lg {
+    @apply px-3 py-1 text-sm font-medium;
+}
+
 .pill-violet {
     @apply text-violet-400 bg-violet-400 bg-opacity-20;
 }

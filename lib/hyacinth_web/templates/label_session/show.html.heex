@@ -3,7 +3,7 @@
   <ul>
     <li>
       <span class="text-gray-400 font-medium">Job:</span>
-      <%= link @label_session.job.name, to: Routes.label_job_path(@conn, :show, @label_session.job), class: "link" %>
+      <%= link @label_session.job.name, to: Routes.live_path(@conn, HyacinthWeb.LabelJobLive.Show, @label_session.job), class: "link" %>
     </li>
     <li>
       <span class="text-gray-400 font-medium">Dataset:</span>
