@@ -1,22 +1,98 @@
 <header>
-  <div class="flex items-center space-x-3">
-    <h1 class="text-3xl"><%= @job.name %></h1>
-    <%= case @job.label_type do %>
-      <% :classification -> %>
-        <div class="pill pill-lg pill-green">Classification</div>
-      <% :comparison_exhaustive -> %>
-        <div class="pill pill-lg pill-blue">Comparison</div>
+  <div class="flex justify-between items-center">
+    <div class="flex items-center space-x-3">
+      <h1 class="text-3xl"><%= @job.name %></h1>
+      <%= case @job.label_type do %>
+        <% :classification -> %>
+          <div class="pill pill-lg pill-green">Classification</div>
+        <% :comparison_exhaustive -> %>
+          <div class="pill pill-lg pill-blue">Comparison</div>
+      <% end %>
+    </div>
+
+    <%= link to: Routes.label_session_path(@socket, :new, @job), class: "btn btn-blue btn-icon" do %>
+      <Icons.plus_small_solid />
+      <span>New Session</span>
     <% end %>
+  </div>
+
+  <div class="mt-4 text-xl border-b-2 border-gray-700">
+    <div class="-mb-0.5">
+      <.tab_button cur_tab={@tab} event="set_tab" tab="sessions">Sessions</.tab_button>
+      <.tab_button cur_tab={@tab} event="set_tab" tab="elements">Elements</.tab_button>
+    </div>
   </div>
 </header>
 
-<main>
-  <div class="grid grid-cols-3 gap-4">
-    <%= for sess <- @sessions do %>
-      <%= link to: Routes.label_session_path(@socket, :show, sess),
-          class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
-        <div>Label Session</div>
+<main class="mt-4">
+  <%= case @tab do %>
+
+  <% :sessions -> %>
+    <div>
+      <.form let={f} for={@session_filter_changeset} phx-change="session_filter_updated">
+        <div class="filter-form-content flex justify-between items-center">
+          <p>
+            <%= text_input f, :search, placeholder: "Search session users...", class: "mr-2 w-80" %>
+          </p>
+          <div class="flex items-center space-x-3">
+            <p>
+              <%= label f, :type %>
+              <%= select f, :type, Ecto.Enum.values(SessionFilterOptions, :type) %>
+            </p>
+            <p>
+              <%= label f, :sort_by %>
+              <%= select f, :sort_by, Ecto.Enum.values(SessionFilterOptions, :sort_by), class: "basic-select" %>
+            </p>
+            <p>
+              <%= label f, :order %>
+              <%= select f, :order, Ecto.Enum.values(SessionFilterOptions, :order) %>
+            </p>
+          </div>
+        </div>
+      </.form>
+    </div>
+    <div class="mt-4 grid grid-cols-3 gap-4">
+      <%= for sess <- filter_sessions(@sessions, @session_filter_changeset) do %>
+        <%= link to: Routes.label_session_path(@socket, :show, sess),
+            class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
+          <div class="shrink text-sm text-gray-300 font-medium"><%= sess.user.email %></div>
+          <div class="mt-2">
+            <div class="text-gray-500 text-xs">Created <%= Calendar.strftime(sess.inserted_at, "%c") %></div>
+          </div>
+        <% end %>
       <% end %>
-    <% end %>
-  </div>
+    </div>
+
+  <% :elements -> %>
+    <div>
+      <div class="ml-1 text-lg text-gray-300"><%= length(@job.blueprint.elements) %> elements</div>
+      <div class="mt-2 border border-gray-700 rounded">
+        <table class="mt-1 w-full table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Objects</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-400 text-sm">
+            <%= for %LabelElement{} = element <- @job.blueprint.elements do %>
+              <tr>
+                <td><%= element.element_index %></td>
+                <td>
+                  <%= for {%Object{} = object, obj_i} <- Enum.with_index(element.objects) do %>
+                  <span class="hover:text-blue-300">
+                    <%= object.name %><%= if obj_i < length(element.objects) - 1, do: ", " %>
+                  </span>
+                  <% end %>
+                </td>
+                <td><%= Calendar.strftime(element.inserted_at, "%c") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  <% end %>
 </main>

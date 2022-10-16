@@ -48,6 +48,7 @@ defmodule HyacinthWeb do
         layout: {HyacinthWeb.LayoutView, "live.html"}
 
       alias HyacinthWeb.Components.Icons
+      import HyacinthWeb.Components.BasicComponents
 
       unquote(view_helpers())
     end
