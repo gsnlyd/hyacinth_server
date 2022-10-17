@@ -1,5 +1,14 @@
 <header>
-  <div class="flex items-center space-x-3">
+  <.breadcrumbs>
+    <:crumb label={nil} to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Index)}>
+      Datasets
+    </:crumb>
+    <:crumb label="Dataset" to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, @dataset)}>
+      <%= @dataset.name %>
+    </:crumb>
+  </.breadcrumbs>
+
+  <div class="mt-2 flex items-center space-x-3">
     <h1 class="text-3xl"><%= @dataset.name %></h1>
     <div>
       <%= case @dataset.type do %>

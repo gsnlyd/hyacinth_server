@@ -1,14 +1,18 @@
 <header>
-  <div class="text-sm">
-    <span class="px-1 py-0.5 text-xs text-gray-400 bg-gray-800 rounded">Dataset</span>
-    <%= link @label_session.job.dataset.name, to: Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, @label_session.job.dataset), class: "link" %>
-    <span class="text-gray-500">></span>
-    <span class="px-1 py-0.5 text-xs text-gray-400 bg-gray-800 rounded">Job</span>
-    <%= link @label_session.job.name, to: Routes.live_path(@socket, HyacinthWeb.LabelJobLive.Show, @label_session.job), class: "link" %>
-    <span class="text-gray-500">></span>
-    <span class="px-1 py-0.5 text-xs text-gray-400 bg-gray-800 rounded">Session</span>
-    <%= link @label_session.user.email, to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @label_session), class: "link" %>
-  </div>
+  <.breadcrumbs>
+    <:crumb label={nil} to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Index)}>
+      Datasets
+    </:crumb>
+    <:crumb label="Dataset" to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, @label_session.job.dataset)}>
+      <%= @label_session.job.dataset.name %>
+    </:crumb>
+    <:crumb label="Job" to={Routes.live_path(@socket, HyacinthWeb.LabelJobLive.Show, @label_session.job)}>
+      <%= @label_session.job.name %>
+    </:crumb>
+    <:crumb label="Session" to={Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @label_session)}>
+      <%= @label_session.user.email %>
+    </:crumb>
+  </.breadcrumbs>
 
   <div class="mt-2">
     <div class="flex items-center space-x-3">

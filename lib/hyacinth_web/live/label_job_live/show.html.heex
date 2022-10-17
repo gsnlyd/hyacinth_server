@@ -1,5 +1,17 @@
 <header>
-  <div class="flex justify-between items-center">
+  <.breadcrumbs>
+    <:crumb label={nil} to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Index)}>
+      Datasets
+    </:crumb>
+    <:crumb label="Dataset" to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, @job.dataset)}>
+      <%= @job.dataset.name %>
+    </:crumb>
+    <:crumb label="Job" to={Routes.live_path(@socket, HyacinthWeb.LabelJobLive.Show, @job)}>
+      <%= @job.name %>
+    </:crumb>
+  </.breadcrumbs>
+
+  <div class="mt-2 flex justify-between items-center">
     <div class="flex items-center space-x-3">
       <h1 class="text-3xl"><%= @job.name %></h1>
       <%= case @job.label_type do %>
