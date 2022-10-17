@@ -25,7 +25,6 @@ defmodule HyacinthWeb.Router do
     resources "/jobs", LabelJobController, except: [:show]
 
     get "/jobs/:label_job_id/sessions/new", LabelSessionController, :new
-    get "/sessions/:label_session_id", LabelSessionController, :show
 
     get "/sessions/:label_session_id/label/:element_index", LabelSessionController, :label
     post "/set_label/:element_id/:label_value", LabelSessionController, :set_label
@@ -45,6 +44,8 @@ defmodule HyacinthWeb.Router do
       live "/pipelines/:pipeline_id", PipelineLive.Show
 
       live "/jobs/:label_job_id", LabelJobLive.Show
+
+      live "/sessions/:label_session_id", LabelSessionLive.Show
     end
   end
 

@@ -7,7 +7,7 @@ defmodule HyacinthWeb.LabelSessionController do
     label_job = Labeling.get_label_job!(label_job_id)
     label_session = Labeling.create_label_session(label_job, conn.assigns.current_user)
 
-    redirect(conn, to: Routes.label_session_path(conn, :show, label_session))
+    redirect(conn, to: Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Show, label_session))
   end
 
   def show(conn, %{"label_session_id" => label_session_id}) do

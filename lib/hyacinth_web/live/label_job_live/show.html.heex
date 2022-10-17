@@ -4,9 +4,9 @@
       <h1 class="text-3xl"><%= @job.name %></h1>
       <%= case @job.label_type do %>
         <% :classification -> %>
-          <div class="pill pill-lg pill-green">Classification</div>
+          <div class="pill pill-lg pill-green">Classification Job</div>
         <% :comparison_exhaustive -> %>
-          <div class="pill pill-lg pill-blue">Comparison</div>
+          <div class="pill pill-lg pill-blue">Comparison Job</div>
       <% end %>
     </div>
 
@@ -53,7 +53,7 @@
     </div>
     <div class="mt-4 grid grid-cols-3 gap-4">
       <%= for sess <- filter_sessions(@sessions, @session_filter_changeset) do %>
-        <%= link to: Routes.label_session_path(@socket, :show, sess),
+        <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, sess),
             class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
           <div class="shrink text-sm text-gray-300 font-medium"><%= sess.user.email %></div>
           <div class="mt-2">

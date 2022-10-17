@@ -1,6 +1,6 @@
 <header class="mt-4 px-4 py-1 w-full bg-gray-800 rounded border border-gray-700 flex justify-between items-center">
   <div>
-    <%= link "Back to session", to: Routes.label_session_path(@conn, :show, @label_session) %>
+    <%= link "Back to session", to: Routes.live_path(@conn, HyacinthWeb.LabelSessionLive.Show, @label_session) %>
   </div>
   <div class="flex items-center">
     <a href={Routes.label_session_path(@conn, :label, @label_session, @element.element_index - 1)}>Prev</a>
