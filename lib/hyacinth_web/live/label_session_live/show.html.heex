@@ -28,7 +28,7 @@
 </header>
 
 <main class="mt-5">
-  <%= link "Start Labeling", to: Routes.label_session_path(@socket, :label, @label_session, 0), class: "btn btn-lg btn-blue" %>
+  <%= link "Start Labeling", to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Label, @label_session, 0), class: "btn btn-lg btn-blue" %>
   <div class="mt-4">
     <div class="ml-1 text-lg text-gray-300"><%= length(@label_session.elements) %> elements</div>
     <div class="mt-2 border border-gray-700 rounded">
@@ -60,7 +60,7 @@
                 <td>-</td>
               <% end %>
               <td>
-                <%= link "View", to: Routes.label_session_path(@socket, :label, @label_session, element.element_index), class: "text-xs text-blue-300 hover:text-blue-400 font-medium" %>
+                <%= link "View", to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Label, @label_session, element.element_index), class: "text-xs text-blue-300 hover:text-blue-400 font-medium" %>
               </td>
             </tr>
           <% end %>

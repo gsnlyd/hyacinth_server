@@ -26,7 +26,6 @@ defmodule HyacinthWeb.Router do
 
     get "/jobs/:label_job_id/sessions/new", LabelSessionController, :new
 
-    get "/sessions/:label_session_id/label/:element_index", LabelSessionController, :label
     post "/set_label/:element_id/:label_value", LabelSessionController, :set_label
 
     get "/object-image/:object_id", ImageController, :show
@@ -46,6 +45,7 @@ defmodule HyacinthWeb.Router do
       live "/jobs/:label_job_id", LabelJobLive.Show
 
       live "/sessions/:label_session_id", LabelSessionLive.Show
+      live "/sessions/:label_session_id/label/:element_index", LabelSessionLive.Label
     end
   end
 
