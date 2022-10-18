@@ -8,17 +8,17 @@
   </div>
 
   <div class="flex items-center">
-    <%= live_redirect "Prev",
-      to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Label, @label_session, max(@element.element_index - 1, 0)),
-      class: "text-blue-300 hover:text-blue-400 font-medium"
-    %>
+    <button class="text-blue-300 hover:text-blue-400 font-medium flex items-center space-x-0.5" phx-click="prev_element">
+      <Icons.chevron_left_mini />
+      <span>Prev</span>
+    </button>
     <div class="w-24 text-4xl font-bold text-center">
       <%= @element.element_index + 1 %>
     </div>
-    <%= live_redirect "Next",
-      to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Label, @label_session, min(@element.element_index + 1, length(@label_session.elements) - 1)),
-      class: "text-blue-300 hover:text-blue-400 font-medium"
-    %>
+    <button class="text-blue-300 hover:text-blue-400 font-medium flex items-center space-x-0.5" phx-click="next_element">
+      <span>Next</span>
+      <Icons.chevron_right_mini />
+    </button>
   </div>
 
   <div />
