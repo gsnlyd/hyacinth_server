@@ -5,6 +5,10 @@
 
 /* Basic Elements */
 
+body {
+    @apply text-white bg-gray-900;
+}
+
 h1 {
     @apply text-3xl text-gray-300 font-medium;
 }

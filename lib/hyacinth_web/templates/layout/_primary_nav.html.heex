@@ -1,7 +1,7 @@
 <nav class="py-2 bg-gray-800">
   <div class="mx-auto max-w-screen-lg flex justify-between items-center">
     <div>
-      <a href={Routes.page_path(assigns[:conn] || assigns[:socket], :index)} class="text-2xl text-white hover:text-gray-300 hover:no-underline font-medium">Hyacinth</a>
+      <%= link "Hyacinth", to: Routes.page_path(assigns[:conn] || assigns[:socket], :index), class: "text-2xl text-white hover:text-gray-300 hover:no-underline font-medium" %>
     </div>
     <div>
       <ul class="flex items-center space-x-4">
