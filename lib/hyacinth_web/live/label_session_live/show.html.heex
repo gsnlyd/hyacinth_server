@@ -14,25 +14,43 @@
     </:crumb>
   </.breadcrumbs>
 
-  <div class="mt-2">
-    <div class="flex items-center space-x-3">
-      <h1>
-        <span class="text-gray-500">Session for</span>
-        <span><%= @label_session.job.name %></span>
-      </h1>
-      <%= case @label_session.job.label_type do %>
-        <% :classification -> %>
-          <div class="pill pill-lg pill-green">Classification Session</div>
-        <% :comparison_exhaustive -> %>
-          <div class="pill pill-lg pill-blue">Comparison Session</div>
+  <div class="mt-2 flex justify-between items-start">
+    <div>
+      <div class="flex items-center space-x-3">
+        <h1>Labeling Session</h1>
+        <div class="mt-2">
+          <%= case @label_session.job.label_type do %>
+            <% :classification -> %>
+              <div class="pill pill-lg pill-green">Classification Session</div>
+            <% :comparison_exhaustive -> %>
+              <div class="pill pill-lg pill-blue">Comparison Session</div>
+          <% end %>
+        </div>
+      </div>
+
+      <h2 class="mt-2 text-gray-400">
+        <div class="flex items-center space-x-1">
+          <span class="mt-0.5 text-gray-500"><Icons.briefcase_mini /></span>
+          <span><%= @label_session.job.name %></span>
+        </div>
+
+        <div class="flex items-center space-x-1">
+          <span class="mt-0.5 text-gray-500"><Icons.user_circle_mini /></span>
+          <span><%= @label_session.user.email %></span>
+        </div>
+      </h2>
+    </div>
+
+    <div class="shrink-0">
+      <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Label, @label_session, 0), class: "btn btn-lg btn-blue btn-icon" do %>
+        <Icons.play_circle_solid />
+        <span>Start Labeling</span>
       <% end %>
     </div>
-    <h2 class="text-lg text-gray-400 font-medium"><%= @label_session.user.email %></h2>
   </div>
 </header>
 
 <main class="mt-5">
-  <%= link "Start Labeling", to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Label, @label_session, 0), class: "btn btn-lg btn-blue" %>
   <div class="mt-4">
     <div class="ml-1 text-lg text-gray-300"><%= length(@label_session.elements) %> elements</div>
     <div class="mt-2 border border-gray-700 rounded">

@@ -6,7 +6,7 @@
 /* Basic Elements */
 
 h1 {
-    @apply text-4xl text-gray-300 font-medium;
+    @apply text-3xl text-gray-300 font-medium;
 }
 
 h3 {
