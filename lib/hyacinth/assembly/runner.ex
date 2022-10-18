@@ -24,6 +24,8 @@ defmodule Hyacinth.Assembly.Runner do
     results_glob_path = Path.join(temp_dir, Driver.results_glob(transform.driver, transform.arguments))
     results_paths = Path.wildcard(results_glob_path)
 
+    output_format = Driver.output_format(transform.driver, transform.arguments)
+
     Enum.map(results_paths, fn path ->
       hash = Store.ingest_file!(path)
 
@@ -31,7 +33,7 @@ defmodule Hyacinth.Assembly.Runner do
         hash: hash,
         type: :blob,  # TODO: handle tree
         name: Path.relative_to(path, temp_dir),
-        file_type: :png,  # TODO: use driver output type
+        file_type: output_format,
       }
     end)
   end

@@ -170,7 +170,60 @@ defmodule Hyacinth.Assembly.Driver do
   @spec results_glob(driver :: atom, options :: %{String.t => term}) :: String.t
   def results_glob(driver, options), do: module_for(driver).results_glob(options)
 
-  @optional_callbacks command_args: 2, results_glob: 1
+  @doc """
+  Callback that returns the input format for this driver with the given options.
+
+  This callback should not be implemented for pure drivers (see `pure?/1`).
+
+  See `input_format/2` for details.
+  """
+  @callback input_format(options :: map) :: atom
+
+  @doc """
+  Returns the input format for the given driver with the given options.
+
+  The returned format can be any valid `Hyacinth.Warehouse.FormatType`
+  format.
+
+  This function is not implemented for pure drivers (see `pure?/1`).
+
+  ## Examples
+
+      iex> input_format(:dicom_to_nifti, some_options)
+      :dicom
+
+  """
+  @spec input_format(atom, map) :: atom
+  def input_format(driver, options), do: module_for(driver).input_format(options)
+
+  @doc """
+  Callback that returns the output format for this driver with the given options.
+
+  This callback should not be implemented for pure drivers (see `pure?/1`).
+
+  See `output_format/2` for details.
+  """
+  @callback output_format(options :: map) :: atom
+
+  @doc """
+  Returns the output format for the given driver with the given options.
+
+  The returned format can be any valid `Hyacinth.Warehouse.FormatType`
+  format.
+
+  This function is not implemented for pure drivers (see `pure?/1`).
+
+  ## Examples
+
+      iex> ouptut_format(:dicom_to_nifti, some_options)
+      :nifti
+
+  """
+  @spec output_format(atom, map) :: atom
+  def output_format(driver, options), do: module_for(driver).output_format(options)
+
+
+  @optional_callbacks command_args: 2, results_glob: 1, input_format: 1, output_format: 1
 
   defp module_for(:sample), do: Driver.Sample
   defp module_for(:slicer), do: Driver.Slicer

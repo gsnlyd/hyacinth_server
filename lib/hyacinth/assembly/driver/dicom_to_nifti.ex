@@ -59,4 +59,10 @@ defmodule Hyacinth.Assembly.Driver.DicomToNifti do
 
   @impl Driver
   def results_glob(_options), do: "**/*.nii.gz"
+
+  @impl Driver
+  def input_format(_options), do: :dicom
+
+  @impl Driver
+  def output_format(_options), do: :nifti
 end

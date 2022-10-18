@@ -59,4 +59,10 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
 
   @impl Driver
   def results_glob(_options), do: "output/*.png"
+
+  @impl Driver
+  def input_format(_options), do: :nifti
+
+  @impl Driver
+  def output_format(_options), do: :png
 end
