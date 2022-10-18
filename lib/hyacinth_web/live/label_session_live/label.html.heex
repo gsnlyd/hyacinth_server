@@ -2,12 +2,12 @@
 <div phx-window-keydown="next_element" phx-key="ArrowRight" />
 <div phx-window-keydown="set_label_key" />
 
-<header class="px-4 py-2 w-full bg-gray-800 flex justify-between items-center">
-  <div>
+<header class="px-4 py-2 w-full bg-gray-800 flex items-center">
+  <div class="w-1/3">
     <%= live_redirect "Back to session", to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @label_session), class: "link" %>
   </div>
 
-  <div class="flex items-center">
+  <div class="w-1/3 flex justify-center items-center">
     <button class="text-blue-300 hover:text-blue-400 font-medium flex items-center space-x-0.5" phx-click="prev_element">
       <Icons.chevron_left_mini />
       <span>Prev</span>
@@ -21,7 +21,26 @@
     </button>
   </div>
 
-  <div />
+  <div class="w-1/3 flex justify-end items-center space-x-6">
+    <div class="space-x-1">
+      <button class="btn btn-gray btn-icon-only" phx-click="open_modal_label_history">
+        <Icons.bookmark_mini />
+      </button>
+      <button class="btn btn-gray btn-icon-only">
+        <Icons.plus_circle_mini />
+      </button>
+      <button class="btn btn-gray btn-icon-only">
+        <Icons.user_mini />
+      </button>
+    </div>
+
+    <div class="bg-gray-700 border border-gray-500 divide-x divide-gray-500 rounded flex">
+      <div class="px-4 text-gray-300 font-mono flex items-center">0:00</div>
+      <button class="p-2 text-gray-300 hover:bg-gray-800 rounded-r transition focus:ring-4 focus:ring-gray-500 focus:outline-none">
+        <Icons.briefcase_mini />
+      </button>
+    </div>
+  </div>
 </header>
 
 <main class="mt-8">
@@ -55,25 +74,32 @@
         <% end %>
       </div>
     </div>
-
-    <div>
-      <div class="text-sm text-gray-400 font-medium">Label History</div>
-      <table class="mt-1 table w-64 text-sm text-gray-400">
-        <thead>
-          <th>Value</th>
-          <th>Timestamp</th>
-        </thead>
-        <tbody>
-          <%= for {label, i} <- Enum.with_index(@labels) do %>
-            <tr class={i == 0 && "text-gray-200"}>
-              <td><%= label.label_value %></td>
-              <td><%= Calendar.strftime(label.inserted_at, "%c") %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
-
-
   </div>
 </main>
+
+<div>
+  <%= case @modal do %>
+  <% :label_history -> %>
+    <.modal>
+      <:header>Label History</:header>
+
+      <div class="border border-gray-700 rounded">
+        <table class="mt-1 w-full table text-sm text-gray-400">
+          <thead>
+            <th>Value</th>
+            <th>Timestamp</th>
+          </thead>
+          <tbody>
+            <%= for {label, i} <- Enum.with_index(@labels) do %>
+              <tr class={i == 0 && "text-blue-500 font-bold"}>
+                <td><%= label.label_value %></td>
+                <td><%= Calendar.strftime(label.inserted_at, "%c") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </.modal>
+  <% nil -> %>
+  <% end %>
+</div>

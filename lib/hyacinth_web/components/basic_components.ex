@@ -2,6 +2,26 @@ defmodule HyacinthWeb.Components.BasicComponents do
   use Phoenix.Component
   alias HyacinthWeb.Components.Icons
 
+  def modal(assigns) do
+    assigns = assign_new(assigns, :close_event, fn -> "close_modal" end)
+    ~H"""
+    <div class="top-0 left-0 fixed bg-black bg-opacity-90 flex justify-center items-start" style="width: 100vw; height: 100vh;">
+      <div class="flex-1 mt-20 p-4 pt-2 max-w-lg bg-gray-800 rounded border border-gray-700" phx-click-away={@close_event}>
+        <div class="flex justify-between items-start">
+          <h1>
+            <%= render_slot(@header) %>
+          </h1>
+          <button class="-mt-2 text-4xl text-gray-300 hover:text-red-500" phx-click={@close_event}>&times;</button>
+        </div>
+
+        <div class="mt-2">
+          <%= render_slot(@inner_block) %>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
   def tab_button(assigns) do
     button_class =
       "px-2 pb-1 border-purple-400 transition" <>

@@ -52,6 +52,13 @@ h3 {
     @apply focus:outline-none;
 }
 
+.btn-gray {
+    @apply text-black font-medium;
+    @apply bg-gray-400 hover:bg-gray-500;
+    @apply focus:ring-gray-200 focus:hover:ring-gray-400;
+    @apply focus:outline-none;
+}
+
 .btn-icon {
     @apply pl-2 flex items-center space-x-1;
 }

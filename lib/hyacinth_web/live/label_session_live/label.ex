@@ -15,6 +15,8 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
       current_value: if(length(labels) == 0, do: nil, else: hd(labels).label_value),
 
+      modal: nil,
+
       disable_primary_nav: true,
       use_wide_layout: true,
     })
@@ -64,5 +66,13 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
     new_index = min(socket.assigns.element.element_index + 1, length(socket.assigns.label_session.elements) - 1)
     path = Routes.live_path(socket, HyacinthWeb.LabelSessionLive.Label, socket.assigns.label_session, new_index)
     {:noreply, push_redirect(socket, to: path)}
+  end
+
+  def handle_event("open_modal_label_history", _value, socket) do
+    {:noreply, assign(socket, :modal, :label_history)}
+  end
+
+  def handle_event("close_modal", _value, socket) do
+    {:noreply, assign(socket, :modal, nil)}
   end
 end
