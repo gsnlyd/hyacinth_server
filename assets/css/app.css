@@ -139,7 +139,7 @@ h3 {
 }
 
 .form-content label {
-    @apply text-sm text-gray-300;
+    @apply text-sm text-gray-400;
 }
 
 .form-content input[type="text"],
@@ -159,7 +159,7 @@ h3 {
 }
 
 .form-content button[type='submit'] {
-    @apply btn btn-blue;
+    @apply mt-4 btn btn-blue;
 }
 
 /* Filter/Sort Forms */

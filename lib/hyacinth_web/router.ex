@@ -22,11 +22,7 @@ defmodule HyacinthWeb.Router do
 
     get "/", PageController, :index
 
-    resources "/jobs", LabelJobController, except: [:show]
-
     get "/jobs/:label_job_id/sessions/new", LabelSessionController, :new
-
-    post "/set_label/:element_id/:label_value", LabelSessionController, :set_label
 
     get "/object-image/:object_id", ImageController, :show
   end
@@ -42,6 +38,7 @@ defmodule HyacinthWeb.Router do
       live "/pipelines/new", PipelineLive.New
       live "/pipelines/:pipeline_id", PipelineLive.Show
 
+      live "/jobs/new", LabelJobLive.New
       live "/jobs/:label_job_id", LabelJobLive.Show
 
       live "/sessions/:label_session_id", LabelSessionLive.Show

@@ -1,0 +1,52 @@
+<header>
+  <%= if @dataset do %>
+    <.breadcrumbs>
+      <:crumb label={nil} to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Index)}>
+        Datasets
+      </:crumb>
+      <:crumb label="Dataset" to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, @dataset)}>
+        <%= @dataset.name %>
+      </:crumb>
+      <:crumb label={nil} to={Routes.live_path(@socket, HyacinthWeb.LabelJobLive.New, dataset: @dataset)}>
+        New Job
+      </:crumb>
+    </.breadcrumbs>
+    <div class="mb-2" />
+  <% end %>
+
+  <h1>New Job</h1>
+</header>
+
+<main class="mt-2">
+  <.form let={f} for={@changeset} phx-change="form_change" phx-submit="form_submit">
+    <div class="form-content">
+      <p>
+        <%= label f, :dataset_id %>
+        <%= select f, :dataset_id, Enum.map(@datasets, fn d -> {d.name, d.id} end), prompt: "Choose a value" %>
+        <%= error_tag f, :dataset_id %>
+      </p>
+
+      <p>
+        <%= label f, :name %>
+        <%= text_input f, :name, placeholder: "Job name" %>
+        <%= error_tag f, :name %>
+      </p>
+
+      <p>
+        <%= label f, :label_type %>
+        <%= select f, :label_type, Ecto.Enum.values(Hyacinth.Labeling.LabelJob, :label_type), prompt: "Choose a value" %>
+        <%= error_tag f, :label_type %>
+      </p>
+
+      <p>
+        <%= label f, :label_options_string %>
+        <%= text_input f, :label_options_string, placeholder: "Label1, Label2" %>
+        <%= error_tag f, :label_options_string %>
+      </p>
+
+      <div>
+        <%= submit "Create Job" %>
+      </div>
+    </div>
+  </.form>
+</main>
