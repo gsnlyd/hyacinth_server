@@ -15,6 +15,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
       current_value: if(length(labels) == 0, do: nil, else: hd(labels).label_value),
 
+      disable_primary_nav: true,
       use_wide_layout: true,
     })
 

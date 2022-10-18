@@ -1,0 +1,19 @@
+<nav class="py-2 bg-gray-800">
+  <div class="mx-auto max-w-screen-lg flex justify-between items-center">
+    <div>
+      <a href={Routes.page_path(assigns[:conn] || assigns[:socket], :index)} class="text-2xl text-white hover:text-gray-300 hover:no-underline font-medium">Hyacinth</a>
+    </div>
+    <div>
+      <ul class="flex items-center space-x-4">
+        <%= if @current_user do %>
+          <li><%= @current_user.email %></li>
+          <li><%= link "Settings", to: Routes.user_settings_path(assigns[:conn] || assigns[:socket], :edit), class: "link" %></li>
+          <li><%= link "Log out", to: Routes.user_session_path(assigns[:conn] || assigns[:socket], :delete), method: :delete, class: "link" %></li>
+        <% else %>
+          <li><%= link "Register", to: Routes.user_registration_path(assigns[:conn] || assigns[:socket], :new), class: "link" %></li>
+          <li><%= link "Log in", to: Routes.user_session_path(assigns[:conn] || assigns[:socket], :new), class: "link" %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</nav>
