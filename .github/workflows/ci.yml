@@ -28,6 +28,10 @@ jobs:
           mkdir -p datasets/test_dataset
           python generate.py 10 datasets/test_dataset
         working-directory: ./priv/test_data
+      - name: Make storage directories
+        run: |
+          mkdir -p priv/test_storage/warehouse
+          mkdir -p priv/test_storage/transform
       - run: mix deps.get
       - run: MIX_ENV=test mix compile
       - run: mix test --only integration
