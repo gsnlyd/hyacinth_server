@@ -45,8 +45,12 @@ npm-debug.log
 # App Transform Temp
 /priv/transform_tmp/
 
-# Test Data (for development)
+# Dev Data
 /priv/data/
+
+# Test Data (for integration tests)
+/priv/test_data/venv/
+/priv/test_data/datasets/
 
 # Python Slicer Venv
 /priv/drivers/python_slicer/venv/
