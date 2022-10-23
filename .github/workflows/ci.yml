@@ -25,12 +25,11 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
-          mkdir -p datasets/test_data
-          python generate.py 10 datasets/test_data
-          ls datasets/test_data
-          ls datasets/test_data/image0
+          mkdir -p datasets/test_dataset
+          python generate.py 10 datasets/test_dataset
         working-directory: ./priv/test_data
       - run: mix deps.get
+      - run: MIX_ENV=test mix compile
       - run: mix test --only integration
 
   build-release-x64-centos-stream-8:
