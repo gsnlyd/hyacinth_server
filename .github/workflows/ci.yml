@@ -12,40 +12,6 @@ jobs:
       - run: mix deps.get
       - run: mix test
 
-  build-release-x64-debian10:
-    runs-on: ubuntu-latest
-    container:
-      image: debian:buster
-    steps:
-      - name: Install Erlang/OTP and Elixir
-        run: |
-          apt-get update
-          apt-get -y install wget gnupg build-essential
-          wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
-          dpkg -i erlang-solutions_2.0_all.deb
-          apt-get update
-          apt-get -y install esl-erlang
-          apt-get -y install elixir
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Build release
-        run: |
-          export MIX_ENV=prod
-          mix local.hex --force
-          mix local.rebar --force
-          mix deps.get --only prod
-          mix compile
-          mix assets.deploy
-          mix release
-      - name: Create release tarball
-        run: tar -cvf hyacinth-x64-debian10.tar hyacinth
-        working-directory: _build/prod/rel
-      - name: Upload release artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: hyacinth-x64-debian10
-          path: _build/prod/rel/hyacinth-x64-debian10.tar
-
   build-release-x64-centos-stream-8:
     runs-on: ubuntu-latest
     container:
