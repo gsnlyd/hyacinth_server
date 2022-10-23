@@ -56,7 +56,7 @@ defmodule Hyacinth.Warehouse.Store do
   Returns the path to the objects directory where objects are saved.
   """
   def get_objects_dir do
-    Path.join File.cwd!(), "priv/warehouse_objects"
+    Application.fetch_env!(:hyacinth, :warehouse_path)
   end
 
   @doc """
@@ -114,7 +114,7 @@ defmodule Hyacinth.Warehouse.Store do
   Returns the transform temp dir.
   """
   def get_transform_temp_dir do
-    Path.join File.cwd!(), "priv/transform_tmp"
+    Application.fetch_env!(:hyacinth, :transform_path)
   end
 
   @doc """

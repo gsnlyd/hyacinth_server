@@ -51,6 +51,7 @@ npm-debug.log
 # Test Data (for integration tests)
 /priv/test_data/venv/
 /priv/test_data/datasets/
+/priv/test_storage/
 
 # Python Slicer Venv
 /priv/drivers/python_slicer/venv/

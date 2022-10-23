@@ -20,6 +20,22 @@ if System.get_env("PHX_SERVER") do
   config :hyacinth, HyacinthWeb.Endpoint, server: true
 end
 
+
+# Configure storage paths
+case config_env() do
+  :dev ->
+    config :hyacinth, :warehouse_path, Path.join(File.cwd!(), "priv/warehouse_objects")
+    config :hyacinth, :transform_path, Path.join(File.cwd!(), "priv/transform_tmp")
+
+  :test ->
+    config :hyacinth, :warehouse_path, Path.join(File.cwd!(), "priv/test_storage/warehouse")
+    config :hyacinth, :transform_path, Path.join(File.cwd!(), "priv/test_storage/transform")
+
+  :prod ->
+    config :hyacinth, :warehouse_path, System.get_env("WAREHOUSE_PATH") || raise "Environment variable WAREHOUSE_PATH missing!"
+    config :hyacinth, :transform_path, System.get_env("TRANSFORM_PATH") || raise "Environment variable TRANSFORM_PATH missing!"
+end
+
 if config_env() == :prod do
   database_path =
     System.get_env("DATABASE_PATH") ||
