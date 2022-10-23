@@ -1,7 +1,7 @@
 on: push
 
 jobs:
-  test:
+  unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -11,6 +11,27 @@ jobs:
           elixir-version: 1.14
       - run: mix deps.get
       - run: mix test
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: 25
+          elixir-version: 1.14
+      - name: Generate test data
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          mkdir -p datasets/test_data
+          python generate.py 10 datasets/test_data
+          ls datasets/test_data
+          ls datasets/test_data/image0
+        working-directory: ./priv/test_data
+      - run: mix deps.get
+      - run: mix test --only integration
 
   build-release-x64-centos-stream-8:
     runs-on: ubuntu-latest
