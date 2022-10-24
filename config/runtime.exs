@@ -36,6 +36,20 @@ case config_env() do
     config :hyacinth, :transform_path, System.get_env("TRANSFORM_PATH") || raise "Environment variable TRANSFORM_PATH missing!"
 end
 
+# Configure driver paths
+case config_env() do
+  env when env in [:dev, :test] ->
+    config :hyacinth, :python_path, Path.join(File.cwd!, "priv/drivers/python_slicer/venv/bin/python")
+    config :hyacinth, :slicer_path, Path.join(File.cwd!, "priv/drivers/python_slicer/slicer.py")
+    config :hyacinth, :dcm2niix_path, "dcm2niix"
+
+  :prod ->
+    config :hyacinth, :python_path, System.get_env("PYTHON_PATH") || "python"
+    # TODO: copy slicer to somewhere less annoying in the release
+    config :hyacinth, :slicer_path, System.get_env("SLICER_PATH") || Path.expand(Path.join(File.cwd!, "../lib/hyacinth-0.1.0/priv/drivers/python_slicer/slicer.py"))
+    config :hyacinth, :dcm2niix_path, System.get_env("DCM2NIIX_PATH") || "dcm2niix"
+end
+
 if config_env() == :prod do
   database_path =
     System.get_env("DATABASE_PATH") ||
@@ -92,9 +106,4 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
-
-  # TODO: better config
-  config :hyacinth, python_path: System.get_env("PYTHON_PATH") || raise "environment variable PYTHON_PATH is missing"
-  config :hyacinth, slicer_path: System.get_env("SLICER_PATH") || raise "environment variable SLICER_PATH is missing"
-  config :hyacinth, dcm2niix_path: System.get_env("DCM2NIIX_PATH") || raise "environment variable DCM2NIIX_PATH is missing"
 end

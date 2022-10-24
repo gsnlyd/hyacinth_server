@@ -48,7 +48,7 @@ defmodule Hyacinth.Assembly.Driver.DicomToNifti do
 
   @impl Driver
   def command_args(_options, file_path) do
-    binary_path = Application.get_env(:hyacinth, :dcm2niix_path, "dcm2niix")
+    binary_path = Application.fetch_env!(:hyacinth, :dcm2niix_path)
     args = [
       "-z", "y",
       file_path,
