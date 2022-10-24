@@ -26,7 +26,7 @@
       <button class="btn btn-gray btn-icon-only" phx-click="open_modal_label_history">
         <Icons.bookmark_mini />
       </button>
-      <button class="btn btn-gray btn-icon-only">
+      <button class="btn btn-gray btn-icon-only" phx-click="open_modal_notes">
         <Icons.plus_circle_mini />
       </button>
       <button class="btn btn-gray btn-icon-only">
@@ -80,24 +80,46 @@
 <div>
   <%= case @modal do %>
   <% :label_history -> %>
-    <.modal>
+    <.modal size="sm">
       <:header>Label History</:header>
 
-      <div class="border border-gray-700 rounded">
-        <table class="mt-1 w-full table text-sm text-gray-400">
-          <thead>
-            <th>Value</th>
-            <th>Timestamp</th>
-          </thead>
-          <tbody>
-            <%= for {label, i} <- Enum.with_index(@labels) do %>
-              <tr class={i == 0 && "text-blue-500 font-bold"}>
-                <td><%= label.label_value %></td>
-                <td><%= Calendar.strftime(label.inserted_at, "%c") %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+      <div class="h-96 overflow-y-auto" style="height: 50vh;">
+        <div class="mt-3 border border-gray-700 rounded">
+          <table class="mt-1 w-full table text-sm text-gray-400">
+            <thead>
+              <th>Label</th>
+              <th>Timestamp</th>
+            </thead>
+            <tbody>
+              <%= for {label, i} <- Enum.with_index(@labels) do %>
+                <tr class={i == 0 && "text-blue-500 font-bold"}>
+                  <td><%= label.label_value %></td>
+                  <td><%= Calendar.strftime(label.inserted_at, "%c") %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </.modal>
+
+  <% :notes -> %>
+    <.modal size="sm">
+      <:header>Notes</:header>
+
+      <div class="mt-2">
+        <.form let={f} for={@notes_changeset} phx-submit="save_notes">
+          <%= textarea f, :notes, placeholder: "Add notes for this element here.",
+            class: "w-full h-64 px-2 py-1 placeholder-gray-500 resize-none
+            bg-gray-800 rounded
+            border-gray-500 hover:border-gray-300 focus:border-blue-500 focus:ring-blue-300"
+          %>
+
+          <div class="mt-4 flex justify-end space-x-2">
+            <button type="button" class="btn btn-gray" phx-click="close_modal">Cancel</button>
+            <%= submit "Save", class: "btn btn-blue" %>
+          </div>
+        </.form>
       </div>
     </.modal>
   <% nil -> %>

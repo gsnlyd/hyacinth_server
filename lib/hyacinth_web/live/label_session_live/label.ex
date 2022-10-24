@@ -3,6 +3,24 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
   alias Hyacinth.Labeling
 
+  defmodule NotesForm do
+    use Ecto.Schema
+    import Ecto.Changeset
+
+    @primary_key false
+    embedded_schema do
+      field :notes, :string, default: ""
+    end
+
+    @doc false
+    def changeset(filter_options, attrs) do
+      filter_options
+      |> cast(attrs, [:notes])
+      |> validate_required([:notes])
+    end
+  end
+
+
   def mount(params, _session, socket) do
     label_session = Labeling.get_label_session_with_elements!(params["label_session_id"])
     element = Labeling.get_label_element!(label_session, params["element_index"])
@@ -16,6 +34,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
       current_value: if(length(labels) == 0, do: nil, else: hd(labels).label_value),
 
       modal: nil,
+      notes_changeset: NotesForm.changeset(%NotesForm{}, %{}),
 
       disable_primary_nav: true,
       use_wide_layout: true,
@@ -70,6 +89,10 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
   def handle_event("open_modal_label_history", _value, socket) do
     {:noreply, assign(socket, :modal, :label_history)}
+  end
+
+  def handle_event("open_modal_notes", _value, socket) do
+    {:noreply, assign(socket, :modal, :notes)}
   end
 
   def handle_event("close_modal", _value, socket) do

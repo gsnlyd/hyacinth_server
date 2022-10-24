@@ -4,17 +4,24 @@ defmodule HyacinthWeb.Components.BasicComponents do
 
   def modal(assigns) do
     assigns = assign_new(assigns, :close_event, fn -> "close_modal" end)
+    assigns = assign_new(assigns, :size, fn -> "md" end)
+    size_class =
+      case assigns.size do
+        "sm" -> "max-w-screen-sm"
+        "md" -> "max-w-screen-md"
+        "lg" -> "max-w-screen-lg"
+      end
     ~H"""
     <div class="top-0 left-0 fixed bg-black bg-opacity-90 flex justify-center items-start" style="width: 100vw; height: 100vh;">
-      <div class="flex-1 mt-20 p-4 pt-2 max-w-lg bg-gray-800 rounded border border-gray-700" phx-click-away={@close_event}>
+      <div class={"flex-1 mt-20 p-4 pt-2 #{size_class} bg-gray-800 rounded border border-gray-700"} phx-click-away={@close_event}>
         <div class="flex justify-between items-start">
           <h1>
             <%= render_slot(@header) %>
           </h1>
-          <button class="-mt-2 text-4xl text-gray-300 hover:text-red-500" phx-click={@close_event}>&times;</button>
+          <button class="-mt-2 text-4xl text-gray-500 hover:text-gray-300 transition" phx-click={@close_event}>&times;</button>
         </div>
 
-        <div class="mt-2">
+        <div>
           <%= render_slot(@inner_block) %>
         </div>
       </div>
