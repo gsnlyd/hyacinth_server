@@ -145,8 +145,7 @@ defmodule Hyacinth.Warehouse.Store do
   @spec retrieve!(String.t, String.t) :: :ok
   def retrieve!(hash, dest_path) when is_binary(hash) and is_binary(dest_path) do
     if File.exists?(dest_path), do: raise "File already exists at dest path: #{dest_path}"
-    # Sanity - TODO: improve this check, maybe with Path.expand and Path.relative_to
-    unless String.contains?(dest_path, "transform_tmp"), do: raise "Dest path is not in transform temp dir: #{dest_path}"
+    unless String.starts_with?(Path.expand(dest_path), get_transform_temp_dir()), do: raise "Dest path is not in transform temp dir: #{dest_path}"
 
     path = get_object_path_from_hash(hash)
     if not File.exists?(path), do: raise "File with hash #{hash} does not exist in the store!"

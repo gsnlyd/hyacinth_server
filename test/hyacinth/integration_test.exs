@@ -1,8 +1,12 @@
 defmodule Hyacinth.IntegrationTest do
   use Hyacinth.DataCase
 
-  alias Hyacinth.Warehouse
-  alias Hyacinth.Warehouse.{Dataset, Object}
+  import Hyacinth.AccountsFixtures
+
+  alias Hyacinth.{Warehouse, Assembly}
+  alias Hyacinth.Accounts.User
+  alias Hyacinth.Warehouse.{Dataset, Object, Store}
+  alias Hyacinth.Assembly.{Pipeline, Runner}
 
   @moduletag :integration
 
@@ -29,10 +33,13 @@ defmodule Hyacinth.IntegrationTest do
 
   setup :clean_test_warehouse
 
+  def get_test_dataset_path(), do: Path.join(File.cwd!, "priv/test_data/datasets/test_dataset")
+
+  def object_file_exists?(%Object{hash: hash}), do: File.exists?(Store.get_object_path_from_hash(hash))
+
   describe "Hyacinth.Warehouse.NewDataset" do
     test "ingests dataset" do
-      dataset_path = Path.join(File.cwd!(), "priv/test_data/datasets/test_dataset")
-      Warehouse.NewDataset.new_dataset({"TestDicomDataset", "dicom", dataset_path})
+      Warehouse.NewDataset.new_dataset({"TestDicomDataset", "dicom", get_test_dataset_path()})
 
       datasets = Warehouse.list_datasets()
       assert length(datasets) == 1
@@ -53,6 +60,66 @@ defmodule Hyacinth.IntegrationTest do
           assert child.type == :blob
           assert child.file_type == :dicom
         end)
+      end)
+    end
+  end
+
+  describe "Hyacinth.Warehouse.Runner" do
+    test "runs 3-step dicom to png pipeline" do
+      Warehouse.NewDataset.new_dataset({"TestDicomDataset", "dicom", get_test_dataset_path()})
+      [dataset] = Warehouse.list_datasets()
+
+      %User{} = user = user_fixture()
+
+      pipeline_params = %{
+        name: "Dicom to PNG test pipeline",
+        transforms: [
+          %{
+            order_index: 0,
+            driver: :dicom_to_nifti,
+            arguments: %{},
+            input_id: dataset.id,
+          },
+          %{
+            order_index: 1,
+            driver: :slicer,
+            arguments: %{},
+          },
+          %{
+            order_index: 2,
+            driver: :sample,
+            arguments: %{object_count: 10},
+          },
+        ]
+      }
+
+      {:ok, %Pipeline{} = pipeline} = Assembly.create_pipeline(user, pipeline_params)
+      Runner.run_pipeline(pipeline)
+
+      [_root_ds, nifti_ds, slicer_ds, sample_ds] = Warehouse.list_datasets()
+
+      nifti_objects = Warehouse.list_objects(nifti_ds)
+      assert length(nifti_objects) == 10
+      Enum.each(nifti_objects, fn %Object{} = o ->
+        assert o.type == :blob
+        assert o.file_type == :nifti
+        assert object_file_exists?(o)
+      end)
+
+      slicer_objects = Warehouse.list_objects(slicer_ds)
+      assert length(slicer_objects) == 1000
+      Enum.each(slicer_objects, fn %Object{} = o ->
+        assert o.type == :blob
+        assert o.file_type == :png
+        assert object_file_exists?(o)
+      end)
+
+      sample_objects = Warehouse.list_objects(sample_ds)
+      assert length(sample_objects) == 10
+      Enum.each(sample_objects, fn %Object{} = o ->
+        assert o.type == :blob
+        assert o.file_type == :png
+        assert object_file_exists?(o)
       end)
     end
   end

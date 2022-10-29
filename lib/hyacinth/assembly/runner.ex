@@ -60,7 +60,10 @@ defmodule Hyacinth.Assembly.Runner do
         |> Enum.concat()
       end
 
-    IO.inspect Assembly.complete_transform(transform, objects_or_params)
+    {:ok, result} = Assembly.complete_transform(transform, objects_or_params)
+    Logger.debug inspect(result)
+
+    :ok
   end
 
   def run_pipeline(%Pipeline{} = pipeline) do
@@ -68,5 +71,7 @@ defmodule Hyacinth.Assembly.Runner do
 
     transforms = Assembly.list_transforms(pipeline)
     Enum.map(transforms, &run_transform/1)
+
+    :ok
   end
 end
