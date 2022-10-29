@@ -24,7 +24,8 @@ jobs:
         run: |
           curl -fLO https://github.com/rordenlab/dcm2niix/releases/latest/download/dcm2niix_lnx.zip
           unzip dcm2niix_lnx.zip
-          ls
+          mkdir ~/dcm2niix_bin
+          mv dcm2niix ~/dcm2niix_bin/dcm2niix
       - name: Generate test data
         run: |
           python -m venv venv
@@ -39,7 +40,10 @@ jobs:
           mkdir -p priv/test_storage/transform
       - run: mix deps.get
       - run: MIX_ENV=test mix compile
-      - run: mix test --only integration
+      - name: Run integration tests
+        run: |
+          export PATH="$PATH:$HOME/dcm2niix_bin"
+          mix test --only integration
 
   build-release-x64-centos-stream-8:
     runs-on: ubuntu-latest
