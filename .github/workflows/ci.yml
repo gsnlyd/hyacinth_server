@@ -20,6 +20,11 @@ jobs:
         with:
           otp-version: 25
           elixir-version: 1.14
+      - name: Download dcm2niix
+        run: |
+          curl -fLO https://github.com/rordenlab/dcm2niix/releases/latest/download/dcm2niix_lnx.zip
+          unzip dcm2niix_lnx.zip
+          ls
       - name: Generate test data
         run: |
           python -m venv venv
