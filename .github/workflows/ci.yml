@@ -26,6 +26,12 @@ jobs:
           unzip dcm2niix_lnx.zip
           mkdir ~/dcm2niix_bin
           mv dcm2niix ~/dcm2niix_bin/dcm2niix
+      - name: Set up slicer python
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+        working-directory: ./priv/drivers/python_slicer
       - name: Generate test data
         run: |
           python -m venv venv
