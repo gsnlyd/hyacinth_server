@@ -27,6 +27,8 @@ jobs:
           mkdir dcm2niix_bin
           mv dcm2niix dcm2niix_bin
         working-directory: ~
+      - run: ls ~
+      - run: ls ~/dcm2niix_bin
       - name: Set up slicer python
         run: |
           python -m venv venv
