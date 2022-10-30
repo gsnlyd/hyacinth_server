@@ -44,7 +44,7 @@ defmodule HyacinthWeb.PipelineLive.New do
       |> Enum.map(fn {{tid, tparams}, {opts_driver, opts}} ->
         params_driver = Driver.from_string!(tparams["driver"])
         if params_driver == opts_driver do
-          tparams = Map.put(tparams, "arguments", opts)
+          tparams = Map.put(tparams, "options", opts)
           {{tid, tparams}, {opts_driver, opts}}
         else
           new_opts =
@@ -52,7 +52,7 @@ defmodule HyacinthWeb.PipelineLive.New do
             |> Driver.options_changeset(%{})
             |> Ecto.Changeset.apply_action!(:insert)
             |> Map.from_struct()
-          tparams = Map.put(tparams, "arguments", new_opts)
+          tparams = Map.put(tparams, "options", new_opts)
           {{tid, tparams}, {params_driver, new_opts}}
         end
       end)
@@ -114,7 +114,7 @@ defmodule HyacinthWeb.PipelineLive.New do
       |> Ecto.Changeset.apply_action!(:insert)
       |> Map.from_struct()
     # Create new transform changeset
-    new_transform_changeset = Transform.changeset(%Transform{}, %{order_index: length(transform_changesets), arguments: options_params})
+    new_transform_changeset = Transform.changeset(%Transform{}, %{order_index: length(transform_changesets), options: options_params})
     # Append new transform changeset to the existing transform changesets
     pipeline_changeset = Ecto.Changeset.put_assoc(pipeline_changeset, :transforms, transform_changesets ++ [new_transform_changeset])
     transform_options = socket.assigns.transform_options ++ [{default_driver, options_params}]
@@ -164,13 +164,13 @@ defmodule HyacinthWeb.PipelineLive.New do
 
     transform_options = List.replace_at(transform_options, index, {driver, params})
 
-    # Inject new arguments into transform changeset
+    # Inject new options into transform changeset
     pipeline_changeset = socket.assigns.pipeline_changeset
     transform_changesets = Map.get(pipeline_changeset.changes, :transforms, [])
     transform_cs =
       transform_changesets
       |> Enum.at(index)
-      |> Transform.changeset(%{arguments: params})
+      |> Transform.changeset(%{options: params})
     transform_changesets = List.replace_at(transform_changesets, index, transform_cs)
     pipeline_changeset = Ecto.Changeset.put_assoc(pipeline_changeset, :transforms, transform_changesets)
 

@@ -15,16 +15,16 @@ defmodule Hyacinth.Assembly.Runner do
   @spec run_command(%Transform{}, %Object{}) :: [map]
   defp run_command(%Transform{} = transform, %Object{} = object) do
     {temp_dir, unpacked_path} = Packer.retrieve_object!(object)
-    {command, command_args} = Driver.command_args(transform.driver, transform.arguments, unpacked_path)
+    {command, command_args} = Driver.command_args(transform.driver, transform.options, unpacked_path)
 
     Logger.debug "Running command #{command} with args: #{command_args}"
     {stdout, exit_code} = System.cmd(command, command_args)
     Logger.debug "Ran command for driver #{transform.driver} with exit code #{exit_code}. Stdout: #{stdout}"
 
-    results_glob_path = Path.join(temp_dir, Driver.results_glob(transform.driver, transform.arguments))
+    results_glob_path = Path.join(temp_dir, Driver.results_glob(transform.driver, transform.options))
     results_paths = Path.wildcard(results_glob_path)
 
-    output_format = Driver.output_format(transform.driver, transform.arguments)
+    output_format = Driver.output_format(transform.driver, transform.options)
 
     Enum.map(results_paths, fn path ->
       hash = Store.ingest_file!(path)
@@ -49,7 +49,7 @@ defmodule Hyacinth.Assembly.Runner do
     if transform.output_id != nil, do: raise "Transform already has output dataset"
 
     objects = Warehouse.list_objects(transform.input)
-    objects = Driver.filter_objects(transform.driver, transform.arguments, objects)
+    objects = Driver.filter_objects(transform.driver, transform.options, objects)
 
     objects_or_params =
       if Driver.pure?(transform.driver) do

@@ -5,7 +5,7 @@ defmodule Hyacinth.Repo.Migrations.CreateTransforms do
     create table(:transforms) do
       add :order_index, :integer
       add :driver, :string
-      add :arguments, :map
+      add :options, :map
 
       add :pipeline_id, references(:pipelines, on_delete: :restrict, on_update: :restrict), null: false
       add :input_id, references(:datasets, on_delete: :restrict, on_update: :restrict)

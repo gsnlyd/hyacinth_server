@@ -67,7 +67,7 @@
                   </button>
                 </div>
                 <div class="mt-1 text-sm">
-                  <%= for {k, v} <- Ecto.Changeset.get_field(ft.source, :arguments) do %>
+                  <%= for {k, v} <- Ecto.Changeset.get_field(ft.source, :options) do %>
                     <div>
                       <span class="text-gray-400"><%= humanize(k) %>:</span>
                       <span><%= v %></span>

@@ -77,18 +77,18 @@ defmodule Hyacinth.IntegrationTest do
           %{
             order_index: 0,
             driver: :dicom_to_nifti,
-            arguments: %{},
+            options: %{},
             input_id: dataset.id,
           },
           %{
             order_index: 1,
             driver: :slicer,
-            arguments: %{},
+            options: %{},
           },
           %{
             order_index: 2,
             driver: :sample,
-            arguments: %{object_count: 10},
+            options: %{object_count: 10},
           },
         ]
       }

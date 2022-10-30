@@ -53,13 +53,13 @@ defmodule Hyacinth.AssemblyTest do
           %{
             order_index: 0,
             driver: :slicer,
-            arguments: %{orientation: :axial},
+            options: %{orientation: :axial},
             input_id: dataset.id,
           },
           %{
             order_index: 1,
             driver: :sample,
-            arguments: %{object_count: 100},
+            options: %{object_count: 100},
           },
         ],
       }
@@ -71,13 +71,13 @@ defmodule Hyacinth.AssemblyTest do
       [%Transform{} = transform1, %Transform{} = transform2] = Assembly.list_transforms(pipeline)
       assert transform1.order_index == 0
       assert transform1.driver == :slicer
-      assert transform1.arguments["orientation"] == "axial"
+      assert transform1.options["orientation"] == "axial"
       assert transform1.input_id == dataset.id
       assert transform1.output_id == nil
 
       assert transform2.order_index == 1
       assert transform2.driver == :sample
-      assert transform2.arguments["object_count"] == 100
+      assert transform2.options["object_count"] == 100
       assert transform2.input_id == nil
       assert transform2.output_id == nil
     end
@@ -89,8 +89,8 @@ defmodule Hyacinth.AssemblyTest do
       params = %{
         name: "Some Pipeline",
         transforms: [
-          %{order_index: 0, driver: :slicer, arguments: %{}, input_id: dataset.id},
-          %{order_index: 2, driver: :sample, arguments: %{}},
+          %{order_index: 0, driver: :slicer, options: %{}, input_id: dataset.id},
+          %{order_index: 2, driver: :sample, options: %{}},
         ],
       }
 
@@ -104,8 +104,8 @@ defmodule Hyacinth.AssemblyTest do
       params = %{
         name: "Some Pipeline",
         transforms: [
-          %{order_index: 0, driver: :slicer, arguments: %{}},
-          %{order_index: 1, driver: :sample, arguments: %{}},
+          %{order_index: 0, driver: :slicer, options: %{}},
+          %{order_index: 1, driver: :sample, options: %{}},
         ],
       }
 
@@ -127,8 +127,8 @@ defmodule Hyacinth.AssemblyTest do
       params = %{
         name: "Some Pipeline",
         transforms: [
-          %{order_index: 0, driver: :slicer, arguments: %{}, input_id: dataset.id},
-          %{order_index: 1, driver: :sample, arguments: %{}, input_id: dataset.id},
+          %{order_index: 0, driver: :slicer, options: %{}, input_id: dataset.id},
+          %{order_index: 1, driver: :sample, options: %{}, input_id: dataset.id},
         ],
       }
 
@@ -149,8 +149,8 @@ defmodule Hyacinth.AssemblyTest do
       params = %{
         name: "Some Pipeline",
         transforms: [
-          %{order_index: 0, driver: :slicer, arguments: %{orientation: "invalid value"}, input_id: dataset.id},
-          %{order_index: 1, driver: :sample, arguments: %{}},
+          %{order_index: 0, driver: :slicer, options: %{orientation: "invalid value"}, input_id: dataset.id},
+          %{order_index: 1, driver: :sample, options: %{}},
         ],
       }
 
@@ -161,7 +161,7 @@ defmodule Hyacinth.AssemblyTest do
       assert Enum.at(changeset.changes.transforms, 1).valid?
 
       assert changeset.errors == []
-      assert Enum.at(changeset.changes.transforms, 0).errors == [arguments: {"options are not valid for driver slicer", []}]
+      assert Enum.at(changeset.changes.transforms, 0).errors == [options: {"options are not valid for driver slicer", []}]
     end
   end
 

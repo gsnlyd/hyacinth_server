@@ -31,13 +31,13 @@ defmodule Hyacinth.AssemblyFixtures do
         %{
           order_index: 0,
           driver: :slicer,
-          arguments: options_fixture(:slicer),
+          options: options_fixture(:slicer),
           input_id: dataset.id,
         },
         %{
           order_index: 1,
           driver: :sample,
-          arguments: options_fixture(:sample),
+          options: options_fixture(:sample),
         },
       ],
     }
