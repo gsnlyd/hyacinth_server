@@ -29,7 +29,7 @@ defmodule HyacinthWeb.LabelJobLive.Show do
     job = Labeling.get_job_with_blueprint(params["label_job_id"])
     socket = assign(socket, %{
       job: job,
-      sessions: Labeling.list_job_sessions(job),
+      sessions: Labeling.list_sessions_with_progress(job),
 
       session_filter_changeset: SessionFilterOptions.changeset(%SessionFilterOptions{}, %{}),
 
@@ -43,14 +43,14 @@ defmodule HyacinthWeb.LabelJobLive.Show do
     %SessionFilterOptions{} = options = Ecto.Changeset.apply_changes(filter_changeset)
 
     sessions_filtered =
-      Enum.filter(sessions, fn %LabelSession{} = sess ->
+      Enum.filter(sessions, fn {%LabelSession{} = sess, _labeled} ->
         (options.search == "" or String.contains?(String.downcase(sess.user.email), String.downcase(options.search)))
       end)
 
     sessions_sorted =
       case options.sort_by do
-        :user -> Enum.sort_by(sessions_filtered, &(&1.user.email))
-        :date_created -> Enum.sort_by(sessions_filtered, &(&1.inserted_at), DateTime)
+        :user -> Enum.sort_by(sessions_filtered, &(elem(&1, 0).user.email))
+        :date_created -> Enum.sort_by(sessions_filtered, &(elem(&1, 0).inserted_at), DateTime)
       end
 
     case options.order do

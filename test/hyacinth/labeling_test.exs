@@ -76,6 +76,11 @@ defmodule Hyacinth.LabelingTest do
 
 
   describe "list_job_sessions/1" do
+    test "returns empty list when there are no sessions" do
+      job = label_job_fixture()
+      assert Labeling.list_job_sessions(job) == []
+    end
+
     test "returns non-blueprint sessions for job" do
       job = label_job_fixture()
       sess1 = label_session_fixture(job)
@@ -87,6 +92,33 @@ defmodule Hyacinth.LabelingTest do
       assert length(job_sessions) == 2
       assert Enum.at(job_sessions, 0).id == sess1.id
       assert Enum.at(job_sessions, 1).id == sess2.id
+    end
+  end
+
+  describe "list_sessions_with_progress/1" do
+    test "returns empty list when there are no sessions" do
+      job = label_job_fixture()
+      assert Labeling.list_sessions_with_progress(job) == []
+    end
+
+    test "returns non-blueprint sessions with progress for job" do
+      job = label_job_fixture()
+      user = user_fixture()
+      sess1 = label_session_fixture(job, user)
+      sess2 = label_session_fixture(job, user)
+
+      sess1 = Labeling.get_label_session_with_elements!(sess1.id)
+
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 1")
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 2")
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 1), user, "option 1")
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 2), user, "option 1")
+
+      [{final_sess1, sess1_count}, {final_sess2, sess2_count}] = Labeling.list_sessions_with_progress(job)
+      assert final_sess1.id == sess1.id
+      assert sess1_count == 3
+      assert final_sess2.id == sess2.id
+      assert sess2_count == 0
     end
   end
 
