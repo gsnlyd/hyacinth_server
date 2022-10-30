@@ -35,7 +35,7 @@ defmodule Hyacinth.WarehouseFixtures do
         hash: ...,
         type: :blob,
         name: "my_object.png",
-        file_type: :png
+        format: :png
       }
 
   """
@@ -45,7 +45,7 @@ defmodule Hyacinth.WarehouseFixtures do
       hash: hash_fixture(name),
       type: :blob,
       name: name <> FormatType.extension(type),
-      file_type: type,
+      format: type,
     }
   end
 
@@ -58,9 +58,9 @@ defmodule Hyacinth.WarehouseFixtures do
 
       iex> many_object_params_fixtures(3, "my_object", :png)
       [
-        %{hash: ..., type: :blob, name: "my_object1.png", file_type: :png},
-        %{hash: ..., type: :blob, name: "my_object2.png", file_type: :png},
-        %{hash: ..., type: :blob, name: "my_object3.png", file_type: :png},
+        %{hash: ..., type: :blob, name: "my_object1.png", format: :png},
+        %{hash: ..., type: :blob, name: "my_object2.png", format: :png},
+        %{hash: ..., type: :blob, name: "my_object3.png", format: :png},
       ]
 
   """

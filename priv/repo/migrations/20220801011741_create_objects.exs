@@ -7,7 +7,7 @@ defmodule Hyacinth.Repo.Migrations.CreateObjects do
       add :type, :string, null: false
 
       add :name, :string, null: false
-      add :file_type, :string, null: false
+      add :format, :string, null: false
 
       add :parent_tree_id, references(:objects, on_delete: :restrict, on_update: :restrict)
 

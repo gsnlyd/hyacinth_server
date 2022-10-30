@@ -101,7 +101,7 @@
             <%= for %Object{} = object <- @objects do %>
               <tr>
                 <td><%= object.name %></td>
-                <td><%= object.file_type %></td>
+                <td><%= object.format %></td>
                 <td class="text-xs"><%= object.hash %></td>
                 <td><%= object.type %></td>
                 <td><%= Calendar.strftime(object.inserted_at, "%c") %></td>

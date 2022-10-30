@@ -35,7 +35,7 @@ defmodule Hyacinth.Warehouse.NewDataset do
                   hash: hash,
                   type: :blob,
                   name: Path.relative_to(path, container_path),
-                  file_type: format,
+                  format: format,
                 }
               end)
 
@@ -43,7 +43,7 @@ defmodule Hyacinth.Warehouse.NewDataset do
               hash: Warehouse.Store.hash_hashes(Enum.map(children, &(&1.hash))),
               type: :tree,
               name: Path.relative_to(container_path, dataset_path),
-              file_type: format,
+              format: format,
               children: children,
             }
           end)
@@ -55,7 +55,7 @@ defmodule Hyacinth.Warehouse.NewDataset do
               hash: hash,
               type: :blob,
               name: Path.relative_to(path, dataset_path),
-              file_type: format,
+              format: format,
             }
           end)
       end

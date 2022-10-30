@@ -9,7 +9,7 @@ defmodule Hyacinth.Warehouse.Object do
     field :type, Ecto.Enum, values: [:blob, :tree]
 
     field :name, :string
-    field :file_type, Ecto.Enum, values: [:png, :dicom, :nifti]
+    field :format, Ecto.Enum, values: [:png, :dicom, :nifti]
 
     belongs_to :parent_tree, Object
 
@@ -24,8 +24,8 @@ defmodule Hyacinth.Warehouse.Object do
   @doc false
   def create_changeset(object, attrs) do
     object
-    |> cast(attrs, [:hash, :type, :name, :file_type])
-    |> validate_required([:hash, :type, :name, :file_type])
+    |> cast(attrs, [:hash, :type, :name, :format])
+    |> validate_required([:hash, :type, :name, :format])
     |> cast_assoc(:children, with: &create_changeset/2)
     |> validate_object_type()
   end

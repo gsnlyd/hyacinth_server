@@ -53,12 +53,12 @@ defmodule Hyacinth.IntegrationTest do
 
       Enum.each(objects, fn %Object{} = object ->
         assert object.type == :tree
-        assert object.file_type == :dicom
+        assert object.format == :dicom
         assert length(object.children) == 100
 
         Enum.each(object.children, fn %Object{} = child ->
           assert child.type == :blob
-          assert child.file_type == :dicom
+          assert child.format == :dicom
         end)
       end)
     end
@@ -102,7 +102,7 @@ defmodule Hyacinth.IntegrationTest do
       assert length(nifti_objects) == 10
       Enum.each(nifti_objects, fn %Object{} = o ->
         assert o.type == :blob
-        assert o.file_type == :nifti
+        assert o.format == :nifti
         assert object_file_exists?(o)
       end)
 
@@ -110,7 +110,7 @@ defmodule Hyacinth.IntegrationTest do
       assert length(slicer_objects) == 1000
       Enum.each(slicer_objects, fn %Object{} = o ->
         assert o.type == :blob
-        assert o.file_type == :png
+        assert o.format == :png
         assert object_file_exists?(o)
       end)
 
@@ -118,7 +118,7 @@ defmodule Hyacinth.IntegrationTest do
       assert length(sample_objects) == 10
       Enum.each(sample_objects, fn %Object{} = o ->
         assert o.type == :blob
-        assert o.file_type == :png
+        assert o.format == :png
         assert object_file_exists?(o)
       end)
     end

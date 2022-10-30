@@ -70,21 +70,21 @@ defmodule Hyacinth.WarehouseTest do
           hash: Warehouse.Store.hash_hashes(Enum.map(children1, &(&1.hash))),
           type: :tree,
           name: "object1",
-          file_type: :dicom,
+          format: :dicom,
           children: children1,
         },
         %{
           hash: Warehouse.Store.hash_hashes(Enum.map(children2, &(&1.hash))),
           type: :tree,
           name: "object2",
-          file_type: :dicom,
+          format: :dicom,
           children: children2,
         },
         %{
           hash: Warehouse.Store.hash_hashes(Enum.map(children3, &(&1.hash))),
           type: :tree,
           name: "object3",
-          file_type: :dicom,
+          format: :dicom,
           children: children3,
         },
       ]
@@ -99,7 +99,7 @@ defmodule Hyacinth.WarehouseTest do
       assert Enum.map(objects, fn %Object{} = o -> o.hash end) == Enum.map(object_params, &(&1.hash))
       assert Enum.map(objects, fn %Object{} = o -> o.type end) == [:tree, :tree, :tree]
       assert Enum.map(objects, fn %Object{} = o -> o.name end) == ["object1", "object2", "object3"]
-      assert Enum.map(objects, fn %Object{} = o -> o.file_type end) == [:dicom, :dicom, :dicom]
+      assert Enum.map(objects, fn %Object{} = o -> o.format end) == [:dicom, :dicom, :dicom]
 
       assert length(Enum.at(objects, 0).children) == 3
       assert length(Enum.at(objects, 1).children) == 2
@@ -109,7 +109,7 @@ defmodule Hyacinth.WarehouseTest do
       assert object3slice2.hash == hash_fixture("o3s2")
       assert object3slice2.type == :blob
       assert object3slice2.name == "o3s2.dcm"
-      assert object3slice2.file_type == :dicom
+      assert object3slice2.format == :dicom
     end
 
     test "creates a derived dataset" do
@@ -175,7 +175,7 @@ defmodule Hyacinth.WarehouseTest do
           hash: hash_fixture("image1"),
           type: :blob,
           name: "path/to/image1.png",
-          file_type: :png,
+          format: :png,
         })
 
       assert changeset.valid? == true
@@ -187,11 +187,11 @@ defmodule Hyacinth.WarehouseTest do
           hash: hash_fixture("image1"),
           type: :tree,
           name: "path/to/image1",
-          file_type: :png,
+          format: :png,
           children: [
-            %{hash: hash_fixture("c1"), type: :blob, name: "c1.png", file_type: :png},
-            %{hash: hash_fixture("c2"), type: :blob, name: "c2.png", file_type: :png},
-            %{hash: hash_fixture("c3"), type: :blob, name: "c3.png", file_type: :png},
+            %{hash: hash_fixture("c1"), type: :blob, name: "c1.png", format: :png},
+            %{hash: hash_fixture("c2"), type: :blob, name: "c2.png", format: :png},
+            %{hash: hash_fixture("c3"), type: :blob, name: "c3.png", format: :png},
           ],
         })
 
@@ -204,7 +204,7 @@ defmodule Hyacinth.WarehouseTest do
           hash: hash_fixture("image1"),
           type: :tree,
           name: "path/to/image1",
-          file_type: :png,
+          format: :png,
         })
 
       assert changeset.valid? == false
@@ -217,7 +217,7 @@ defmodule Hyacinth.WarehouseTest do
           hash: hash_fixture("image1"),
           type: :tree,
           name: "path/to/image1",
-          file_type: :png,
+          format: :png,
           children: [],
         })
 
@@ -231,11 +231,11 @@ defmodule Hyacinth.WarehouseTest do
           hash: hash_fixture("image1"),
           type: :blob,
           name: "path/to/image1",
-          file_type: :png,
+          format: :png,
           children: [
-            %{hash: hash_fixture("c1"), type: :blob, name: "c1.png", file_type: :png},
-            %{hash: hash_fixture("c2"), type: :blob, name: "c2.png", file_type: :png},
-            %{hash: hash_fixture("c3"), type: :blob, name: "c3.png", file_type: :png},
+            %{hash: hash_fixture("c1"), type: :blob, name: "c1.png", format: :png},
+            %{hash: hash_fixture("c2"), type: :blob, name: "c2.png", format: :png},
+            %{hash: hash_fixture("c3"), type: :blob, name: "c3.png", format: :png},
           ],
         })
 
@@ -249,11 +249,11 @@ defmodule Hyacinth.WarehouseTest do
           hash: hash_fixture("image1"),
           type: :tree,
           name: "path/to/image1",
-          file_type: :png,
+          format: :png,
           children: [
-            %{hash: hash_fixture("c1"), type: :blob, name: "c1.png", file_type: :png},
-            %{hash: hash_fixture("c2"), type: :tree, name: "c2.png", file_type: :png},
-            %{hash: hash_fixture("c3"), type: :blob, name: "c3.png", file_type: :png},
+            %{hash: hash_fixture("c1"), type: :blob, name: "c1.png", format: :png},
+            %{hash: hash_fixture("c2"), type: :tree, name: "c2.png", format: :png},
+            %{hash: hash_fixture("c3"), type: :blob, name: "c3.png", format: :png},
           ],
         })
 

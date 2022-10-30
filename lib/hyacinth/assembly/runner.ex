@@ -33,7 +33,7 @@ defmodule Hyacinth.Assembly.Runner do
         hash: hash,
         type: :blob,  # TODO: handle tree
         name: Path.relative_to(path, temp_dir),
-        file_type: output_format,
+        format: output_format,
       }
     end)
   end
