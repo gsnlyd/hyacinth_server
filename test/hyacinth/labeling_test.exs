@@ -14,6 +14,32 @@ defmodule Hyacinth.LabelingTest do
       label_job = label_job_fixture()
       assert Labeling.list_label_jobs() == [label_job]
     end
+
+    test "returns empty list if there are no jobs" do
+      assert Labeling.list_label_jobs() == []
+    end
+  end
+
+  describe "list_label_jobs/1" do
+    test "returns all jobs for the given dataset" do
+      dataset1 = root_dataset_fixture()
+      dataset2 = root_dataset_fixture()
+
+      job1 = label_job_fixture(%{}, dataset1)
+      job2 = label_job_fixture(%{}, dataset1)
+
+      jobs = Labeling.list_label_jobs(dataset1)
+      assert length(jobs) == 2
+      assert Enum.at(jobs, 0).id == job1.id
+      assert Enum.at(jobs, 1).id == job2.id
+
+      assert Labeling.list_label_jobs(dataset2) == []
+    end
+
+    test "returns empty list if there are no jobs" do
+      dataset = root_dataset_fixture()
+      assert Labeling.list_label_jobs(dataset) == []
+    end
   end
 
   describe "get_label_job!/1" do

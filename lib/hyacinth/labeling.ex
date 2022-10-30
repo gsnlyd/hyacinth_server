@@ -15,7 +15,7 @@ defmodule Hyacinth.Labeling do
   alias Hyacinth.Labeling.{LabelType, LabelJob, LabelSession, LabelElement, LabelElementObject, LabelEntry}
 
   @doc """
-  Returns the list of label_jobs.
+  Returns a list of all LabelJobs.
 
   ## Examples
 
@@ -23,10 +23,20 @@ defmodule Hyacinth.Labeling do
       [%LabelJob{}, ...]
 
   """
+  @spec list_label_jobs() :: [%LabelJob{}]
   def list_label_jobs do
     Repo.all(LabelJob)
   end
 
+  @doc """
+  Returns a list of LabelJobs for the given dataset.
+
+  ## Examples
+
+      iex> list_label_jobs(some_dataset)
+      [%LabelJob{}, ...]
+
+  """
   @spec list_label_jobs(%Dataset{}) :: [%LabelJob{}]
   def list_label_jobs(%Dataset{} = dataset) do
     Repo.all(
@@ -37,24 +47,35 @@ defmodule Hyacinth.Labeling do
   end
 
   @doc """
-  Gets a single label_job.
+  Gets a single LabelJob.
 
-  Raises `Ecto.NoResultsError` if the Label job does not exist.
+  Raises `Ecto.NoResultsError` if the LabelJob does not exist.
 
   ## Examples
 
       iex> get_label_job!(123)
-      %LabelJob{}
+      %LabelJob{...}
 
       iex> get_label_job!(456)
       ** (Ecto.NoResultsError)
 
   """
+  @spec get_label_job!(term) :: %LabelJob{}
   def get_label_job!(id), do: Repo.get!(LabelJob, id)
 
   @doc """
   Gets a single LabelJob with its blueprint session preloaded.
+
+  ## Examples
+
+      iex> get_label_job_with_blueprint(123)
+      %LabelJob{...}
+
+      iex> get_label_job_with_blueprint(456)
+      ** (Ecto.NoResultsError)
+      
   """
+  @spec get_job_with_blueprint(term) :: %LabelJob{}
   def get_job_with_blueprint(id) do
     Repo.one!(
       from lj in LabelJob,
@@ -65,8 +86,18 @@ defmodule Hyacinth.Labeling do
   end
 
   @doc """
-  Creates a label_job.
+  Creates a new LabelJob.
+
+  ## Examples
+
+      iex> create_label_job(params, some_user)
+      {:ok, %LabelJob{...}}
+
+      iex>create_label_job(invalid_params, some_user)
+      {:error, %Ecto.Changeset{...}}
+
   """
+  @spec create_label_job(map, %User{}) :: {:ok, %LabelJob{}} | {:error, %Ecto.Changeset{}}
   def create_label_job(attrs \\ %{}, %User{} = created_by_user) do
     result =
       Multi.new()
@@ -109,7 +140,7 @@ defmodule Hyacinth.Labeling do
   end
 
   @doc """
-  Updates a label_job.
+  Updates a LabelJob.
 
   ## Examples
 
@@ -120,6 +151,7 @@ defmodule Hyacinth.Labeling do
       {:error, %Ecto.Changeset{}}
 
   """
+  @spec update_label_job(%LabelJob{}, map) :: {:ok, %LabelJob{}} | {:error, %Ecto.Changeset{}}
   def update_label_job(%LabelJob{} = label_job, attrs) do
     label_job
     |> LabelJob.changeset(attrs)
@@ -127,7 +159,7 @@ defmodule Hyacinth.Labeling do
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking label_job changes.
+  Returns an `%Ecto.Changeset{}` for tracking LabelJob changes.
 
   ## Examples
 
@@ -135,6 +167,7 @@ defmodule Hyacinth.Labeling do
       %Ecto.Changeset{data: %LabelJob{}}
 
   """
+  @spec change_label_job(%LabelJob{}, map) :: %Ecto.Changeset{}
   def change_label_job(%LabelJob{} = label_job, attrs \\ %{}) do
     LabelJob.changeset(label_job, attrs)
   end
@@ -197,9 +230,32 @@ defmodule Hyacinth.Labeling do
 
   @doc """
   Gets a single LabelSession.
+
+  ## Examples
+
+      iex> get_label_session!(123)
+      %LabelSession{...}
+
+      iex> get_label_session!(456)
+      ** (Ecto.NoResultsError)
+
   """
+  @spec get_label_session!(term) :: %LabelSession{}
   def get_label_session!(id), do: Repo.get!(LabelSession, id)
 
+  @doc """
+  Gets a single LabelSession with its elements preloaded.
+
+  ## Examples
+
+      iex> get_label_session_with_elements!(123)
+      %LabelSession{...}
+
+      iex> get_label_session_with_elements!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec get_label_session_with_elements!(term) :: %LabelSession{}
   def get_label_session_with_elements!(id) do
     Repo.one!(
       from ls in LabelSession,
@@ -210,7 +266,15 @@ defmodule Hyacinth.Labeling do
   end
 
   @doc """
+  Creates a new LabelSession.
+
+  ## Examples
+
+      iex> create_label_session(some_job, some_user)
+      %LabelSession{...}
+
   """
+  @spec create_label_session(%LabelJob{}, %User{}) :: %LabelSession{}
   def create_label_session(%LabelJob{} = job, %User{} = user) do
     result =
       Multi.new()
@@ -239,12 +303,29 @@ defmodule Hyacinth.Labeling do
 
   @doc """
   Gets a single LabelElement by id.
+
+  ## Examples
+
+      iex> get_label_element!(123)
+      %LabelElement{...}
+
+      iex> get_label_element!(456)
+      ** (Ecto.NoResultsError)
+
   """
+  @spec get_label_element!(term) :: %LabelElement{}
   def get_label_element!(id), do: Repo.get!(LabelElement, id)
 
   @doc """
   Gets a single LabelElement with the given element_index from a LabelSesssion.
+
+  ## Examples
+
+      iex> get_label_element!(some_session, 3)
+      %LabelElement{element_index: 3, ...}
+
   """
+  @spec get_label_element!(%LabelSession{}, integer) :: %LabelElement{}
   def get_label_element!(%LabelSession{} = session, element_index) do
     Repo.one!(
       from le in LabelElement,
@@ -255,7 +336,18 @@ defmodule Hyacinth.Labeling do
   end
 
   @doc """
+  Creates a new LabelEntry.
+
+  Raises if user does not match session user or label_value
+  is not a valid option for the job.
+
+  ## Examples
+
+      iex> create_label_entry!(some_element, some_user, "some label")
+      %LabelEntry{...}
+
   """
+  @spec create_label_entry!(%LabelElement{}, %User{}, String.t) :: %LabelEntry{}
   def create_label_entry!(%LabelElement{} = element, %User{} = user, label_value) when is_binary(label_value) do
     result =
       Multi.new()
@@ -289,7 +381,16 @@ defmodule Hyacinth.Labeling do
   end
 
   @doc """
+  Lists all labels for the given element. Labels are returned
+  in descending order by creation timestamp.
+
+  ## Examples
+
+      iex> list_element_labels(some_element)
+      [%LabelEntry{}, ...]
+
   """
+  @spec list_element_labels(%LabelElement{}) :: [%LabelEntry{}]
   def list_element_labels(%LabelElement{} = element) do
     Repo.all(
       from entry in LabelEntry,
