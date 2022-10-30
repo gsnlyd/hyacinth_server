@@ -143,8 +143,15 @@ defmodule Hyacinth.Labeling do
 
   @doc """
   Lists all (non-blueprint) sessions for the given LabelJob.
+
+  ## Examples
+
+      iex> list_sessions(some_job)
+      [%LabelSession{}, %LabelSession{}, ...]
+
   """
-  def list_job_sessions(%LabelJob{} = job) do
+  @spec list_sessions(%LabelJob{}) :: [%LabelSession{}]
+  def list_sessions(%LabelJob{} = job) do
     Repo.all(
       from ls in LabelSession,
       where: (ls.job_id == ^job.id) and (not ls.blueprint),

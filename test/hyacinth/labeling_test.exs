@@ -75,10 +75,10 @@ defmodule Hyacinth.LabelingTest do
   end
 
 
-  describe "list_job_sessions/1" do
+  describe "list_sessions/1" do
     test "returns empty list when there are no sessions" do
       job = label_job_fixture()
-      assert Labeling.list_job_sessions(job) == []
+      assert Labeling.list_sessions(job) == []
     end
 
     test "returns non-blueprint sessions for job" do
@@ -87,7 +87,7 @@ defmodule Hyacinth.LabelingTest do
       sess2 = label_session_fixture(job)
       _other_job_sess = label_session_fixture()
 
-      job_sessions = Labeling.list_job_sessions(job)
+      job_sessions = Labeling.list_sessions(job)
 
       assert length(job_sessions) == 2
       assert Enum.at(job_sessions, 0).id == sess1.id
