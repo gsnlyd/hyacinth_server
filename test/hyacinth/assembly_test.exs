@@ -43,6 +43,33 @@ defmodule Hyacinth.AssemblyTest do
     end
   end
 
+  describe "get_pipeline_preloaded!/1" do
+    test "returns pipeline with preloads" do
+      original_pipeline = pipeline_fixture()
+      pipeline_run_fixture(original_pipeline)
+
+      %Pipeline{} = pipeline = Assembly.get_pipeline_preloaded!(original_pipeline.id)
+      assert pipeline.id == original_pipeline.id
+      assert Ecto.assoc_loaded?(pipeline.creator)
+      assert Ecto.assoc_loaded?(pipeline.transforms)
+      assert Ecto.assoc_loaded?(pipeline.runs)
+
+      %PipelineRun{} = pr = hd(pipeline.runs)
+      assert Ecto.assoc_loaded?(pr.ran_by)
+      assert Ecto.assoc_loaded?(pr.transform_runs)
+
+      %TransformRun{} = tr = hd(pr.transform_runs)
+      assert Ecto.assoc_loaded?(tr.input)
+      assert Ecto.assoc_loaded?(tr.output)
+    end
+
+    test "raises if pipeline does not exist" do
+      assert_raise Ecto.NoResultsError, fn ->
+        Assembly.get_pipeline_preloaded!(1)
+      end
+    end
+  end
+
   describe "create_pipeline/4" do
     test "correctly creates a pipeline" do
       %User{} = user = user_fixture()

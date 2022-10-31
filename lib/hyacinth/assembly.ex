@@ -56,6 +56,37 @@ defmodule Hyacinth.Assembly do
   def get_pipeline!(id), do: Repo.get!(Pipeline, id)
 
   @doc """
+  Gets a single Pipeline with preloads.
+
+  The following fields are preloaded:
+    * `creator`
+    * `transforms`
+    * `runs`
+    * `PipelineRun.ran_by`
+    * `PipelineRun.transform_runs`
+    * `TransformRun.input`
+    * `TransformRun.output`
+
+  ## Examples
+
+      iex> get_pipeline_preloaded!(123)
+      %Pipeline{...}
+
+      iex> get_pipeline_preloaded!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec get_pipeline_preloaded!(term) :: %Pipeline{}
+  def get_pipeline_preloaded!(id) do
+    Repo.one!(
+      from p in Pipeline,
+      where: p.id == ^id,
+      select: p,
+      preload: [:creator, :transforms, runs: [:ran_by, transform_runs: [:input, :output]]]
+    )
+  end
+
+  @doc """
   Creates a pipeline.
 
   ## Examples

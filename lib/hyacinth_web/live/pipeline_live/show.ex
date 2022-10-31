@@ -23,7 +23,7 @@ defmodule HyacinthWeb.PipelineLive.Show do
   end
 
   def mount(params, _session, socket) do
-    pipeline = Assembly.get_pipeline!(params["pipeline_id"])
+    pipeline = Assembly.get_pipeline_preloaded!(params["pipeline_id"])
 
     socket = assign(socket, %{
       pipeline: pipeline,
@@ -32,6 +32,8 @@ defmodule HyacinthWeb.PipelineLive.Show do
       datasets: Warehouse.list_datasets(),
 
       run_pipeline_changeset: RunPipelineForm.changeset(%RunPipelineForm{}, %{}),
+
+      tab: :runs,
     })
 
     {:ok, socket}
@@ -51,5 +53,13 @@ defmodule HyacinthWeb.PipelineLive.Show do
         nil
     end
     {:noreply, assign(socket, :run_pipeline_changeset, changeset)}
+  end
+
+  def handle_event("set_tab", %{"tab" => tab}, socket) do
+    tab = case tab do
+      "runs" -> :runs
+      "steps" -> :steps
+    end
+    {:noreply, assign(socket, :tab, tab)}
   end
 end

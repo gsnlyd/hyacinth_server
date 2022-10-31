@@ -10,31 +10,67 @@
       </.form>
     </div>
   </div>
+
+  <div class="mt-4 text-xl border-b-2 border-gray-700">
+    <div class="-mb-0.5">
+      <.tab_button cur_tab={@tab} event="set_tab" tab="runs">Runs</.tab_button>
+      <.tab_button cur_tab={@tab} event="set_tab" tab="steps">Steps</.tab_button>
+    </div>
+  </div>
 </header>
 
 <main class="mt-4 mx-auto max-w-screen-lg">
-  <div class="space-y-4">
-    <%= for {transform, i} <- Enum.with_index(@transforms) do %>
-      <div class="p-2 text-sm bg-gray-800 rounded border border-gray-700">
-        <h2 class="text-xl text-gray-300">Transform #<%= i + 1 %></h2>
-        <ul class="mt-2">
-          <li>
-            <span class="text-gray-400">Driver:</span>
-            <span><%= transform.driver %></span>
-          </li>
-        </ul>
-        <div class="mt-4">
-          <h3 class="text-base text-gray-400">Driver Options</h3>
-          <ul>
-            <%= for {key, value} <- transform.options do %>
-              <li>
-                <span class="text-gray-400"><%= key %>:</span>
-                <span><%= value %></span>
-              </li>
+  <%= case @tab do %>
+  <% :runs -> %>
+    <div>
+      <div class="mt-2 border border-gray-700 rounded">
+        <table class="mt-1 w-full table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>User</th>
+              <th>Started</th>
+              <th>Completed</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-400 text-sm">
+            <%= for %PipelineRun{} = run <- @pipeline.runs do %>
+              <tr>
+                <td><%= run.status %></td>
+                <td><%= run.ran_by.email %></td>
+                <td><%= Calendar.strftime(run.inserted_at, "%c") %></td>
+                <td><%= if run.completed_at, do: Calendar.strftime(run.completed_at, "%c"), else: "-" %></td>
+              </tr>
             <% end %>
-          </ul>
-        </div>
+          </tbody>
+        </table>
       </div>
-    <% end %>
-  </div>
+    </div>
+
+  <% :steps -> %>
+    <div class="space-y-4">
+      <%= for {transform, i} <- Enum.with_index(@transforms) do %>
+        <div class="p-2 text-sm bg-gray-800 rounded border border-gray-700">
+          <h2 class="text-xl text-gray-300">Transform #<%= i + 1 %></h2>
+          <ul class="mt-2">
+            <li>
+              <span class="text-gray-400">Driver:</span>
+              <span><%= transform.driver %></span>
+            </li>
+          </ul>
+          <div class="mt-4">
+            <h3 class="text-base text-gray-400">Driver Options</h3>
+            <ul>
+              <%= for {key, value} <- transform.options do %>
+                <li>
+                  <span class="text-gray-400"><%= key %>:</span>
+                  <span><%= value %></span>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
 </main>
