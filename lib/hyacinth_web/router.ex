@@ -38,6 +38,8 @@ defmodule HyacinthWeb.Router do
       live "/pipelines/new", PipelineLive.New
       live "/pipelines/:pipeline_id", PipelineLive.Show
 
+      live "/runs/:pipeline_run_id", PipelineRunLive.Show
+
       live "/jobs/new", LabelJobLive.New
       live "/jobs/:label_job_id", LabelJobLive.Show
 

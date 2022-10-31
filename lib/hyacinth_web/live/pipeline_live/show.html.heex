@@ -1,4 +1,13 @@
 <header class="mt-6 mx-auto max-w-screen-lg">
+  <.breadcrumbs>
+    <:crumb label={nil} to={Routes.live_path(@socket, HyacinthWeb.PipelineLive.Index)}>
+      Pipelines
+    </:crumb>
+    <:crumb label="Pipeline" to={Routes.live_path(@socket, HyacinthWeb.PipelineLive.Show, @pipeline)}>
+      <%= @pipeline.name %>
+    </:crumb>
+  </.breadcrumbs>
+
   <div class="w-full flex justify-between items-center">
     <h1 class="text-4xl"><%= @pipeline.name %></h1>
     <div class="">
@@ -22,29 +31,48 @@
 <main class="mt-4 mx-auto max-w-screen-lg">
   <%= case @tab do %>
   <% :runs -> %>
-    <div>
-      <div class="mt-2 border border-gray-700 rounded">
-        <table class="mt-1 w-full table">
-          <thead>
-            <tr>
-              <th>Status</th>
-              <th>User</th>
-              <th>Started</th>
-              <th>Completed</th>
-            </tr>
-          </thead>
-          <tbody class="text-gray-400 text-sm">
-            <%= for %PipelineRun{} = run <- @pipeline.runs do %>
-              <tr>
-                <td><%= run.status %></td>
-                <td><%= run.ran_by.email %></td>
-                <td><%= Calendar.strftime(run.inserted_at, "%c") %></td>
-                <td><%= if run.completed_at, do: Calendar.strftime(run.completed_at, "%c"), else: "-" %></td>
-              </tr>
+    <div class="grid grid-cols-3 gap-4">
+      <%= for %PipelineRun{} = run <- @pipeline.runs do %>
+        <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.PipelineRunLive.Show, run),
+            class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
+          <div class="flex justify-between items-start space-x-4">
+            <div class="shrink">
+              <span class="px-1 py-0.5 text-xs text-gray-400 bg-gray-700 rounded">Input</span>
+              <span class="text-sm text-gray-300 font-medium"><%= hd(run.transform_runs).input.name %></span>
+            </div>
+            <div class="shrink-0">
+              <%= case run.status do %>
+              <% :running -> %>
+                <div class="pill pill-yellow">Running</div>
+              <% :complete -> %>
+                <div class="pill pill-green">Complete</div>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="mt-1 text-sm">
+            <span class="text-gray-500">Ran by</span>
+            <span class="text-gray-400"><%= run.ran_by.email %></span>
+          </div>
+
+          <div class="mt-2 text-xs text-gray-400">
+            <%= for tr <- run.transform_runs do %>
+              <div>
+                <span class="">Step <%= tr.order_index + 1 %>:</span>
+                <span><%= tr.status %></span>
+              </div>
             <% end %>
-          </tbody>
-        </table>
-      </div>
+          </div>
+
+          <div class="mt-2">
+            <%= if run.status == :complete do %>
+              <div class="text-gray-500 text-xs">Completed <%= Calendar.strftime(run.completed_at, "%c") %></div>
+            <% else %>
+              <div class="text-gray-500 text-xs">Started <%= Calendar.strftime(run.inserted_at, "%c") %></div>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
     </div>
 
   <% :steps -> %>
