@@ -45,14 +45,6 @@
               </div>
               <%= hidden_input ft, :order_index, value: i %>
               <div class="form-content">
-                <%= if i == 0 do %>
-                  <p>
-                    <%= label ft, :input_id, "Input Dataset" %>
-                    <%= select ft, :input_id, Enum.map(@datasets, fn d -> {d.name, d.id} end), prompt: "Choose a value" %>
-                    <%= error_tag ft, :input_id %>
-                  </p>
-                <% end %>
-
                 <p>
                   <%= label ft, :driver %>
                   <%= select ft, :driver, Ecto.Enum.values(Transform, :driver) %>

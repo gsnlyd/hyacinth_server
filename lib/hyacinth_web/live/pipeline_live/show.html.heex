@@ -1,7 +1,14 @@
 <header class="mt-6 mx-auto max-w-screen-lg">
   <div class="w-full flex justify-between items-center">
     <h1 class="text-4xl"><%= @pipeline.name %></h1>
-    <button class="btn btn-blue" phx-click="run_pipeline">Run Pipeline</button>
+    <div class="">
+      <.form let={f} for={@run_pipeline_changeset} phx-submit="run_pipeline_submit">
+        <div class="filter-form-content space-x-4">
+          <%= select f, :dataset_id, Enum.map(@datasets, &({&1.name, &1.id})), prompt: "Choose a Dataset" %>
+          <%= submit "Run Pipeline", class: "btn btn-blue" %>
+        </div>
+      </.form>
+    </div>
   </div>
 </header>
 
@@ -15,22 +22,6 @@
             <span class="text-gray-400">Driver:</span>
             <span><%= transform.driver %></span>
           </li>
-          <li>
-            <span class="text-gray-400">Run:</span>
-            <span><%= transform.output_id != nil %></span>
-          </li>
-          <%= if transform.input do %>
-            <li class="mt-2">
-              <span class="text-gray-400">Input Dataset:</span>
-              <span><%= transform.input.name %></span>
-            </li>
-          <% end %>
-          <%= if transform.output do %>
-            <li>
-              <span class="text-gray-400">Output Dataset:</span>
-              <span><%= transform.output.name %></span>
-            </li>
-          <% end %>
         </ul>
         <div class="mt-4">
           <h3 class="text-base text-gray-400">Driver Options</h3>

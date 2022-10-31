@@ -1,12 +1,11 @@
 defmodule HyacinthWeb.PipelineLive.New do
   use HyacinthWeb, :live_view
 
-  alias Hyacinth.{Warehouse, Assembly}
+  alias Hyacinth.Assembly
   alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
 
   def mount(_params, _session, socket) do
     socket = assign(socket, %{
-      datasets: Warehouse.list_datasets(),
       pipeline_changeset: Ecto.Changeset.change(%Pipeline{}, %{}),
       transform_options: [],
       transforms: [],
