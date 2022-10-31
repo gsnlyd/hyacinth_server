@@ -8,23 +8,23 @@ defmodule Hyacinth.Assembly.Runner do
   alias Hyacinth.{Warehouse, Assembly}
 
   alias Hyacinth.Warehouse.{Object, Store, Packer}
-  alias Hyacinth.Assembly.{Transform, PipelineRun, TransformRun, Driver}
+  alias Hyacinth.Assembly.{PipelineRun, TransformRun, Driver}
 
   @type object_tuple :: {String.t, String.t}
 
-  @spec run_command(%Transform{}, %Object{}) :: [map]
-  defp run_command(%Transform{} = transform, %Object{} = object) do
+  @spec run_command(atom, map, %Object{}) :: [map]
+  defp run_command(driver, options, %Object{} = object) when is_atom(driver) and is_map(options) do
     {temp_dir, unpacked_path} = Packer.retrieve_object!(object)
-    {command, command_args} = Driver.command_args(transform.driver, transform.options, unpacked_path)
+    {command, command_args} = Driver.command_args(driver, options, unpacked_path)
 
     Logger.debug "Running command #{command} with args: #{command_args}"
     {stdout, exit_code} = System.cmd(command, command_args)
-    Logger.debug "Ran command for driver #{transform.driver} with exit code #{exit_code}. Stdout: #{stdout}"
+    Logger.debug "Ran command for driver #{driver} with exit code #{exit_code}. Stdout: #{stdout}"
 
-    results_glob_path = Path.join(temp_dir, Driver.results_glob(transform.driver, transform.options))
+    results_glob_path = Path.join(temp_dir, Driver.results_glob(driver, options))
     results_paths = Path.wildcard(results_glob_path)
 
-    output_format = Driver.output_format(transform.driver, transform.options)
+    output_format = Driver.output_format(driver, options)
 
     Enum.map(results_paths, fn path ->
       hash = Store.ingest_file!(path)
@@ -46,17 +46,18 @@ defmodule Hyacinth.Assembly.Runner do
 
     {:ok, _} = Assembly.start_transform_run(transform_run)
 
-    %Transform{} = transform = transform_run.transform
+    driver = transform_run.transform.driver
+    options = transform_run.transform.options
 
     objects = Warehouse.list_objects(transform_run.input)
-    objects = Driver.filter_objects(transform.driver, transform.options, objects)
+    objects = Driver.filter_objects(driver, options, objects)
 
     objects_or_params =
-      if Driver.pure?(transform.driver) do
+      if Driver.pure?(driver) do
         objects
       else
         objects
-        |> Enum.map(fn o -> run_command(transform, o) end)
+        |> Enum.map(fn o -> run_command(driver, options, o) end)
         |> Enum.concat()
       end
 
