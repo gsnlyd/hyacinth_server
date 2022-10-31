@@ -38,7 +38,7 @@ defmodule Hyacinth.Assembly.Runner do
     end)
   end
 
-  @spec run_transform(%TransformRun{}) :: any()
+  @spec run_transform(%TransformRun{}) :: :ok
   defp run_transform(%TransformRun{} = transform_run) do
     # Reload transform run to ensure input is loaded
     %TransformRun{} = transform_run = Assembly.get_transform_run!(transform_run.id)
@@ -67,6 +67,16 @@ defmodule Hyacinth.Assembly.Runner do
     :ok
   end
 
+  @doc """
+  Runs a pipeline.
+
+  ## Examples
+
+      iex> run_pipeline(some_pipeline_run)
+      :ok
+
+  """
+  @spec run_pipeline(%PipelineRun{}) :: :ok
   def run_pipeline(%PipelineRun{} = pipeline_run) do
     # Guarantee preloads by reloading
     %PipelineRun{} = pipeline_run = Assembly.get_pipeline_run!(pipeline_run.id)
