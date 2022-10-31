@@ -87,19 +87,6 @@ defmodule Hyacinth.Assembly do
   end
 
   @doc """
-  Returns an `Ecto.Changeset` for tracking Transform changes.
-
-  ## Examples
-
-      iex> change_transform(transform)
-      %Ecto.Changeset{data: %Transform{}}
-
-  """
-  def change_transform(%Transform{} = transform, attrs \\ %{}) do
-    Transform.changeset(transform, attrs)
-  end
-
-  @doc """
   Gets a single PipelineRun.
 
   The following attributes are preloaded:

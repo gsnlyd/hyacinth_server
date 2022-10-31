@@ -128,14 +128,6 @@ defmodule Hyacinth.AssemblyTest do
     end
   end
 
-  describe "change_transform/2" do
-    test "returns changeset for transform" do
-      changeset = Assembly.change_transform(%Transform{}, %{order_index: 0, driver: :sample})
-      assert %Ecto.Changeset{} = changeset
-      assert %Transform{} = changeset.data
-    end
-  end
-
   describe "get_pipeline_run!/1" do
     test "gets a single pipeline run with preloads" do
       original_pr = pipeline_run_fixture()

@@ -1,6 +1,5 @@
 defmodule Hyacinth.Assembly.TransformRun do
   use Hyacinth.Schema
-  import Ecto.Changeset
 
   alias Hyacinth.Warehouse.Dataset
   alias Hyacinth.Assembly.{Transform, PipelineRun}
@@ -19,16 +18,5 @@ defmodule Hyacinth.Assembly.TransformRun do
     belongs_to :transform, Transform
 
     timestamps()
-  end
-
-  @doc false
-  def changeset(transform_run, attrs) do
-    transform_run
-    |> cast(attrs, [:order_index, :status, :started_at, :completed_at, :input_id, :output_id, :pipeline_run_id, :transform_id])
-    |> validate_required([:order_index, :status, :pipeline_run_id, :transform_id])
-    |> assoc_constraint(:input)
-    |> assoc_constraint(:output)
-    |> assoc_constraint(:pipeline_run)
-    |> assoc_constraint(:transform)
   end
 end

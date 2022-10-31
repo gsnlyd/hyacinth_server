@@ -1,6 +1,5 @@
 defmodule Hyacinth.Assembly.PipelineRun do
   use Hyacinth.Schema
-  import Ecto.Changeset
 
   alias Hyacinth.Accounts.User
   alias Hyacinth.Assembly.{Pipeline, TransformRun}
@@ -15,14 +14,5 @@ defmodule Hyacinth.Assembly.PipelineRun do
     has_many :transform_runs, TransformRun, preload_order: [asc: :order_index]
 
     timestamps()
-  end
-
-  @doc false
-  def changeset(pipeline_run, attrs) do
-    pipeline_run
-    |> cast(attrs, [:status, :completed_at, :ran_by_id, :pipeline_id])
-    |> validate_required([:status, :ran_by_id, :pipeline_id])
-    |> assoc_constraint(:ran_by)
-    |> assoc_constraint(:pipeline)
   end
 end
