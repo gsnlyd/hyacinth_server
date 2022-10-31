@@ -226,7 +226,7 @@ defmodule Hyacinth.AssemblyTest do
       assert pipeline_run.completed_at == nil
 
       # ---- Start TR1 ----
-      {:ok, _} = Assembly.start_transform_run!(tr1)
+      {:ok, _} = Assembly.start_transform_run(tr1)
 
       %PipelineRun{transform_runs: [tr1, tr2]} = pipeline_run = Assembly.get_pipeline_run!(pipeline_run.id)
 
@@ -270,7 +270,7 @@ defmodule Hyacinth.AssemblyTest do
       assert pipeline_run.completed_at == nil
 
       # ---- Start TR2 ----
-      {:ok, _} = Assembly.start_transform_run!(tr2)
+      {:ok, _} = Assembly.start_transform_run(tr2)
 
       %PipelineRun{transform_runs: [tr1, tr2]} = pipeline_run = Assembly.get_pipeline_run!(pipeline_run.id)
 
@@ -318,26 +318,26 @@ defmodule Hyacinth.AssemblyTest do
   describe "start_transform_run/1" do
     test "fails if transform is running" do
       [tr1, _] = pipeline_run_fixture().transform_runs
-      {:ok, _} = Assembly.start_transform_run!(tr1)
-      {:error, :validate_transform_waiting, :running, _changes} = Assembly.start_transform_run!(tr1)
+      {:ok, _} = Assembly.start_transform_run(tr1)
+      {:error, :validate_transform_waiting, :running, _changes} = Assembly.start_transform_run(tr1)
     end
 
     test "fails if transform is complete" do
       [tr1, _] = pipeline_run_fixture().transform_runs
-      {:ok, _} = Assembly.start_transform_run!(tr1)
+      {:ok, _} = Assembly.start_transform_run(tr1)
       {:ok, _} = Assembly.complete_transform_run(tr1, many_object_params_fixtures())
-      {:error, :validate_transform_waiting, :complete, _changes} = Assembly.start_transform_run!(tr1)
+      {:error, :validate_transform_waiting, :complete, _changes} = Assembly.start_transform_run(tr1)
     end
 
     test "fails if previous transform is waiting" do
       [_, tr2] = pipeline_run_fixture().transform_runs
-      {:error, :validate_previous_transforms_complete, False, _changes} = Assembly.start_transform_run!(tr2)
+      {:error, :validate_previous_transforms_complete, False, _changes} = Assembly.start_transform_run(tr2)
     end
 
     test "fails if previous transform is running" do
       [tr1, tr2] = pipeline_run_fixture().transform_runs
-      {:ok, _} = Assembly.start_transform_run!(tr1)
-      {:error, :validate_previous_transforms_complete, False, _changes} = Assembly.start_transform_run!(tr2)
+      {:ok, _} = Assembly.start_transform_run(tr1)
+      {:error, :validate_previous_transforms_complete, False, _changes} = Assembly.start_transform_run(tr2)
     end
 
     test "fails if pipeline is not running" do
@@ -346,7 +346,7 @@ defmodule Hyacinth.AssemblyTest do
 
       Hyacinth.Repo.update! Ecto.Changeset.change(pipeline_run, %{status: :failed})
 
-      {:error, :validate_pipeline_running, :failed, _changes} = Assembly.start_transform_run!(tr1)
+      {:error, :validate_pipeline_running, :failed, _changes} = Assembly.start_transform_run(tr1)
     end
   end
 
@@ -358,7 +358,7 @@ defmodule Hyacinth.AssemblyTest do
 
     test "fails if transform is complete" do
       [tr1, _] = pipeline_run_fixture().transform_runs
-      {:ok, _} = Assembly.start_transform_run!(tr1)
+      {:ok, _} = Assembly.start_transform_run(tr1)
       {:ok, _} = Assembly.complete_transform_run(tr1, many_object_params_fixtures())
       {:error, :validate_transform_running, :complete, _changes} = Assembly.complete_transform_run(tr1, many_object_params_fixtures())
     end
@@ -367,7 +367,7 @@ defmodule Hyacinth.AssemblyTest do
       pipeline_run = pipeline_run_fixture()
       [tr1, _] = pipeline_run.transform_runs
 
-      {:ok, _} = Assembly.start_transform_run!(tr1)
+      {:ok, _} = Assembly.start_transform_run(tr1)
       Hyacinth.Repo.update! Ecto.Changeset.change(pipeline_run, %{status: :failed})
 
       {:error, :validate_pipeline_running, :failed, _changes} = Assembly.complete_transform_run(tr1, many_object_params_fixtures())

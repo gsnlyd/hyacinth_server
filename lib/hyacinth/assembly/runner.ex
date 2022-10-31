@@ -44,7 +44,7 @@ defmodule Hyacinth.Assembly.Runner do
     %TransformRun{} = transform_run = Assembly.get_transform_run!(transform_run.id)
     Logger.debug "Running transform: #{inspect(transform_run)}"
 
-    {:ok, _} = Assembly.start_transform_run!(transform_run)
+    {:ok, _} = Assembly.start_transform_run(transform_run)
 
     %Transform{} = transform = transform_run.transform
 

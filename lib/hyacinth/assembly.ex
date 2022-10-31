@@ -199,15 +199,15 @@ defmodule Hyacinth.Assembly do
 
   ## Examples
 
-      iex> start_transform_run!(some_transform_run)
+      iex> start_transform_run(some_transform_run)
       {:ok, _changes}
 
-      iex> start_transform_run!(invalid_transform_run)
+      iex> start_transform_run(invalid_transform_run)
       {:error, _failed_operation, _value, _changes}
 
   """
-  @spec start_transform_run!(%TransformRun{}) :: {:ok, map} | {:error, atom, term, map}
-  def start_transform_run!(%TransformRun{} = transform_run) do
+  @spec start_transform_run(%TransformRun{}) :: {:ok, map} | {:error, atom, term, map}
+  def start_transform_run(%TransformRun{} = transform_run) do
     Multi.new()
     |> Multi.run(:validate_transform_waiting, fn _repo, _changes ->
       case get_transform_run!(transform_run.id).status do
