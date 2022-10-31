@@ -35,7 +35,11 @@
       <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.PipelineLive.Show, pipeline), class: "card link-card" do %>
         <div class="flex justify-between items-start space-x-4">
           <div class="shrink text-sm text-gray-300 font-medium"><%= pipeline.name %></div>
-          <div class="pill pill-green"><%= length(pipeline.transforms) %> transforms</div>
+          <%= if Enum.any?(pipeline.runs, &(&1.status == :running)) do %>
+            <div class="pill pill-yellow">Running</div>
+          <% else %>
+            <div class="pill pill-green"><%= length(pipeline.runs) %> runs</div>
+          <% end %>
         </div>
         <div class="mt-2 text-xs text-gray-400">
           <%= for {transform, i} <- Enum.with_index(pipeline.transforms) do %>

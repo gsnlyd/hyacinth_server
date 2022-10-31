@@ -3,7 +3,7 @@ defmodule Hyacinth.Assembly.Pipeline do
   import Ecto.Changeset
 
   alias Hyacinth.Accounts.User
-  alias Hyacinth.Assembly.Transform
+  alias Hyacinth.Assembly.{Transform, PipelineRun}
 
   schema "pipelines" do
     field :name, :string
@@ -11,6 +11,7 @@ defmodule Hyacinth.Assembly.Pipeline do
     belongs_to :creator, User
 
     has_many :transforms, Transform
+    has_many :runs, PipelineRun
 
     timestamps()
   end

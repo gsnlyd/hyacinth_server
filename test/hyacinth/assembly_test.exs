@@ -21,6 +21,7 @@ defmodule Hyacinth.AssemblyTest do
       Enum.each(pipelines, fn %Pipeline{} = p ->
         assert Ecto.assoc_loaded?(p.creator)
         assert Ecto.assoc_loaded?(p.transforms)
+        assert Ecto.assoc_loaded?(p.runs)
       end)
     end
 

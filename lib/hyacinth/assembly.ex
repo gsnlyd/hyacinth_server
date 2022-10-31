@@ -34,7 +34,7 @@ defmodule Hyacinth.Assembly do
   def list_pipelines_preloaded do
     Repo.all(
       from p in Pipeline,
-      preload: [:creator, :transforms]
+      preload: [:creator, :transforms, :runs]
     )
   end
 
