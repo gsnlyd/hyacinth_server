@@ -12,8 +12,8 @@ defmodule Hyacinth.Assembly do
   alias Hyacinth.Warehouse
 
   alias Hyacinth.Accounts.User
-  alias Hyacinth.Warehouse.{Dataset, Object}
-  alias Hyacinth.Assembly.{Pipeline, Transform}
+  alias Hyacinth.Warehouse.{Dataset}
+  alias Hyacinth.Assembly.{Pipeline, Transform, PipelineRun, TransformRun}
 
   @doc """
   Returns a list of all Pipelines with their
@@ -79,31 +79,7 @@ defmodule Hyacinth.Assembly do
   def list_transforms(%Pipeline{} = pipeline) do
     Repo.all(
       from t in Ecto.assoc(pipeline, :transforms),
-      select: t,
-      preload: [:input, :output]
-    )
-  end
-
-  @doc """
-  Returns a single Transform with its input and output datasets
-  preloaded.
-
-  ## Examples
-
-      iex> get_transform_with_datasets(123)
-      %Transform{...}
-
-      iex> get_transform_with_datasets(456)
-      nil
-
-  """
-  @spec get_transform_with_datasets(id :: any) :: %Transform{}
-  def get_transform_with_datasets(id) do
-    Repo.one(
-      from t in Transform,
-      where: t.id == ^id,
-      select: t,
-      preload: [:input, :output]
+      select: t
     )
   end
 
@@ -121,44 +97,171 @@ defmodule Hyacinth.Assembly do
   end
 
   @doc """
-  Completes a Transform.
+  Gets a single PipelineRun.
+
+  The following attributes are preloaded:
+    * `pipeline`
+    * `transform_runs`
+    * `TransformRun.input`
+    * `TransformRun.output`
+
   """
-  @spec complete_transform(%Transform{}, [%Object{}] | [map]) :: any
-  def complete_transform(%Transform{} = transform, objects_or_params) do
+  @spec get_pipeline_run!(term) :: %PipelineRun{}
+  def get_pipeline_run!(id) do
+    Repo.one!(
+      from pr in PipelineRun,
+      where: pr.id == ^id,
+      select: pr,
+      preload: [:pipeline, transform_runs: [:transform, :input, :output]]
+    )
+  end
+
+  @doc """
+  Creates a new PipelineRun for the given Pipeline.
+
+  The `input` to the first TransformRun will be the given Dataset,
+  and the `ran_by` of the PipelineRun will be the given User.
+
+  ## Examples
+
+    iex> create_pipeline_run!(some_pipeline, some_dataset, some_user)
+    %PipelineRun{...}
+
+  """
+  @spec create_pipeline_run!(%Pipeline{}, %Dataset{}, %User{}) :: %PipelineRun{}
+  def create_pipeline_run!(%Pipeline{} = pipeline, %Dataset{} = dataset, %User{} = user) do
+    result =
+      Multi.new()
+      |> Multi.insert(:pipeline_run, %PipelineRun{status: :running, ran_by_id: user.id, pipeline_id: pipeline.id})
+      |> Multi.run(:transform_runs, fn _repo, %{pipeline_run: %PipelineRun{} = pipeline_run} ->
+        transform_runs =
+          Enum.map(list_transforms(pipeline), fn %Transform{} = transform ->
+            Repo.insert!(%TransformRun{
+              order_index: transform.order_index,
+              status: :waiting,
+              input_id: if(transform.order_index == 0, do: dataset.id, else: nil),
+              pipeline_run_id: pipeline_run.id,
+              transform_id: transform.id,
+            })
+          end)
+        {:ok, transform_runs}
+      end)
+      |> Repo.transaction()
+
+    {:ok, %{pipeline_run: %PipelineRun{} = pipeline_run}} = result
+    pipeline_run
+  end
+
+  def list_transform_runs(%PipelineRun{} = pipeline_run) do
+    Repo.all(
+      from tr in TransformRun,
+      where: tr.pipeline_run_id == ^pipeline_run.id,
+      select: tr,
+      preload: [:input, :output, :pipeline_run, :transform]
+    )
+  end
+
+  def get_transform_run!(id) do
+    Repo.one!(
+      from tr in TransformRun,
+      where: tr.id == ^id,
+      select: tr,
+      preload: [:input, :output, :transform]
+    )
+  end
+
+  def start_transform_run!(%TransformRun{} = transform_run) do
     Multi.new()
-    |> Multi.run(:validate_transform_has_no_output, fn _repo, _changes ->
-      # Must be checked within transaction
-      output_id = Repo.one! from(t in Transform, where: t.id == ^transform.id, select: t.output_id)
-      case output_id do
-        nil -> {:ok, output_id}
-        _ -> {:error, output_id}
+    |> Multi.run(:validate_transform_waiting, fn _repo, _changes ->
+      case get_transform_run!(transform_run.id).status do
+        :waiting -> {:ok, :waiting}
+        status -> {:error, status}
       end
     end)
-    |> Multi.run(:dataset, fn _repo, _changes ->
-      %Pipeline{} = pipeline = get_pipeline!(transform.pipeline_id)
+    |> Multi.run(:pipeline_run, fn _repo, _changes ->
+      {:ok, get_pipeline_run!(transform_run.pipeline_run_id)}
+    end)
+    |> Multi.run(:validate_previous_transforms_complete, fn _repo, %{pipeline_run: %PipelineRun{} = pipeline_run} ->
+      all_complete =
+        pipeline_run.transform_runs
+        |> Enum.slice(0, transform_run.order_index)
+        |> Enum.all?(fn %TransformRun{} = tr -> tr.status == :complete end)
+
+      if all_complete do
+        {:ok, True}
+      else
+        {:error, False}
+      end
+    end)
+    |> Multi.run(:update_transform_run, fn _repo, _changes ->
+      updated_params = %{
+        status: :running,
+        started_at: DateTime.utc_now(),
+      }
+      Repo.update Ecto.Changeset.change(transform_run, updated_params)
+    end)
+    |> Repo.transaction()
+  end
+
+  def complete_transform_run(%TransformRun{} = transform_run, objects_or_params) do
+    Multi.new()
+    |> Multi.run(:validate_transform_running, fn _repo, _changes ->
+      # Check within transaction to prevent race conditions
+      case get_transform_run!(transform_run.id).status do
+        :running -> {:ok, :running}
+        status -> {:error, status}
+      end
+    end)
+    |> Multi.run(:pipeline_run, fn _repo, _changes ->
+      %PipelineRun{} = pipeline_run = get_pipeline_run!(transform_run.pipeline_run_id)
+      {:ok, pipeline_run}
+    end)
+    |> Multi.run(:validate_pipeline_running, fn _repo, %{pipeline_run: %PipelineRun{} = pipeline_run} ->
+      case pipeline_run.status do
+        :running -> {:ok, :running}
+        status -> {:error, status}
+      end
+    end)
+    |> Multi.run(:dataset, fn _repo, %{pipeline_run: %PipelineRun{pipeline: %Pipeline{} = pipeline}} ->
       dataset_params = %{
-        name: "Derived from #{pipeline.name} T#{transform.order_index + 1}",
+        name: "Derived from #{pipeline.name} T#{transform_run.order_index + 1}",
         type: :derived,
       }
-      {:ok, %{dataset: dataset}} = Warehouse.create_dataset(dataset_params, objects_or_params)
+
+      {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(dataset_params, objects_or_params)
       {:ok, dataset}
     end)
-    |> Multi.run(:update_transform_output, fn _repo, %{dataset: %Dataset{} = dataset} ->
-      Repo.update Transform.update_output_changeset(transform, %{output_id: dataset.id})
+    |> Multi.run(:update_transform_run, fn _changes, %{dataset: %Dataset{} = dataset} ->
+      updated_params = %{
+        status: :complete,
+        completed_at: DateTime.utc_now(),
+        output_id: dataset.id,
+      }
+      Repo.update Ecto.Changeset.change(transform_run, updated_params)
     end)
-    |> Multi.run(:update_next_transform_input, fn _repo, %{dataset: %Dataset{} = dataset} ->
-      next_transform = Repo.one(
-        from t in Transform,
-        where: t.pipeline_id == ^transform.pipeline_id and t.order_index == ^transform.order_index + 1,
-        select: t
-      )
-
-      case next_transform do
-        %Transform{} ->
-          Repo.update Transform.update_input_changeset(next_transform, %{input_id: dataset.id})
+    |> Multi.run(:maybe_update_next_transform_run, fn _changes, %{pipeline_run: %PipelineRun{} = pipeline_run, dataset: %Dataset{} = dataset} ->
+      case Enum.at(pipeline_run.transform_runs, transform_run.order_index + 1) do
+        %TransformRun{} = next_run ->
+          case next_run.input_id do
+            nil -> Repo.update Ecto.Changeset.change(next_run, %{input_id: dataset.id})
+            _ -> {:error, :next_transform_already_has_input}
+          end
 
         nil ->
-          {:ok, nil}
+          {:ok, :no_more_transform_runs}
+      end
+    end)
+    |> Multi.run(:maybe_complete_pipeline_run, fn _changes, %{pipeline_run: %PipelineRun{} = pipeline_run} ->
+      case Enum.at(pipeline_run.transform_runs, transform_run.order_index + 1) do
+        nil ->
+          updated_params = %{
+            status: :complete,
+            completed_at: DateTime.utc_now(),
+          }
+          Repo.update Ecto.Changeset.change(pipeline_run, updated_params)
+
+        _next_run ->
+          {:ok, :still_has_more_transform_runs}
       end
     end)
     |> Repo.transaction()

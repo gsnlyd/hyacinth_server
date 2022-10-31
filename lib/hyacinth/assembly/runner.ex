@@ -8,7 +8,7 @@ defmodule Hyacinth.Assembly.Runner do
   alias Hyacinth.{Warehouse, Assembly}
 
   alias Hyacinth.Warehouse.{Object, Store, Packer}
-  alias Hyacinth.Assembly.{Pipeline, Transform, Driver}
+  alias Hyacinth.Assembly.{Transform, PipelineRun, TransformRun, Driver}
 
   @type object_tuple :: {String.t, String.t}
 
@@ -38,17 +38,17 @@ defmodule Hyacinth.Assembly.Runner do
     end)
   end
 
-  @spec run_transform(transform :: %Transform{}) :: any()
-  def run_transform(%Transform{} = transform) do
-    Logger.debug "Running transform #{inspect(transform)}"
+  @spec run_transform(%TransformRun{}) :: any()
+  defp run_transform(%TransformRun{} = transform_run) do
+    # Reload transform run to ensure input is loaded
+    %TransformRun{} = transform_run = Assembly.get_transform_run!(transform_run.id)
+    Logger.debug "Running transform: #{inspect(transform_run)}"
 
-    # Reload transform to ensure input is loaded
-    %Transform{} = transform = Assembly.get_transform_with_datasets(transform.id)
+    {:ok, _} = Assembly.start_transform_run!(transform_run)
 
-    if transform.input_id == nil, do: raise "Transform has no input dataset"
-    if transform.output_id != nil, do: raise "Transform already has output dataset"
+    %Transform{} = transform = transform_run.transform
 
-    objects = Warehouse.list_objects(transform.input)
+    objects = Warehouse.list_objects(transform_run.input)
     objects = Driver.filter_objects(transform.driver, transform.options, objects)
 
     objects_or_params =
@@ -60,17 +60,18 @@ defmodule Hyacinth.Assembly.Runner do
         |> Enum.concat()
       end
 
-    {:ok, result} = Assembly.complete_transform(transform, objects_or_params)
+    {:ok, result} = Assembly.complete_transform_run(transform_run, objects_or_params)
     Logger.debug inspect(result)
 
     :ok
   end
 
-  def run_pipeline(%Pipeline{} = pipeline) do
-    Logger.debug "Running pipeline #{inspect(pipeline)}"
+  def run_pipeline(%PipelineRun{} = pipeline_run) do
+    # Guarantee preloads by reloading
+    %PipelineRun{} = pipeline_run = Assembly.get_pipeline_run!(pipeline_run.id)
+    Logger.debug "Running pipeline: #{inspect(pipeline_run)}"
 
-    transforms = Assembly.list_transforms(pipeline)
-    Enum.map(transforms, &run_transform/1)
+    Enum.map(pipeline_run.transform_runs, &run_transform/1)
 
     :ok
   end

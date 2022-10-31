@@ -6,7 +6,7 @@ defmodule Hyacinth.IntegrationTest do
   alias Hyacinth.{Warehouse, Assembly}
   alias Hyacinth.Accounts.User
   alias Hyacinth.Warehouse.{Dataset, Object, Store}
-  alias Hyacinth.Assembly.{Pipeline, Runner}
+  alias Hyacinth.Assembly.{Pipeline, PipelineRun, TransformRun, Runner}
 
   @moduletag :integration
 
@@ -94,9 +94,11 @@ defmodule Hyacinth.IntegrationTest do
       }
 
       {:ok, %Pipeline{} = pipeline} = Assembly.create_pipeline(user, pipeline_params)
-      Runner.run_pipeline(pipeline)
+      %PipelineRun{} = pipeline_run = Assembly.create_pipeline_run!(pipeline, dataset, user)
+      Runner.run_pipeline(pipeline_run)
 
-      [_root_ds, nifti_ds, slicer_ds, sample_ds] = Warehouse.list_datasets()
+      # ---- Check Datasets ----
+      [root_ds, nifti_ds, slicer_ds, sample_ds] = Warehouse.list_datasets()
 
       nifti_objects = Warehouse.list_objects(nifti_ds)
       assert length(nifti_objects) == 10
@@ -121,6 +123,33 @@ defmodule Hyacinth.IntegrationTest do
         assert o.format == :png
         assert object_file_exists?(o)
       end)
+
+      # ---- Check Pipeline Run ----
+      %PipelineRun{transform_runs: [tr1, tr2, tr3]} = pipeline_run = Assembly.get_pipeline_run!(pipeline_run.id)
+
+      assert pipeline_run.status == :complete
+      assert pipeline_run.completed_at != nil
+
+      assert %TransformRun{} = tr1
+      assert tr1.status == :complete
+      assert tr1.started_at != nil
+      assert tr1.completed_at != nil
+      assert tr1.input_id == root_ds.id
+      assert tr1.output_id == nifti_ds.id
+
+      assert %TransformRun{} = tr2
+      assert tr2.status == :complete
+      assert tr2.started_at != nil
+      assert tr2.completed_at != nil
+      assert tr2.input_id == nifti_ds.id
+      assert tr2.output_id == slicer_ds.id
+
+      assert %TransformRun{} = tr3
+      assert tr3.status == :complete
+      assert tr3.started_at != nil
+      assert tr3.completed_at != nil
+      assert tr3.input_id == slicer_ds.id
+      assert tr3.output_id == sample_ds.id
     end
   end
 end

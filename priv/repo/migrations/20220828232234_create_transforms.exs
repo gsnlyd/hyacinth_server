@@ -8,14 +8,10 @@ defmodule Hyacinth.Repo.Migrations.CreateTransforms do
       add :options, :map
 
       add :pipeline_id, references(:pipelines, on_delete: :restrict, on_update: :restrict), null: false
-      add :input_id, references(:datasets, on_delete: :restrict, on_update: :restrict)
-      add :output_id, references(:datasets, on_delete: :restrict, on_update: :restrict)
 
       timestamps()
     end
 
     create index(:transforms, [:pipeline_id])
-    create index(:transforms, [:input_id])
-    create index(:transforms, [:output_id])
   end
 end

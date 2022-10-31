@@ -10,7 +10,7 @@ defmodule Hyacinth.AssemblyFixtures do
 
   alias Hyacinth.Accounts.User
   alias Hyacinth.Warehouse.Dataset
-  alias Hyacinth.Assembly.{Pipeline, Driver}
+  alias Hyacinth.Assembly.{Pipeline, Driver, PipelineRun}
 
   @spec options_fixture(atom, map) :: map
   def options_fixture(driver, params \\ %{}) do
@@ -44,5 +44,14 @@ defmodule Hyacinth.AssemblyFixtures do
 
     {:ok, %Pipeline{} = pipeline} = Assembly.create_pipeline(user, params)
     pipeline
+  end
+
+  def pipeline_run_fixture(pipeline \\ nil, dataset \\ nil, user \\ nil) do
+    %Pipeline{} = pipeline = (pipeline || pipeline_fixture())
+    %Dataset{} = dataset = (dataset || root_dataset_fixture())
+    %User{} = user = (user || user_fixture())
+
+    %PipelineRun{} = pipeline_run = Assembly.create_pipeline_run!(pipeline, dataset, user)
+    Assembly.get_pipeline_run!(pipeline_run.id)
   end
 end
