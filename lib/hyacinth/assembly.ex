@@ -12,7 +12,7 @@ defmodule Hyacinth.Assembly do
   alias Hyacinth.Warehouse
 
   alias Hyacinth.Accounts.User
-  alias Hyacinth.Warehouse.{Dataset}
+  alias Hyacinth.Warehouse.{Dataset, Object}
   alias Hyacinth.Assembly.{Pipeline, Transform, PipelineRun, TransformRun}
 
   @doc """
@@ -30,6 +30,7 @@ defmodule Hyacinth.Assembly do
       [%Pipeline{}, %Pipeline{}, ...]
 
   """
+  @spec list_pipelines_preloaded() :: [%Pipeline{}]
   def list_pipelines_preloaded do
     Repo.all(
       from p in Pipeline,
@@ -51,6 +52,7 @@ defmodule Hyacinth.Assembly do
       ** (Ecto.NoResultsError)
 
   """
+  @spec get_pipeline!(term) :: %Pipeline{}
   def get_pipeline!(id), do: Repo.get!(Pipeline, id)
 
   @doc """
@@ -76,6 +78,7 @@ defmodule Hyacinth.Assembly do
       [%Transform{}, %Transform{}, ...]
 
   """
+  @spec list_transforms(%Pipeline{}) :: [%Transform{}]
   def list_transforms(%Pipeline{} = pipeline) do
     Repo.all(
       from t in Ecto.assoc(pipeline, :transforms),
@@ -152,6 +155,16 @@ defmodule Hyacinth.Assembly do
     pipeline_run
   end
 
+  @doc """
+  Returns a list of all TransformRuns which belong to the given PipelineRun.
+
+  ## Examples
+
+      iex> list_transform_runs(some_pipeline_run)
+      [%TransformRun{}, ...]
+
+  """
+  @spec list_transform_runs(%PipelineRun{}) :: [%TransformRun{}]
   def list_transform_runs(%PipelineRun{} = pipeline_run) do
     Repo.all(
       from tr in TransformRun,
@@ -161,6 +174,24 @@ defmodule Hyacinth.Assembly do
     )
   end
 
+  @doc """
+  Gets a single TransformRun.
+
+  The following fields are preloaded:
+    * input
+    * output
+    * transform
+
+  ## Examples
+
+      iex> get_transform_run!(123)
+      %TransformRun{...}
+
+      iex> get_transform_run!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec get_transform_run!(term) :: %TransformRun{}
   def get_transform_run!(id) do
     Repo.one!(
       from tr in TransformRun,
@@ -170,6 +201,25 @@ defmodule Hyacinth.Assembly do
     )
   end
 
+  @doc """
+  Starts a TransformRun.
+
+  Updates the `status` and `started_at` fields of
+  the TransformRun.
+
+  Fails if transform is not `:waiting`, pipeline is not `:running`,
+  or previous transforms are not `:complete`.
+
+  ## Examples
+
+      iex> start_transform_run!(some_transform_run)
+      {:ok, _changes}
+
+      iex> start_transform_run!(invalid_transform_run)
+      {:error, _failed_operation, _value, _changes}
+
+  """
+  @spec start_transform_run!(%TransformRun{}) :: {:ok, map} | {:error, atom, term, map}
   def start_transform_run!(%TransformRun{} = transform_run) do
     Multi.new()
     |> Multi.run(:validate_transform_waiting, fn _repo, _changes ->
@@ -209,6 +259,29 @@ defmodule Hyacinth.Assembly do
     |> Repo.transaction()
   end
 
+  @doc """
+  Completes a TransformRun.
+
+  Creates a new derived dataset with the given `objects_or_params` and
+  updates the given TransformRun's `status`, `completed_at`, and `output` fields.
+
+  If there are more transforms left in the pipeline, updates the
+  next TransformRun's `input` with the created dataset. Otherwise,
+  marks the PipelineRun as `:completed`.
+
+  Fails if the given TransformRun is not `:running` or if the PipelineRun
+  is not `:running`.
+
+  ## Examples
+
+      iex> complete_transform_run(some_transform_run, some_object_params)
+      {:ok, _changes}
+
+      iex> complete_transform_run(some_invalid_transform_run, some_object_params)
+      {:error, _failed_operation, _value, _changes}
+
+  """
+  @spec complete_transform_run(%TransformRun{}, [map] | [%Object{}]) :: {:ok, map} | {:error, atom, term, map}
   def complete_transform_run(%TransformRun{} = transform_run, objects_or_params) do
     Multi.new()
     |> Multi.run(:validate_transform_running, fn _repo, _changes ->
