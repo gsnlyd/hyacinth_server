@@ -181,6 +181,12 @@ defmodule Hyacinth.Assembly do
     |> Multi.run(:pipeline_run, fn _repo, _changes ->
       {:ok, get_pipeline_run!(transform_run.pipeline_run_id)}
     end)
+    |> Multi.run(:validate_pipeline_running, fn _repo, %{pipeline_run: %PipelineRun{} = pipeline_run} ->
+      case pipeline_run.status do
+        :running -> {:ok, :running}
+        status -> {:error, status}
+      end
+    end)
     |> Multi.run(:validate_previous_transforms_complete, fn _repo, %{pipeline_run: %PipelineRun{} = pipeline_run} ->
       all_complete =
         pipeline_run.transform_runs

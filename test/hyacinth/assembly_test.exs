@@ -347,6 +347,15 @@ defmodule Hyacinth.AssemblyTest do
       {:ok, _} = Assembly.start_transform_run!(tr1)
       {:error, :validate_previous_transforms_complete, False, _changes} = Assembly.start_transform_run!(tr2)
     end
+
+    test "fails if pipeline is not running" do
+      pipeline_run = pipeline_run_fixture()
+      [tr1, _] = pipeline_run.transform_runs
+
+      Hyacinth.Repo.update! Ecto.Changeset.change(pipeline_run, %{status: :failed})
+
+      {:error, :validate_pipeline_running, :failed, _changes} = Assembly.start_transform_run!(tr1)
+    end
   end
 
   describe "complete_transform_run/2" do
