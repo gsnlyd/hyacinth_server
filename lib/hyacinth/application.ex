@@ -15,7 +15,10 @@ defmodule Hyacinth.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Hyacinth.PubSub},
       # Start the Endpoint (http/https)
-      HyacinthWeb.Endpoint
+      HyacinthWeb.Endpoint,
+      # Start the Pipeline Run TaskSupervisor
+      {Task.Supervisor, name: Hyacinth.PipelineRunSupervisor},
+
       # Start a worker by calling: Hyacinth.Worker.start_link(arg)
       # {Hyacinth.Worker, arg}
     ]

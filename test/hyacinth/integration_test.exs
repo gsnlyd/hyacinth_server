@@ -95,7 +95,9 @@ defmodule Hyacinth.IntegrationTest do
 
       {:ok, %Pipeline{} = pipeline} = Assembly.create_pipeline(user, pipeline_params)
       %PipelineRun{} = pipeline_run = Assembly.create_pipeline_run!(pipeline, dataset, user)
-      Runner.run_pipeline(pipeline_run)
+
+      %Task{} = pipeline_task = Runner.run_pipeline(pipeline_run)
+      :ok = Task.await(pipeline_task, 30_000)  # This test pipeline should take under 10s to run
 
       # ---- Check Datasets ----
       [root_ds, nifti_ds, slicer_ds, sample_ds] = Warehouse.list_datasets()

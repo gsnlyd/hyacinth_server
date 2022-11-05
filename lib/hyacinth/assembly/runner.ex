@@ -68,22 +68,34 @@ defmodule Hyacinth.Assembly.Runner do
   end
 
   @doc """
-  Runs a pipeline.
+  Runs a pipeline asynchronously under the PipelineRunSupervisor.
+  Returns a `Task` which can be awaited.
+
+  The returned Task will return :ok when complete.
 
   ## Examples
 
-      iex> run_pipeline(some_pipeline_run)
+      iex> my_task = run_pipeline(some_pipeline_run)
+      %Task{...}
+
+      iex> Task.await(my_task) # This will probably take some time
       :ok
 
   """
-  @spec run_pipeline(%PipelineRun{}) :: :ok
+  @spec run_pipeline(%PipelineRun{}) :: Task.t
   def run_pipeline(%PipelineRun{} = pipeline_run) do
-    # Guarantee preloads by reloading
-    %PipelineRun{} = pipeline_run = Assembly.get_pipeline_run!(pipeline_run.id)
-    Logger.debug "Running pipeline: #{inspect(pipeline_run)}"
+    # It is very important that async_nolink is used here instead of async,
+    # as this function is generally called from within a LiveView process
+    # which may be terminated (by a page reload/navigation) while the
+    # Task is still running.
+    Task.Supervisor.async_nolink(Hyacinth.PipelineRunSupervisor, fn ->
+      # Guarantee preloads by reloading
+      %PipelineRun{} = pipeline_run = Assembly.get_pipeline_run!(pipeline_run.id)
+      Logger.debug "Running pipeline: #{inspect(pipeline_run)}"
 
-    Enum.map(pipeline_run.transform_runs, &run_transform/1)
+      Enum.map(pipeline_run.transform_runs, &run_transform/1)
 
-    :ok
+      :ok
+    end)
   end
 end

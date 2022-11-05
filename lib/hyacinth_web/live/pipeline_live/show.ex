@@ -47,7 +47,7 @@ defmodule HyacinthWeb.PipelineLive.Show do
       dataset_id when is_integer(dataset_id) ->
         %Dataset{} = dataset = Warehouse.get_dataset!(dataset_id)
         %PipelineRun{} = pipeline_run = Assembly.create_pipeline_run!(socket.assigns.pipeline, dataset, socket.assigns.current_user)
-        :ok = Runner.run_pipeline(pipeline_run)
+        %Task{} = Runner.run_pipeline(pipeline_run)
 
       nil ->
         nil
