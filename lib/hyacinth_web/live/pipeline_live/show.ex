@@ -65,7 +65,7 @@ defmodule HyacinthWeb.PipelineLive.Show do
     {:noreply, assign(socket, :tab, tab)}
   end
 
-  def handle_info({:pipeline_run_updated, _pipeline_run_id}, socket) do
+  def handle_info({:pipeline_run_updated, {_id, _status}}, socket) do
     pipeline = Assembly.get_pipeline_preloaded!(socket.assigns.pipeline.id)
     {:noreply, assign(socket, :pipeline, pipeline)}
   end

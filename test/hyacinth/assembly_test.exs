@@ -170,6 +170,44 @@ defmodule Hyacinth.AssemblyTest do
         assert Ecto.assoc_loaded?(transform_run.output)
       end)
     end
+
+    test "raises if pipeline run does not exist" do
+      assert_raise Ecto.NoResultsError, fn ->
+        Assembly.get_pipeline_run!(1)
+      end
+    end
+  end
+
+  describe "get_pipeline_run_status!/1" do
+    test "gets the status of a new pipeline run" do
+      %PipelineRun{} = pipeline_run = pipeline_run_fixture()
+      assert Assembly.get_pipeline_run_status!(pipeline_run.id) == :running
+    end
+
+    test "gets the status of a started pipeline run" do
+      %PipelineRun{} = pipeline_run = pipeline_run_fixture()
+      [tr1, _] = pipeline_run.transform_runs
+      {:ok, _} = Assembly.start_transform_run(tr1)
+
+      assert Assembly.get_pipeline_run_status!(pipeline_run.id) == :running
+    end
+
+    test "gets the status of a completed pipeline run" do
+      %PipelineRun{} = pipeline_run = pipeline_run_fixture()
+      [tr1, tr2] = pipeline_run.transform_runs
+      {:ok, _} = Assembly.start_transform_run(tr1)
+      {:ok, _} = Assembly.complete_transform_run(tr1, many_object_params_fixtures())
+      {:ok, _} = Assembly.start_transform_run(tr2)
+      {:ok, _} = Assembly.complete_transform_run(tr2, many_object_params_fixtures())
+
+      assert Assembly.get_pipeline_run_status!(pipeline_run.id) == :complete
+    end
+
+    test "raises if pipeline run does not exist" do
+      assert_raise Ecto.NoResultsError, fn ->
+        Assembly.get_pipeline_run_status!(1)
+      end
+    end
   end
 
   describe "create_pipeline_run!/3" do
@@ -353,11 +391,11 @@ defmodule Hyacinth.AssemblyTest do
 
       :ok = Assembly.broadcast_pipeline_run_update(run1)
       run1_id = run1.id
-      assert_received {:pipeline_run_updated, ^run1_id}
+      assert_received {:pipeline_run_updated, {^run1_id, :running}}
 
       :ok = Assembly.broadcast_pipeline_run_update(run2)
       run2_id = run2.id
-      assert_received {:pipeline_run_updated, ^run2_id}
+      assert_received {:pipeline_run_updated, {^run2_id, :running}}
     end
 
     test "correctly subscribes to pipeline run" do
@@ -367,7 +405,7 @@ defmodule Hyacinth.AssemblyTest do
       :ok = Assembly.broadcast_pipeline_run_update(pipeline_run)
 
       pipeline_run_id = pipeline_run.id
-      assert_received {:pipeline_run_updated, ^pipeline_run_id}
+      assert_received {:pipeline_run_updated, {^pipeline_run_id, :running}}
     end
   end
 
@@ -380,7 +418,7 @@ defmodule Hyacinth.AssemblyTest do
       {:ok, _} = Assembly.start_transform_run(tr1)
 
       pipeline_run_id = pipeline_run.id
-      assert_received {:pipeline_run_updated, ^pipeline_run_id}
+      assert_received {:pipeline_run_updated, {^pipeline_run_id, :running}}
     end
 
     test "fails if transform is running" do
@@ -418,7 +456,7 @@ defmodule Hyacinth.AssemblyTest do
   end
 
   describe "complete_transform_run/2" do
-    test "broadcasts PubSub update" do
+    test "broadcasts PubSub update with status running" do
       %PipelineRun{} = pipeline_run = pipeline_run_fixture()
       [tr1, _] = pipeline_run.transform_runs
       {:ok, _} = Assembly.start_transform_run(tr1)
@@ -427,7 +465,21 @@ defmodule Hyacinth.AssemblyTest do
       {:ok, _} = Assembly.complete_transform_run(tr1, many_object_params_fixtures())
 
       pipeline_run_id = pipeline_run.id
-      assert_received {:pipeline_run_updated, ^pipeline_run_id}
+      assert_received {:pipeline_run_updated, {^pipeline_run_id, :running}}
+    end
+
+    test "broadcasts PubSub update with status complete" do
+      %PipelineRun{} = pipeline_run = pipeline_run_fixture()
+      [tr1, tr2] = pipeline_run.transform_runs
+      {:ok, _} = Assembly.start_transform_run(tr1)
+      {:ok, _} = Assembly.complete_transform_run(tr1, many_object_params_fixtures())
+      {:ok, _} = Assembly.start_transform_run(tr2)
+
+      :ok = Assembly.subscribe_pipeline_run_updates(pipeline_run)
+      {:ok, _} = Assembly.complete_transform_run(tr2, many_object_params_fixtures())
+
+      pipeline_run_id = pipeline_run.id
+      assert_received {:pipeline_run_updated, {^pipeline_run_id, :complete}}
     end
 
     test "fails if transform is waiting" do

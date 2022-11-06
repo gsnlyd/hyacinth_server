@@ -139,6 +139,30 @@ defmodule Hyacinth.Assembly do
   end
 
   @doc """
+  Gets the status of a `Hyacinth.Assembly.PipelineRun`.
+
+  ## Examples
+
+      iex> get_pipeline_run_status!(123)
+      :running
+
+      iex> get_pipeline_run_status!(124)
+      :complete
+
+      iex> get_pipeline_run_status!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec get_pipeline_run_status!(term) :: atom
+  def get_pipeline_run_status!(id) do
+    Repo.one!(
+      from pr in PipelineRun,
+      where: pr.id == ^id,
+      select: pr.status
+    )
+  end
+
+  @doc """
   Creates a new PipelineRun for the given Pipeline.
 
   The `input` to the first TransformRun will be the given Dataset,
@@ -262,8 +286,9 @@ defmodule Hyacinth.Assembly do
   @doc false
   @spec broadcast_pipeline_run_update(%PipelineRun{}) :: :ok
   def broadcast_pipeline_run_update(%PipelineRun{id: pipeline_run_id, pipeline_id: pipeline_id}) do
-    PubSub.broadcast!(Hyacinth.PubSub, "pipeline_run_updates:pipeline_id:#{pipeline_id}", {:pipeline_run_updated, pipeline_run_id})
-    PubSub.broadcast!(Hyacinth.PubSub, "pipeline_run_updates:pipeline_run_id:#{pipeline_run_id}", {:pipeline_run_updated, pipeline_run_id})
+    message = {:pipeline_run_updated, {pipeline_run_id, get_pipeline_run_status!(pipeline_run_id)}}
+    PubSub.broadcast!(Hyacinth.PubSub, "pipeline_run_updates:pipeline_id:#{pipeline_id}", message)
+    PubSub.broadcast!(Hyacinth.PubSub, "pipeline_run_updates:pipeline_run_id:#{pipeline_run_id}", message)
     :ok
   end
 
