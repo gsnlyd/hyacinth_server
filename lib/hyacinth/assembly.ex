@@ -6,6 +6,7 @@ defmodule Hyacinth.Assembly do
 
   import Ecto.Query, warn: false
   alias Ecto.Multi
+  alias Phoenix.PubSub
 
   alias Hyacinth.Repo
 
@@ -220,6 +221,53 @@ defmodule Hyacinth.Assembly do
   end
 
   @doc """
+  Subscribes to updates for a PipelineRun.
+
+  If a `Hyacinth.Assembly.Pipeline` is passed, updates
+  are sent for all runs associated with that Pipeline.
+
+  If a `Hyacinth.Assembly.PipelineRun` is passed, updates
+  are sent for only that run.
+
+  Update messages have the following format:
+  `{:pipeline_run_updated, pipeline_run_id}`
+
+  ## Examples
+
+      iex> my_pipeline = %Pipeline{...}
+      iex> subscribe_pipeline_run_updates(my_pipeline)
+      :ok
+
+      iex> my_run = %PipelineRun{...}
+      iex> subscribe_pipeline_run_updates(my_run)
+      :ok
+
+      # In your LiveView:
+      def handle_info({:pipeline_run_updated, run_id}, socket) do
+        # Handle event
+        {:noreply, socket}
+      end
+
+  """
+  @spec subscribe_pipeline_run_updates(%Pipeline{}) :: :ok
+  def subscribe_pipeline_run_updates(%Pipeline{id: pipeline_id}) do
+    :ok = PubSub.subscribe(Hyacinth.PubSub, "pipeline_run_updates:pipeline_id:#{pipeline_id}")
+  end
+
+  @spec subscribe_pipeline_run_updates(%PipelineRun{}) :: :ok
+  def subscribe_pipeline_run_updates(%PipelineRun{id: pipeline_run_id}) do
+    :ok = PubSub.subscribe(Hyacinth.PubSub, "pipeline_run_updates:pipeline_run_id:#{pipeline_run_id}")
+  end
+
+  @doc false
+  @spec broadcast_pipeline_run_update(%PipelineRun{}) :: :ok
+  def broadcast_pipeline_run_update(%PipelineRun{id: pipeline_run_id, pipeline_id: pipeline_id}) do
+    PubSub.broadcast!(Hyacinth.PubSub, "pipeline_run_updates:pipeline_id:#{pipeline_id}", {:pipeline_run_updated, pipeline_run_id})
+    PubSub.broadcast!(Hyacinth.PubSub, "pipeline_run_updates:pipeline_run_id:#{pipeline_run_id}", {:pipeline_run_updated, pipeline_run_id})
+    :ok
+  end
+
+  @doc """
   Starts a TransformRun.
 
   Updates the `status` and `started_at` fields of
@@ -273,6 +321,10 @@ defmodule Hyacinth.Assembly do
         started_at: DateTime.utc_now(),
       }
       Repo.update Ecto.Changeset.change(transform_run, updated_params)
+    end)
+    |> Multi.run(:broadcast_update, fn _changes, %{pipeline_run: %PipelineRun{} = pipeline_run} ->
+      :ok = broadcast_pipeline_run_update(pipeline_run)
+      {:ok, :success}
     end)
     |> Repo.transaction()
   end
@@ -360,6 +412,10 @@ defmodule Hyacinth.Assembly do
         _next_run ->
           {:ok, :still_has_more_transform_runs}
       end
+    end)
+    |> Multi.run(:broadcast_update, fn _changes, %{pipeline_run: %PipelineRun{} = pipeline_run} ->
+      :ok = broadcast_pipeline_run_update(pipeline_run)
+      {:ok, :success}
     end)
     |> Repo.transaction()
   end

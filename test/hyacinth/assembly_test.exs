@@ -343,7 +343,46 @@ defmodule Hyacinth.AssemblyTest do
     end
   end
 
+  describe "subscribe_pipeline_run_updates/1" do
+    test "correctly subscribes to pipeline" do
+      %Pipeline{} = pipeline = pipeline_fixture()
+      %PipelineRun{} = run1 = pipeline_run_fixture(pipeline)
+      %PipelineRun{} = run2 = pipeline_run_fixture(pipeline)
+
+      :ok = Assembly.subscribe_pipeline_run_updates(pipeline)
+
+      :ok = Assembly.broadcast_pipeline_run_update(run1)
+      run1_id = run1.id
+      assert_received {:pipeline_run_updated, ^run1_id}
+
+      :ok = Assembly.broadcast_pipeline_run_update(run2)
+      run2_id = run2.id
+      assert_received {:pipeline_run_updated, ^run2_id}
+    end
+
+    test "correctly subscribes to pipeline run" do
+      %PipelineRun{} = pipeline_run = pipeline_run_fixture()
+
+      :ok = Assembly.subscribe_pipeline_run_updates(pipeline_run)
+      :ok = Assembly.broadcast_pipeline_run_update(pipeline_run)
+
+      pipeline_run_id = pipeline_run.id
+      assert_received {:pipeline_run_updated, ^pipeline_run_id}
+    end
+  end
+
   describe "start_transform_run/1" do
+    test "broadcasts PubSub update" do
+      %PipelineRun{} = pipeline_run = pipeline_run_fixture()
+      [tr1, _] = pipeline_run.transform_runs
+
+      :ok = Assembly.subscribe_pipeline_run_updates(pipeline_run)
+      {:ok, _} = Assembly.start_transform_run(tr1)
+
+      pipeline_run_id = pipeline_run.id
+      assert_received {:pipeline_run_updated, ^pipeline_run_id}
+    end
+
     test "fails if transform is running" do
       [tr1, _] = pipeline_run_fixture().transform_runs
       {:ok, _} = Assembly.start_transform_run(tr1)
@@ -379,6 +418,18 @@ defmodule Hyacinth.AssemblyTest do
   end
 
   describe "complete_transform_run/2" do
+    test "broadcasts PubSub update" do
+      %PipelineRun{} = pipeline_run = pipeline_run_fixture()
+      [tr1, _] = pipeline_run.transform_runs
+      {:ok, _} = Assembly.start_transform_run(tr1)
+
+      :ok = Assembly.subscribe_pipeline_run_updates(pipeline_run)
+      {:ok, _} = Assembly.complete_transform_run(tr1, many_object_params_fixtures())
+
+      pipeline_run_id = pipeline_run.id
+      assert_received {:pipeline_run_updated, ^pipeline_run_id}
+    end
+
     test "fails if transform is waiting" do
       [tr1, _] = pipeline_run_fixture().transform_runs
       {:error, :validate_transform_running, :waiting, _changes} = Assembly.complete_transform_run(tr1, many_object_params_fixtures())

@@ -64,6 +64,30 @@ defmodule Hyacinth.IntegrationTest do
     end
   end
 
+  @doc """
+  Blocks until the given PipelineRun's status is `:complete`.
+
+  You MUST call Assembly.subscribe_pipeline_run_updates/1
+  for the given PipelineRun BEFORE calling this function,
+  or no updates will be received via PubSub.
+
+  Raises if no message is received after `timeout` ms.
+  """
+  @spec await_complete(%PipelineRun{}, integer) :: :ok
+  def await_complete(%PipelineRun{id: pipeline_run_id} = pipeline_run, timeout) when is_integer(timeout) do
+    receive do
+      {:pipeline_run_updated, ^pipeline_run_id} ->
+        case Assembly.get_pipeline_run!(pipeline_run_id).status do
+          :complete ->
+            :ok
+          _ ->
+            await_complete(pipeline_run, timeout)
+        end
+    after
+      timeout -> raise "Timed out while waiting for message"
+    end
+  end
+
   describe "Hyacinth.Warehouse.Runner" do
     test "runs 3-step dicom to png pipeline" do
       Warehouse.NewDataset.new_dataset({"TestDicomDataset", "dicom", get_test_dataset_path()})
@@ -96,8 +120,9 @@ defmodule Hyacinth.IntegrationTest do
       {:ok, %Pipeline{} = pipeline} = Assembly.create_pipeline(user, pipeline_params)
       %PipelineRun{} = pipeline_run = Assembly.create_pipeline_run!(pipeline, dataset, user)
 
-      %Task{} = pipeline_task = Runner.run_pipeline(pipeline_run)
-      :ok = Task.await(pipeline_task, 30_000)  # This test pipeline should take under 10s to run
+      :ok = Assembly.subscribe_pipeline_run_updates(pipeline_run)
+      :ok = Runner.run_pipeline(pipeline_run)
+      :ok = await_complete(pipeline_run, 30_000)  # This test pipeline should take under 10s to run
 
       # ---- Check Datasets ----
       [root_ds, nifti_ds, slicer_ds, sample_ds] = Warehouse.list_datasets()

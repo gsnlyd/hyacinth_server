@@ -25,6 +25,8 @@ defmodule HyacinthWeb.PipelineLive.Show do
   def mount(params, _session, socket) do
     pipeline = Assembly.get_pipeline_preloaded!(params["pipeline_id"])
 
+    if connected?(socket), do: Assembly.subscribe_pipeline_run_updates(pipeline)
+
     socket = assign(socket, %{
       pipeline: pipeline,
       transforms: Assembly.list_transforms(pipeline),
@@ -47,7 +49,7 @@ defmodule HyacinthWeb.PipelineLive.Show do
       dataset_id when is_integer(dataset_id) ->
         %Dataset{} = dataset = Warehouse.get_dataset!(dataset_id)
         %PipelineRun{} = pipeline_run = Assembly.create_pipeline_run!(socket.assigns.pipeline, dataset, socket.assigns.current_user)
-        %Task{} = Runner.run_pipeline(pipeline_run)
+        :ok = Runner.run_pipeline(pipeline_run)
 
       nil ->
         nil
@@ -61,5 +63,10 @@ defmodule HyacinthWeb.PipelineLive.Show do
       "steps" -> :steps
     end
     {:noreply, assign(socket, :tab, tab)}
+  end
+
+  def handle_info({:pipeline_run_updated, _pipeline_run_id}, socket) do
+    pipeline = Assembly.get_pipeline_preloaded!(socket.assigns.pipeline.id)
+    {:noreply, assign(socket, :pipeline, pipeline)}
   end
 end
