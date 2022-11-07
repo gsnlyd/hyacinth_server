@@ -5,7 +5,7 @@ defmodule HyacinthWeb.LabelJobLive.Show do
   alias Hyacinth.Warehouse.Object
   alias Hyacinth.Labeling.{LabelSession, LabelElement}
 
-  defmodule SessionFilterOptions do
+  defmodule SessionFilterForm do
     use Ecto.Schema
     import Ecto.Changeset
 
@@ -14,7 +14,7 @@ defmodule HyacinthWeb.LabelJobLive.Show do
       field :search, :string, default: ""
       field :type, Ecto.Enum, values: [:all], default: :all
       field :sort_by, Ecto.Enum, values: [:user, :date_created], default: :date_created
-      field :order, Ecto.Enum, values: [:ascending, :descending], default: :descending
+      field :order, Ecto.Enum, values: [:asc, :desc], default: :desc
     end
 
     @doc false
@@ -31,36 +31,33 @@ defmodule HyacinthWeb.LabelJobLive.Show do
       job: job,
       sessions: Labeling.list_sessions_with_progress(job),
 
-      session_filter_changeset: SessionFilterOptions.changeset(%SessionFilterOptions{}, %{}),
+      session_filter_changeset: SessionFilterForm.changeset(%SessionFilterForm{}, %{}),
 
       tab: :sessions,
     })
     {:ok, socket}
   end
 
-  @spec filter_sessions([%LabelSession{}], %Ecto.Changeset{}) :: [%LabelSession{}]
-  def filter_sessions(sessions, %Ecto.Changeset{} = filter_changeset) when is_list(sessions) do
-    %SessionFilterOptions{} = options = Ecto.Changeset.apply_changes(filter_changeset)
+  def filter_sessions(sessions, %Ecto.Changeset{} = changeset) when is_list(sessions) do
+    %SessionFilterForm{} = form = Ecto.Changeset.apply_changes(changeset)
 
-    sessions_filtered =
-      Enum.filter(sessions, fn {%LabelSession{} = sess, _labeled} ->
-        (options.search == "" or String.contains?(String.downcase(sess.user.email), String.downcase(options.search)))
-      end)
+    filter_func = fn {%LabelSession{} = session, _} ->
+      contains_search?(session.user.email, form.search)
+    end
 
-    sessions_sorted =
-      case options.sort_by do
-        :user -> Enum.sort_by(sessions_filtered, &(elem(&1, 0).user.email))
-        :date_created -> Enum.sort_by(sessions_filtered, &(elem(&1, 0).inserted_at), DateTime)
+    {sort_func, sorter} =
+      case form.sort_by do
+        :user -> {&(elem(&1, 0).user.email), form.order}
+        :date_created -> {&(elem(&1, 0).inserted_at), {form.order, DateTime}}
       end
 
-    case options.order do
-      :ascending -> sessions_sorted
-      :descending -> Enum.reverse(sessions_sorted)
-    end
+    sessions
+    |> Enum.filter(filter_func)
+    |> Enum.sort_by(sort_func, sorter)
   end
 
-  def handle_event("session_filter_updated", %{"session_filter_options" => params}, socket) do
-    changeset = SessionFilterOptions.changeset(%SessionFilterOptions{}, params)
+  def handle_event("session_filter_updated", %{"session_filter_form" => params}, socket) do
+    changeset = SessionFilterForm.changeset(%SessionFilterForm{}, params)
     {:noreply, assign(socket, :session_filter_changeset, changeset)}
   end
 
