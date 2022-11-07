@@ -46,63 +46,64 @@
   <div class="space-y-4">
     <%= for %TransformRun{} = tr <- @pipeline_run.transform_runs do %>
       <div class="card">
-        <div class="flex items-center space-x-3">
-          <h2 class="text-gray-300">Step <%= tr.order_index + 1 %></h2>
+
+        <div class="flex items-center space-x-2">
+          <div class="flex items-center space-x-1">
+            <%= if tr.status == :running do %>
+              <div class="text-yellow-400 animate-spin">
+                <Icons.refresh_mini />
+              </div>
+            <% end %>
+            <h2 class="text-gray-300">Step <%= tr.order_index + 1 %></h2>
+          </div>
 
           <%= case tr.status do %>
           <% :waiting -> %>
-            <div class="pill pill-lg pill-yellow">Waiting</div>
+            <div class="pill pill-gray">Waiting</div>
           <% :running -> %>
-            <div class="pill pill-lg pill-yellow">Running</div>
+            <div class="pill pill-yellow">Running</div>
           <% :complete -> %>
-            <div class="pill pill-lg pill-green">Complete</div>
+            <div class="pill pill-green">Complete</div>
           <% end %>
         </div>
 
-        <%= if tr.started_at && tr.completed_at do %>
-          <div class="text-gray-400 flex items-center space-x-0.5">
-            <div class="text-gray-500">
-              <Icons.check_circle_mini />
+        <div class="text-gray-400 flex items-center space-x-2">
+          <div>
+            <span class="tag tag-light">Driver</span>
+            <span><%= tr.transform.driver %></span>
+          </div>
+
+          <%= if tr.started_at && tr.completed_at do %>
+            <div class="flex items-center space-x-0.5">
+              <div class="text-gray-500">
+                <Icons.check_circle_mini />
+              </div>
+              <span><%= format_time(DateTime.diff(tr.completed_at, tr.started_at)) %></span>
             </div>
-            <span><%= format_time(DateTime.diff(tr.completed_at, tr.started_at)) %></span>
+          <% end %>
+        </div>
+
+        <%= if tr.input do %>
+          <div class="mt-2 pt-2 border-t border-gray-600 flex space-x-2">
+            <.dataset_link_card label="Input" dataset={tr.input} socket={@socket} />
+
+            <%= if tr.output do %>
+              <.dataset_link_card label="Output" dataset={tr.output} socket={@socket} />
+            <% end %>
           </div>
         <% end %>
 
-        <div class="mt-2">
-          <table class="border-separate border-spacing-x-2 border-spacing-y-1 border-l-2 border-gray-600">
-            <tbody class="text-gray-200 text-sm">
-              <tr>
-                <td><div class="tag tag-light w-full text-center">Driver</div></td>
-                <td><%= tr.transform.driver %></td>
-              </tr>
-
-              <%= if tr.input do %>
-                <tr>
-                  <td><div class="tag tag-light w-full text-center">Input</div></td>
-                  <td><%= link tr.input.name, to: Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, tr.input), class: "link text-xs" %></td>
-                </tr>
-              <% end %>
-
-              <%= if tr.output do %>
-                <tr>
-                  <td><div class="tag tag-light w-full text-center">Output</div></td>
-                  <td><%= link tr.output.name, to: Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, tr.output), class: "link text-xs" %></td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="mt-3 text-xs text-gray-400">
-          <%= if tr.started_at do %>
+        <%= if tr.started_at do %>
+          <div class="mt-3 text-xs text-gray-400">
             <span>Started at <%= Calendar.strftime(tr.started_at, "%c") %></span>
-          <% end %>
 
-          <%= if tr.completed_at do %>
-            <span class="mx-0.5">&bull;</span>
-            <span>Completed at <%= Calendar.strftime(tr.started_at, "%c") %></span>
-          <% end %>
-        </div>
+            <%= if tr.completed_at do %>
+              <span class="mx-0.5">&bull;</span>
+              <span>Completed at <%= Calendar.strftime(tr.started_at, "%c") %></span>
+            <% end %>
+          </div>
+        <% end %>
+
       </div>
     <% end %>
   </div>

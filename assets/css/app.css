@@ -121,6 +121,10 @@ h3 {
     @apply text-yellow-300 bg-yellow-300 bg-opacity-20;
 }
 
+.pill-gray {
+    @apply text-gray-400 bg-gray-500 bg-opacity-20;
+}
+
 .tag {
     @apply px-1 py-0.5 text-xs text-gray-400 bg-gray-800 rounded;
 }
