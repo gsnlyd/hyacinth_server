@@ -47,15 +47,15 @@
           <div class="flex items-center space-x-3">
             <p>
               <%= label f, :type %>
-              <%= select f, :type, Ecto.Enum.values(JobFilterOptions, :type) %>
+              <%= select f, :type, humanize_enum(JobFilterForm, :type) %>
             </p>
             <p>
               <%= label f, :sort_by %>
-              <%= select f, :sort_by, Ecto.Enum.values(JobFilterOptions, :sort_by), class: "basic-select" %>
+              <%= select f, :sort_by, humanize_enum(JobFilterForm, :sort_by) %>
             </p>
             <p>
               <%= label f, :order %>
-              <%= select f, :order, Ecto.Enum.values(JobFilterOptions, :order) %>
+              <%= select f, :order, humanize_enum(JobFilterForm, :order) %>
             </p>
           </div>
         </div>

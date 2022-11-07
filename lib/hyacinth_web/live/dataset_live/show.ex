@@ -5,7 +5,7 @@ defmodule HyacinthWeb.DatasetLive.Show do
   alias Hyacinth.Warehouse.Object
   alias Hyacinth.Labeling.LabelJob
 
-  defmodule JobFilterOptions do
+  defmodule JobFilterForm do
     use Ecto.Schema
     import Ecto.Changeset
 
@@ -14,7 +14,7 @@ defmodule HyacinthWeb.DatasetLive.Show do
       field :search, :string, default: ""
       field :type, Ecto.Enum, values: [:all, :classification, :comparison_exhaustive], default: :all
       field :sort_by, Ecto.Enum, values: [:name, :date_created], default: :date_created
-      field :order, Ecto.Enum, values: [:ascending, :descending], default: :descending
+      field :order, Ecto.Enum, values: [:asc, :desc], default: :desc
     end
 
     @doc false
@@ -33,33 +33,29 @@ defmodule HyacinthWeb.DatasetLive.Show do
       jobs: Labeling.list_label_jobs(dataset),
       objects: Warehouse.list_objects(dataset),
 
-      job_filter_changeset: JobFilterOptions.changeset(%JobFilterOptions{}, %{}),
+      job_filter_changeset: JobFilterForm.changeset(%JobFilterForm{}, %{}),
 
       tab: :jobs,
     })
     {:ok, socket}
   end
 
-  @spec filter_jobs([%LabelJob{}], %Ecto.Changeset{}) :: [%LabelJob{}]
-  def filter_jobs(jobs, %Ecto.Changeset{} = filter_changeset) when is_list(jobs) do
-    %JobFilterOptions{} = options = Ecto.Changeset.apply_changes(filter_changeset)
+  def filter_jobs(jobs, %Ecto.Changeset{} = changeset) when is_list(jobs) do
+    %JobFilterForm{} = form = Ecto.Changeset.apply_changes(changeset)
 
-    jobs_filtered =
-      Enum.filter(jobs, fn %LabelJob{} = job ->
-        (options.search == "" or String.contains?(String.downcase(job.name), String.downcase(options.search))) and
-        (options.type == :all or options.type == job.label_type)
-      end)
+    filter_func = fn %LabelJob{} = job ->
+      contains_search?(job.name, form.search) and value_matches?(job.label_type, form.type)
+    end
 
-    jobs_sorted =
-      case options.sort_by do
-        :name -> Enum.sort_by(jobs_filtered, &(String.downcase(&1.name)))
-        :date_created -> Enum.sort_by(jobs_filtered, &(&1.inserted_at), DateTime)
+    {sort_func, sorter} =
+      case form.sort_by do
+        :name -> {&String.downcase(&1.name), form.order}
+        :date_created -> {&(&1.inserted_at), {form.order, DateTime}}
       end
 
-    case options.order do
-      :ascending -> jobs_sorted
-      :descending -> Enum.reverse(jobs_sorted)
-    end
+    jobs
+    |> Enum.filter(filter_func)
+    |> Enum.sort_by(sort_func, sorter)
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do
@@ -70,8 +66,8 @@ defmodule HyacinthWeb.DatasetLive.Show do
     {:noreply, assign(socket, :tab, tab)}
   end
 
-  def handle_event("job_filter_updated", %{"job_filter_options" => params}, socket) do
-    changeset = JobFilterOptions.changeset(%JobFilterOptions{}, params)
+  def handle_event("job_filter_updated", %{"job_filter_form" => params}, socket) do
+    changeset = JobFilterForm.changeset(%JobFilterForm{}, params)
     {:noreply, assign(socket, :job_filter_changeset, changeset)}
   end
 end

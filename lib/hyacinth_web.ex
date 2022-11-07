@@ -49,6 +49,7 @@ defmodule HyacinthWeb do
 
       alias HyacinthWeb.Components.Icons
       import HyacinthWeb.Components.BasicComponents
+      import HyacinthWeb.LiveUtils
 
       unquote(view_helpers())
     end
