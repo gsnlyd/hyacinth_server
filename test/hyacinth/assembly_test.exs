@@ -162,6 +162,7 @@ defmodule Hyacinth.AssemblyTest do
       %PipelineRun{} = pipeline_run = Assembly.get_pipeline_run!(original_pr.id)
 
       assert pipeline_run.id == original_pr.id
+      assert Ecto.assoc_loaded?(pipeline_run.ran_by)
       assert Ecto.assoc_loaded?(pipeline_run.pipeline)
       assert Ecto.assoc_loaded?(pipeline_run.transform_runs)
 

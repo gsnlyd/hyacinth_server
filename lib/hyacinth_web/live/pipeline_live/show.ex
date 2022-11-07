@@ -95,10 +95,11 @@ defmodule HyacinthWeb.PipelineLive.Show do
         %PipelineRun{} = pipeline_run = Assembly.create_pipeline_run!(socket.assigns.pipeline, dataset, socket.assigns.current_user)
         :ok = Runner.run_pipeline(pipeline_run)
 
+        {:noreply, push_redirect(socket, to: Routes.live_path(socket, HyacinthWeb.PipelineRunLive.Show, pipeline_run))}
+
       nil ->
-        nil
+        {:noreply, assign(socket, :run_pipeline_changeset, changeset)}
     end
-    {:noreply, assign(socket, :run_pipeline_changeset, changeset)}
   end
 
   def handle_event("set_tab", %{"tab" => tab}, socket) do

@@ -122,6 +122,7 @@ defmodule Hyacinth.Assembly do
   Gets a single PipelineRun.
 
   The following attributes are preloaded:
+    * `ran_by`
     * `pipeline`
     * `transform_runs`
     * `TransformRun.input`
@@ -134,7 +135,7 @@ defmodule Hyacinth.Assembly do
       from pr in PipelineRun,
       where: pr.id == ^id,
       select: pr,
-      preload: [:pipeline, transform_runs: [:transform, :input, :output]]
+      preload: [:ran_by, :pipeline, transform_runs: [:transform, :input, :output]]
     )
   end
 
