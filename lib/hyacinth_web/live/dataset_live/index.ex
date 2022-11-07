@@ -4,7 +4,7 @@ defmodule HyacinthWeb.DatasetLive.Index do
   alias Hyacinth.Warehouse
   alias Hyacinth.Warehouse.Dataset
 
-  defmodule FilterOptions do
+  defmodule DatasetFilterForm do
     use Ecto.Schema
     import Ecto.Changeset
 
@@ -13,7 +13,7 @@ defmodule HyacinthWeb.DatasetLive.Index do
       field :search, :string, default: ""
       field :type, Ecto.Enum, values: [:all, :root, :derived], default: :all
       field :sort_by, Ecto.Enum, values: [:name, :date_created], default: :date_created
-      field :order, Ecto.Enum, values: [:ascending, :descending], default: :descending
+      field :order, Ecto.Enum, values: [:asc, :desc], default: :desc
     end
 
     @doc false
@@ -28,35 +28,31 @@ defmodule HyacinthWeb.DatasetLive.Index do
     socket = assign(socket, %{
       datasets: Warehouse.list_datasets_with_counts(),
 
-      filter_changeset: FilterOptions.changeset(%FilterOptions{}, %{}),
+      dataset_filter_changeset: DatasetFilterForm.changeset(%DatasetFilterForm{}, %{}),
     })
     {:ok, socket}
   end
 
-  def filter_datasets(datasets, filter_changeset) do
-    %FilterOptions{} = options = Ecto.Changeset.apply_changes(filter_changeset)
+  def filter_datasets(datasets, %Ecto.Changeset{} = changeset) when is_list(datasets) do
+    %DatasetFilterForm{} = form = Ecto.Changeset.apply_changes(changeset)
 
-    datasets_filtered =
-      Enum.filter(datasets, fn {%Dataset{} = dataset, _, _} ->
-        (options.search == "" or String.contains?(String.downcase(dataset.name), String.downcase(options.search))) and
-        (options.type == :all or options.type == dataset.type)
-      end)
+    filter_func = fn {%Dataset{} = dataset, _, _} ->
+      contains_search?(dataset.name, form.search) and value_matches?(dataset.type, form.type)
+    end
 
-    datasets_sorted =
-      case options.sort_by do
-        :name -> Enum.sort_by(datasets_filtered, &(String.downcase(elem(&1, 0).name)))
-        :date_created -> Enum.sort_by(datasets_filtered, &(elem(&1, 0).inserted_at), DateTime)
+    {sort_func, sorter} =
+      case form.sort_by do
+        :name -> {&String.downcase(elem(&1, 0).name), form.order}
+        :date_created -> {&(elem(&1, 0).inserted_at), {form.order, DateTime}}
       end
 
-    case options.order do
-      :ascending -> datasets_sorted
-      :descending -> Enum.reverse(datasets_sorted)
-    end
+    datasets
+    |> Enum.filter(filter_func)
+    |> Enum.sort_by(sort_func, sorter)
   end
 
-  def handle_event("filter_updated", %{"filter_options" => params}, socket) do
-    changeset = FilterOptions.changeset(%FilterOptions{}, params)
-    socket = assign(socket, :filter_changeset, changeset)
-    {:noreply, socket}
+  def handle_event("dataset_filter_updated", %{"dataset_filter_form" => params}, socket) do
+    changeset = DatasetFilterForm.changeset(%DatasetFilterForm{}, params)
+    {:noreply, assign(socket, :dataset_filter_changeset, changeset)}
   end
 end
