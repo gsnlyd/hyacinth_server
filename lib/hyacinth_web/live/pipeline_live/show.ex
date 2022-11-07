@@ -1,6 +1,8 @@
 defmodule HyacinthWeb.PipelineLive.Show do
   use HyacinthWeb, :live_view
 
+  import HyacinthWeb.LiveUtils
+
   alias Hyacinth.{Assembly, Warehouse}
   alias Hyacinth.Warehouse.Dataset
   alias Hyacinth.Assembly.{PipelineRun, Runner}
@@ -22,6 +24,27 @@ defmodule HyacinthWeb.PipelineLive.Show do
     end
   end
 
+  defmodule RunFilterForm do
+    use Ecto.Schema
+    import Ecto.Changeset
+
+    @primary_key false
+    embedded_schema do
+      field :search, :string, default: ""
+      field :status, Ecto.Enum, values: [:all, :running, :complete, :failed], default: :all
+      field :sort_by, Ecto.Enum, values: [:dataset_name, :date_created], default: :date_created
+      field :order, Ecto.Enum, values: [:asc, :desc], default: :desc
+    end
+
+    @doc false
+    def changeset(filter_options, attrs) do
+      filter_options
+      |> cast(attrs, [:search, :status, :sort_by, :order])
+      |> validate_required([:search, :status, :sort_by, :order])
+    end
+  end
+
+
   def mount(params, _session, socket) do
     pipeline = Assembly.get_pipeline_preloaded!(params["pipeline_id"])
 
@@ -35,10 +58,31 @@ defmodule HyacinthWeb.PipelineLive.Show do
 
       run_pipeline_changeset: RunPipelineForm.changeset(%RunPipelineForm{}, %{}),
 
+      run_filter_changeset: RunFilterForm.changeset(%RunFilterForm{}, %{}),
+
       tab: :runs,
     })
 
     {:ok, socket}
+  end
+
+  defp filter_runs(runs, %Ecto.Changeset{} = changeset) when is_list(runs) do
+    %RunFilterForm{} = form = Ecto.Changeset.apply_changes(changeset)
+
+    filter_func = fn %PipelineRun{} = run ->
+      %Dataset{} = input = hd(run.transform_runs).input
+      contains_search?([input.name, run.ran_by.email], form.search) and value_matches?(run.status, form.status)
+    end
+
+    {sort_func, sorter} =
+      case form.sort_by do
+        :dataset_name -> {&String.downcase(hd(&1.transform_runs).input.name), form.order}
+        :date_created -> {&(&1.inserted_at), {form.order, DateTime}}
+      end
+
+    runs
+    |> Enum.filter(filter_func)
+    |> Enum.sort_by(sort_func, sorter)
   end
 
   def handle_event("run_pipeline_submit", %{"run_pipeline_form" => params}, socket) do
@@ -63,6 +107,11 @@ defmodule HyacinthWeb.PipelineLive.Show do
       "steps" -> :steps
     end
     {:noreply, assign(socket, :tab, tab)}
+  end
+
+  def handle_event("run_filter_updated", %{"run_filter_form" => params}, socket) do
+    changeset = RunFilterForm.changeset(%RunFilterForm{}, params)
+    {:noreply, assign(socket, :run_filter_changeset, changeset)}
   end
 
   def handle_info({:pipeline_run_updated, {_id, _status}}, socket) do
