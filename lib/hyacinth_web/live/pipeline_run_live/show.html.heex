@@ -24,11 +24,20 @@
       </div>
     </div>
 
-    <div class="mt-1">
+    <div class="mt-1 text-gray-400 flex items-center space-x-2">
       <div>
         <span class="tag">Ran by</span>
-        <span class="text-gray-400"><%= @pipeline_run.ran_by.email %></span>
+        <span><%= @pipeline_run.ran_by.email %></span>
       </div>
+
+      <%= if @pipeline_run.completed_at do %>
+        <div class="flex items-center space-x-0.5">
+          <div class="text-gray-500">
+            <Icons.check_circle_mini />
+          </div>
+          <span><%= format_time(DateTime.diff(@pipeline_run.completed_at, @pipeline_run.inserted_at)) %></span>
+        </div>
+      <% end %>
     </div>
   </div>
 </header>
@@ -49,6 +58,15 @@
             <div class="pill pill-lg pill-green">Complete</div>
           <% end %>
         </div>
+
+        <%= if tr.started_at && tr.completed_at do %>
+          <div class="text-gray-400 flex items-center space-x-0.5">
+            <div class="text-gray-500">
+              <Icons.check_circle_mini />
+            </div>
+            <span><%= format_time(DateTime.diff(tr.completed_at, tr.started_at)) %></span>
+          </div>
+        <% end %>
 
         <div class="mt-2">
           <table class="border-separate border-spacing-x-2 border-spacing-y-1 border-l-2 border-gray-600">

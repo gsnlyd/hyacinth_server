@@ -1,5 +1,33 @@
 defmodule HyacinthWeb.LiveUtils do
   @doc """
+  Returns the given duration formatted as
+  a short string.
+
+  ## Examples
+
+      iex> format_time(30)
+      "30s"
+
+      iex> format_time(99)
+      "1m 39s"
+
+      iex> format_time(3601)
+      "1h"
+
+  """
+  @spec format_time(integer) :: String.t
+  def format_time(seconds) do
+    cond do
+      seconds < 60 ->
+        "#{seconds}s"
+      seconds < (60 * 60) ->
+        "#{div(seconds, 60)}m #{rem(seconds, 60)}s"
+      true ->
+        "#{div(seconds, 60 * 60)}h"
+    end
+  end
+
+  @doc """
   Checks whether the given string or list of strings
   contains the given search string (case-insensitive).
 
