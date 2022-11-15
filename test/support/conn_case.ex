@@ -22,6 +22,7 @@ defmodule HyacinthWeb.ConnCase do
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
+      import Phoenix.LiveViewTest
       import HyacinthWeb.ConnCase
 
       alias HyacinthWeb.Router.Helpers, as: Routes
@@ -39,11 +40,19 @@ defmodule HyacinthWeb.ConnCase do
   @doc """
   Setup helper that registers and logs in users.
 
-      setup :register_and_log_in_user
-
   It stores an updated connection and a registered user in the
   test context.
+
+  If the tag `disable_login: true` is passed via the context,
+  this function does nothing.
+
+  ## Examples
+
+      setup :register_and_log_in_user
+
   """
+  def register_and_log_in_user(%{disable_login: true}), do: %{}
+
   def register_and_log_in_user(%{conn: conn}) do
     user = Hyacinth.AccountsFixtures.user_fixture()
     %{conn: log_in_user(conn, user), user: user}

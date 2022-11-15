@@ -81,12 +81,12 @@ defmodule Hyacinth.WarehouseFixtures do
 
   """
   @spec root_dataset_fixture(String.t | nil, integer) :: %Dataset{}
-  def root_dataset_fixture(name \\ nil, num_objects \\ 3) do
+  def root_dataset_fixture(name \\ nil, num_objects \\ 3, object_name_prefix \\ "object") do
     dataset_params = %{
       name: name || "Dataset #{System.unique_integer()}",
       type: :root,
     }
-    object_params = many_object_params_fixtures(num_objects)
+    object_params = many_object_params_fixtures(num_objects, object_name_prefix)
 
     {:ok, %{dataset: %Dataset{} = dataset}} = Warehouse.create_dataset(dataset_params, object_params)
     dataset
