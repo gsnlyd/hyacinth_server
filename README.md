@@ -37,7 +37,7 @@ $ cd hyacinth
 ```
 
 2. Hyacinth is configured using environment variables. While not strictly necessary,
-it is convenient to save these to a config file for convenience. An example config is
+it is convenient to save these to a config file. An example config is
 included below these steps - create a file named `prod.env` with the contents of this example.
 Note that you must provide `SECRET_KEY_BASE` yourself for security. It must be set to an
 80-character random alphanumeric string.
@@ -69,7 +69,7 @@ $ source prod.env
 $ ./bin/new_dataset MyNiftiDataset nifti /path/to/niftis
 ```
 
-6. Now we can start our server. To start the server, run the command below and then point your
+6. Now we can start our server using the `server` script. To start the server, run the command below and then point your
 web browser to `localhost:4000` (the default host/port) to verify everything is working.
 
 ```console
