@@ -78,3 +78,13 @@ web browser to `localhost:4000` (the default host/port) to verify everything is 
 ```
 $ (source .env && ./bin/server)
 ```
+
+### Example Config
+
+```bash
+export DATABASE_PATH="~/hyacinth/hyacinth.db"
+export WAREHOUSE_PATH="~/hyacinth/warehouse"
+export TRANSFORM_PATH="~/hyacinth/transform"
+
+export SECRET_KEY_BASE=[YOUR SECRET_KEY_BASE HERE: MUST BE AN 80-CHARACTER ALPHANUMERIC STRING]
+```
