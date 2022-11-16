@@ -17,10 +17,10 @@ defmodule HyacinthWeb.PipelineLive.TransformOptionsModal do
     <div class="top-0 left-0 fixed bg-black bg-opacity-90 flex justify-center items-start" style="width: 100vw; height: 100vh;">
       <div class="flex-1 mt-64 p-4 max-w-lg bg-gray-800 rounded border border-gray-700" phx-click-away="close_modal">
         <div>
-          <h2 class="text-2xl text-gray-300">Options for Transform <%= @index + 1 %></h2>
+          <h3>Options for Step <%= @index + 1 %></h3>
         </div>
         <div class="mt-4">
-          <.form let={f} for={@changeset} as="options" phx-change="validate_change" phx-submit="validate_submit" phx-target={@myself}>
+          <.form let={f} for={@changeset} as="options" phx-change="validate_change" phx-submit="validate_submit" phx-target={@myself} id="transform-options-modal-form">
             <Driver.render_form driver={@driver} form={f} />
             <div class="mt-6">
               <%= submit "Save", class: "btn btn-blue" %>

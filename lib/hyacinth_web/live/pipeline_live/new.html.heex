@@ -24,7 +24,7 @@
           </button>
         </div>
       </div>
-      <div class="mt-3 space-y-4">
+      <div class="mt-3 space-y-6">
         <%= if length(inputs_for(f, :transforms)) == 0 do %>
           <div class="p-4 mb-8 rounded border border-gray-800">
             <div class="text-lg text-gray-400 text-center">No steps yet.</div>
@@ -32,11 +32,12 @@
         <% end %>
         <%= for {ft, i} <- Enum.with_index(inputs_for(f, :transforms)) do %>
           <div class="relative">
-            <div class="absolute -left-20">
+            <div class="absolute top-1 -left-20">
               <div class="w-14 h-14 text-3xl text-black font-semibold bg-gray-200 rounded-full shadow flex justify-center items-center">
                 <%= i + 1%>
               </div>
             </div>
+            <h3>Step <%= i + 1 %></h3>
             <div class="card mt-1 relative">
               <div class="absolute top-4 right-4">
                 <button type="button" class="text-gray-500 hover:text-red-500 transition" phx-click="delete_transform" phx-value-index={i}>

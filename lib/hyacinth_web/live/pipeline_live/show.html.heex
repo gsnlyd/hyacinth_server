@@ -9,7 +9,7 @@
   </.breadcrumbs>
 
   <div class="w-full flex justify-between items-center">
-    <h1 class="text-4xl"><%= @pipeline.name %></h1>
+    <h1><%= @pipeline.name %></h1>
     <div class="">
       <.form let={f} for={@run_pipeline_changeset} phx-submit="run_pipeline_submit">
         <div class="filter-form-content space-x-4">
