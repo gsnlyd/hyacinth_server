@@ -1,5 +1,5 @@
 defmodule HyacinthWeb.LiveUtils do
-  alias Hyacinth.Labeling.LabelJob
+  alias Hyacinth.Labeling.{LabelJob, LabelElement}
 
   @doc """
   Returns the given duration formatted as
@@ -41,11 +41,20 @@ defmodule HyacinthWeb.LiveUtils do
       "Comparisons"
 
   """
-  def elements_name(%LabelJob{} = job) do
-    case length(hd(job.blueprint.elements).objects) do
-      1 -> "Images"
-      _ -> "Comparisons"
-    end
+  @spec elements_name(%LabelJob{} | [%LabelElement{}], boolean) :: String.t
+  def elements_name(elements_or_job, capitalize \\ false)
+  def elements_name(elements, capitalize) when is_list(elements) do
+    name =
+      case length(hd(elements).objects) do
+        1 -> "Images"
+        _ -> "Comparisons"
+      end
+
+    if capitalize, do: name, else: String.downcase(name)
+  end
+
+  def elements_name(%LabelJob{} = job, capitalize) do
+    elements_name(job.blueprint.elements, capitalize)
   end
 
   @doc """
