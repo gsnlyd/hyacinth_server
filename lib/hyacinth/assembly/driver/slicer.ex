@@ -16,6 +16,13 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
       |> cast(params, [:orientation])
       |> validate_required([:orientation])
     end
+
+    @doc false
+    def parse(params) do
+      %SlicerOptions{}
+      |> changeset(params)
+      |> apply_changes()
+    end
   end
 
   @behaviour Driver
@@ -47,11 +54,14 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
   def pure?, do: false
 
   @impl Driver
-  def command_args(_options, file_path) do
+  def command_args(options, file_path) do
+    orientation = SlicerOptions.parse(options).orientation
+
     binary_path = Application.fetch_env!(:hyacinth, :python_path)
     args = [
       Application.fetch_env!(:hyacinth, :slicer_path),
       file_path,
+      Atom.to_string(orientation),
     ]
 
     {binary_path, args}
