@@ -31,7 +31,7 @@
   <div class="mt-4 text-xl border-b-2 border-gray-700">
     <div class="-mb-0.5">
       <.tab_button cur_tab={@tab} event="set_tab" tab="sessions">Sessions</.tab_button>
-      <.tab_button cur_tab={@tab} event="set_tab" tab="elements">Elements</.tab_button>
+      <.tab_button cur_tab={@tab} event="set_tab" tab="elements"><%= elements_name(@job) %></.tab_button>
     </div>
   </div>
 </header>
@@ -100,7 +100,7 @@
 
   <% :elements -> %>
     <div>
-      <div class="ml-1 text-lg text-gray-300"><%= length(@job.blueprint.elements) %> elements</div>
+      <div class="ml-1 text-lg text-gray-300"><%= length(@job.blueprint.elements) %> <%= String.downcase(elements_name(@job)) %></div>
       <div class="mt-2 border border-gray-700 rounded">
         <table class="mt-1 w-full table">
           <thead>
@@ -113,7 +113,7 @@
           <tbody class="text-gray-400 text-sm">
             <%= for %LabelElement{} = element <- @job.blueprint.elements do %>
               <tr>
-                <td><%= element.element_index %></td>
+                <td><%= element.element_index + 1 %></td>
                 <td>
                   <%= for {%Object{} = object, obj_i} <- Enum.with_index(element.objects) do %>
                   <span class="hover:text-blue-300">

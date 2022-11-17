@@ -1,4 +1,6 @@
 defmodule HyacinthWeb.LiveUtils do
+  alias Hyacinth.Labeling.LabelJob
+
   @doc """
   Returns the given duration formatted as
   a short string.
@@ -24,6 +26,25 @@ defmodule HyacinthWeb.LiveUtils do
         "#{div(seconds, 60)}m #{rem(seconds, 60)}s"
       true ->
         "#{div(seconds, 60 * 60)}h"
+    end
+  end
+
+  @doc """
+  Returns a display name for the elements of the given job.
+
+  ## Examples
+
+      iex> elements_name(some_job)
+      "Images"
+
+      iex> elements_name(some_other_job)
+      "Comparisons"
+
+  """
+  def elements_name(%LabelJob{} = job) do
+    case length(hd(job.blueprint.elements).objects) do
+      1 -> "Images"
+      _ -> "Comparisons"
     end
   end
 
