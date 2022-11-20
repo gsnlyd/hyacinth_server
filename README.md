@@ -1,6 +1,18 @@
 # Hyacinth
 
 Hyacinth is a collaborative data management and labeling tool for medical images.
+The Hyacinth server provides a uniform and friendly interface for ingesting, transforming,
+and labeling medical images in a collaborative environment.
+
+Here are some things you can do with Hyacinth:
+
+* Manage large image datasets from a collaborative web app
+* Create pipelines to transform data to different formats (e.g. convert DICOM images to Nifti volumes) via a friendly interface
+* Create labeling jobs allowing multiple annotators to classify images based on provided criteria (pairwise comparison is also supported)
+
+The Hyacinth web server can be run either on a local machine, or as a central
+server for collaboration. Once the server is running, you can connect via any standard web
+browser. Installation instructions can be found below.
 
 ## Installation
 
@@ -84,4 +96,42 @@ export WAREHOUSE_PATH="~/hyacinth/warehouse"
 export TRANSFORM_PATH="~/hyacinth/transform"
 
 export SECRET_KEY_BASE=[YOUR SECRET_KEY_BASE HERE: MUST BE AN 80-CHARACTER ALPHANUMERIC STRING]
+```
+
+## Developer Installation
+
+**These instructions are for software developers who wish to modify Hyacinth's code. For user
+installation instructions, see above.**
+
+### Prerequisites
+
+Hyacinth is an Elixir/Phoenix application, and an Elixir installation is required for compilation.
+See the [Elixir installation instructions](https://elixir-lang.org/install.html).
+
+## Compilation
+
+1. Clone the `hyacinth_server` repository and `cd` inside.
+
+2. (Optional) If this is your first time using Elixir, you will need to install Hex and Rebar
+(package managers for the Elixir and Erlang ecosystems, respectively) to build Hyacinth. Both
+can be installed via the `mix` build tool included with Elixir.
+
+If you skip this step, you will be prompted to install both during step 3.
+
+```console
+$ mix local.hex
+$ mix local.rebar
+```
+
+3. Install Hyacinth's dependencies from Hex (the Elixir package manager).
+
+```console
+$ mix deps.get
+```
+
+4. Run the Phoenix server in development mode. Once the server is running,
+you can connect via your web browser.
+
+```console
+$ mix phx.server
 ```
