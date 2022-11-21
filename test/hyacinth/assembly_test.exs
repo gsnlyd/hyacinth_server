@@ -156,6 +156,156 @@ defmodule Hyacinth.AssemblyTest do
     end
   end
 
+  describe "check_transform_formats/2" do
+    test "returns no errors for valid transforms" do
+      transforms = [
+        %Transform{order_index: 0, driver: :dicom_to_nifti, options: %{}},
+        %Transform{order_index: 1, driver: :slicer, options: %{}},
+      ]
+
+      assert Assembly.check_transform_formats(transforms) == [
+        nil,
+        nil,
+      ]
+    end
+
+    test "returns no errors for valid transforms with starting_format" do
+      transforms = [
+        %Transform{order_index: 0, driver: :dicom_to_nifti, options: %{}},
+        %Transform{order_index: 1, driver: :slicer, options: %{}},
+      ]
+
+      assert Assembly.check_transform_formats(transforms, :dicom) == [
+        nil,
+        nil,
+      ]
+    end
+
+    test "returns no errors for valid transforms starting with pure drivers" do
+      transforms = [
+        %Transform{order_index: 0, driver: :sample, options: %{}},
+        %Transform{order_index: 1, driver: :sample, options: %{}},
+        %Transform{order_index: 2, driver: :dicom_to_nifti, options: %{}},
+        %Transform{order_index: 3, driver: :slicer, options: %{}},
+      ]
+
+      assert Assembly.check_transform_formats(transforms) == [
+        nil,
+        nil,
+        nil,
+        nil,
+      ]
+    end
+
+
+    test "returns no errors for valid transforms ending with pure driver" do
+      transforms = [
+        %Transform{order_index: 0, driver: :dicom_to_nifti, options: %{}},
+        %Transform{order_index: 1, driver: :slicer, options: %{}},
+        %Transform{order_index: 2, driver: :sample, options: %{}},
+      ]
+
+      assert Assembly.check_transform_formats(transforms) == [
+        nil,
+        nil,
+        nil,
+      ]
+    end
+
+
+    test "returns no errors for valid transforms with pure drivers in between" do
+      transforms = [
+        %Transform{order_index: 0, driver: :dicom_to_nifti, options: %{}},
+        %Transform{order_index: 1, driver: :sample, options: %{}},
+        %Transform{order_index: 2, driver: :sample, options: %{}},
+        %Transform{order_index: 3, driver: :slicer, options: %{}},
+      ]
+
+      assert Assembly.check_transform_formats(transforms) == [
+        nil,
+        nil,
+        nil,
+        nil,
+      ]
+    end
+
+    test "returns no errors for valid transforms with pure drivers in between and starting_format" do
+      transforms = [
+        %Transform{order_index: 0, driver: :dicom_to_nifti, options: %{}},
+        %Transform{order_index: 1, driver: :sample, options: %{}},
+        %Transform{order_index: 2, driver: :sample, options: %{}},
+        %Transform{order_index: 3, driver: :slicer, options: %{}},
+      ]
+
+      assert Assembly.check_transform_formats(transforms, :dicom) == [
+        nil,
+        nil,
+        nil,
+        nil,
+      ]
+    end
+
+    test "returns errors for basic format mismatch" do
+      transforms = [
+        %Transform{order_index: 0, driver: :slicer, options: %{}},
+        %Transform{order_index: 1, driver: :dicom_to_nifti, options: %{}},
+        %Transform{order_index: 2, driver: :dicom_to_nifti, options: %{}},
+      ]
+
+      assert Assembly.check_transform_formats(transforms) == [
+        nil,
+        {:dicom, :png},
+        {:dicom, :nifti},
+      ]
+    end
+
+    test "returns errors for basic format mismatch with pure drivers in between" do
+      transforms = [
+        %Transform{order_index: 0, driver: :slicer, options: %{}},
+        %Transform{order_index: 1, driver: :sample, options: %{}},
+        %Transform{order_index: 2, driver: :sample, options: %{}},
+        %Transform{order_index: 3, driver: :dicom_to_nifti, options: %{}},
+        %Transform{order_index: 4, driver: :dicom_to_nifti, options: %{}},
+      ]
+
+      assert Assembly.check_transform_formats(transforms) == [
+        nil,
+        nil,
+        nil,
+        {:dicom, :png},
+        {:dicom, :nifti},
+      ]
+    end
+
+    test "returns errors for mismatch with starting_format" do
+      transforms = [
+        %Transform{order_index: 0, driver: :dicom_to_nifti, options: %{}},
+        %Transform{order_index: 1, driver: :slicer, options: %{}},
+      ]
+
+      assert Assembly.check_transform_formats(transforms, :png) == [
+        {:dicom, :png},
+        nil,
+      ]
+    end
+
+    test "returns errors for mismatch with starting_format starting with pure drivers" do
+      transforms = [
+        %Transform{order_index: 0, driver: :sample, options: %{}},
+        %Transform{order_index: 1, driver: :sample, options: %{}},
+        %Transform{order_index: 2, driver: :dicom_to_nifti, options: %{}},
+        %Transform{order_index: 3, driver: :slicer, options: %{}},
+      ]
+
+      assert Assembly.check_transform_formats(transforms, :png) == [
+        nil,
+        nil,
+        {:dicom, :png},
+        nil,
+      ]
+    end
+  end
+
   describe "get_pipeline_run!/1" do
     test "gets a single pipeline run with preloads" do
       original_pr = pipeline_run_fixture()

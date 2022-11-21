@@ -2,6 +2,8 @@ defmodule Hyacinth.Assembly.Pipeline do
   use Hyacinth.Schema
   import Ecto.Changeset
 
+  alias Hyacinth.Assembly
+
   alias Hyacinth.Accounts.User
   alias Hyacinth.Assembly.{Transform, PipelineRun}
 
@@ -24,6 +26,7 @@ defmodule Hyacinth.Assembly.Pipeline do
     |> cast_assoc(:transforms, with: &Transform.changeset/2)
     |> validate_length(:name, min: 1, max: 30)
     |> validate_transform_order()
+    |> validate_transform_inputs_match_outputs()
   end
 
   defp validate_transform_order(%Ecto.Changeset{} = changeset) do
@@ -34,5 +37,18 @@ defmodule Hyacinth.Assembly.Pipeline do
     else
       changeset
     end
+  end
+
+  defp validate_transform_inputs_match_outputs(%Ecto.Changeset{} = changeset) do
+    changeset
+    |> get_field(:transforms)
+    |> Assembly.check_transform_formats()
+    |> Enum.filter(&(&1 != nil))
+    |> Enum.map(fn {expected, found} ->
+      "expected format #{expected}, got #{found}"
+    end)
+    |> Enum.reduce(changeset, fn error, %Ecto.Changeset{} = changeset ->
+      add_error(changeset, :transforms, error)
+    end)
   end
 end

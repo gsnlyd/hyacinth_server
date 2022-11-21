@@ -14,7 +14,7 @@ defmodule Hyacinth.Assembly do
 
   alias Hyacinth.Accounts.User
   alias Hyacinth.Warehouse.{Dataset, Object}
-  alias Hyacinth.Assembly.{Pipeline, Transform, PipelineRun, TransformRun}
+  alias Hyacinth.Assembly.{Pipeline, Transform, PipelineRun, TransformRun, Driver}
 
   @doc """
   Returns a list of all Pipelines with their
@@ -116,6 +116,60 @@ defmodule Hyacinth.Assembly do
       from t in Ecto.assoc(pipeline, :transforms),
       select: t
     )
+  end
+
+  @doc """
+  Checks whether each transform's input format matches the
+  previous output format.
+
+  Returns a list the same length as the input `transforms`,
+  where each element is either an error tuple `{expected, found}`
+  or nil if the formats match.
+
+  If `starting_format` is not provided (as it is not known
+  at pipeline creation, only once the pipeline is run),
+  errors are checked starting at the first output
+  format found (i.e. the first non-pure transform).
+
+  When pure transforms are present, the previous format
+  will cascade as would be expected.
+
+  ## Examples
+
+      iex> check_transform_formats(some_transforms, :dicom)
+      [
+        {:dicom, :png},
+        nil,
+        nil
+      ]
+
+      iex> check_transform_formats(some_other_transforms)
+      [
+        nil,
+        {:nifti, :png},
+        nil
+      ]
+
+  """
+  @spec check_transform_formats([%Transform{}], atom | nil) :: [{atom, atom} | nil]
+  def check_transform_formats(transforms, starting_format \\ nil) when is_list(transforms) do
+    transforms
+    |> Enum.map_reduce(starting_format, fn %Transform{} = transform, prev_output ->
+      if Driver.pure?(transform.driver) do
+        {nil, prev_output}
+      else
+        cur_input = Driver.input_format(transform.driver, transform.options)
+        cur_output = Driver.output_format(transform.driver, transform.options)
+
+        error =
+          if prev_output != nil and prev_output != cur_input do
+            {cur_input, prev_output}
+          end
+
+        {error, cur_output}
+      end
+    end)
+    |> elem(0)
   end
 
   @doc """
