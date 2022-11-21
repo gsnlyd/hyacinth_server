@@ -6,7 +6,7 @@ defmodule HyacinthWeb.PipelineLive.New do
 
   def mount(_params, _session, socket) do
     socket = assign(socket, %{
-      pipeline_changeset: Ecto.Changeset.change(%Pipeline{}, %{}),
+      pipeline_changeset: Pipeline.changeset(%Pipeline{}, %{}),
       transform_options: [],
       transforms: [],
 
@@ -61,6 +61,15 @@ defmodule HyacinthWeb.PipelineLive.New do
     {transforms_map, options_list}
   end
 
+  @spec convert_transform_list_to_params([{atom, map}]) :: [map]
+  defp convert_transform_list_to_params(transforms) when is_list(transforms) do
+    transforms
+    |> Enum.with_index()
+    |> Enum.map(fn {{driver, options}, order_index} ->
+      %{order_index: order_index, driver: driver, options: options}
+    end)
+  end
+
   def handle_event("validate_pipeline", %{"pipeline" => pipeline_params}, socket) do
     {new_transforms, new_options} = inject_options(pipeline_params["transforms"], socket.assigns.transform_options)
     pipeline_params = Map.put(pipeline_params, "transforms", new_transforms)
@@ -96,28 +105,29 @@ defmodule HyacinthWeb.PipelineLive.New do
   end
 
   def handle_event("add_transform", _value, socket) do
-    pipeline_changeset = socket.assigns.pipeline_changeset
-    # Retrieve existing transform changesets so we can append the new one
-    # Note: If we were to instead use Ecto.Changeset.get_change/3 or get_field/3
-    # then Ecto would unpack the structs from their changesets, which is not what we want.
-    # The combined struct/changeset list seems to trigger a bug with validation of the
-    # previous transform changesets that marks them as valid no matter what,
-    # likely because the function does not seem to be meant to handle the mixed types.
-    transform_changesets = Map.get(pipeline_changeset.changes, :transforms, [])
-
     # Get default options as a map of params
     default_driver = :sample
-    options_params =
+    default_options =
       default_driver
       |> Driver.options_changeset(%{})
       |> Ecto.Changeset.apply_action!(:insert)
       |> Map.from_struct()
-    # Create new transform changeset
-    new_transform_changeset = Transform.changeset(%Transform{}, %{order_index: length(transform_changesets), options: options_params})
-    # Append new transform changeset to the existing transform changesets
-    pipeline_changeset = Ecto.Changeset.put_assoc(pipeline_changeset, :transforms, transform_changesets ++ [new_transform_changeset])
-    transform_options = socket.assigns.transform_options ++ [{default_driver, options_params}]
 
+    # Add new transform to list of transforms and convert to params to cast into the changeset
+    transform_options = socket.assigns.transform_options ++ [{default_driver, default_options}]
+    transforms_params = convert_transform_list_to_params(transform_options)
+
+    # Rebuild changeset with new transforms params
+    # Note: it is necessary to rebuild instead of calling changeset(existing_changeset, additional_params)
+    # because re-running the validations does not remove existing errors, causing ghost
+    # errors to persist on the :transforms field
+    pipeline_params = Map.put(socket.assigns.pipeline_changeset.params, "transforms", transforms_params)
+    pipeline_changeset =
+      %Pipeline{}
+      |> Pipeline.changeset(pipeline_params)
+      |> Map.put(:action, :insert)
+
+    # Update state
     socket = assign(socket, %{
       pipeline_changeset: pipeline_changeset,
       transform_options: transform_options,
@@ -129,12 +139,16 @@ defmodule HyacinthWeb.PipelineLive.New do
   def handle_event("delete_transform", %{"index" => index}, socket) do
     index = String.to_integer(index)
 
-    pipeline_changeset = socket.assigns.pipeline_changeset
-    transform_changesets = Map.get(pipeline_changeset.changes, :transforms, [])
-    transform_changesets = List.delete_at(transform_changesets, index)
-    pipeline_changeset = Ecto.Changeset.put_assoc(pipeline_changeset, :transforms, transform_changesets)
-
+    # Delete transform from list of transforms and convert to params to cast into the changeset
     transform_options = List.delete_at(socket.assigns.transform_options, index)
+    transforms_params = convert_transform_list_to_params(transform_options)
+
+    # Rebuild changeset with new transforms params (see note in add_transform above)
+    pipeline_params = Map.put(socket.assigns.pipeline_changeset.params, "transforms", transforms_params)
+    pipeline_changeset =
+      %Pipeline{}
+      |> Pipeline.changeset(pipeline_params)
+      |> Map.put(:action, :insert)
 
     socket = assign(socket, %{
       pipeline_changeset: pipeline_changeset,
@@ -161,17 +175,16 @@ defmodule HyacinthWeb.PipelineLive.New do
     {cur_driver, _opts} = Enum.at(transform_options, index)
     if cur_driver != driver, do: raise "Driver mismatch: expected #{cur_driver} got #{driver}"
 
+    # Replace existing options with new options and convert to params to cast into the changeset
     transform_options = List.replace_at(transform_options, index, {driver, params})
-
-    # Inject new options into transform changeset
-    pipeline_changeset = socket.assigns.pipeline_changeset
-    transform_changesets = Map.get(pipeline_changeset.changes, :transforms, [])
-    transform_cs =
-      transform_changesets
-      |> Enum.at(index)
-      |> Transform.changeset(%{options: params})
-    transform_changesets = List.replace_at(transform_changesets, index, transform_cs)
-    pipeline_changeset = Ecto.Changeset.put_assoc(pipeline_changeset, :transforms, transform_changesets)
+    transforms_params = convert_transform_list_to_params(transform_options)
+    
+    # Rebuild changeset with new transforms params (see note in add_transform above)
+    pipeline_params = Map.put(socket.assigns.pipeline_changeset.params, "transforms", transforms_params)
+    pipeline_changeset =
+      %Pipeline{}
+      |> Pipeline.changeset(pipeline_params)
+      |> Map.put(:action, :insert)
 
     socket = assign(socket, %{
       pipeline_changeset: pipeline_changeset,
