@@ -104,6 +104,18 @@ defmodule Hyacinth.AssemblyTest do
       assert transform2.options["object_count"] == 100
     end
 
+    test "error if transforms are empty" do
+      %User{} = user = user_fixture()
+
+      params = %{
+        name: "Some Pipeline",
+        transforms: [],
+      }
+
+      {:error, %Ecto.Changeset{} = changeset} = Assembly.create_pipeline(user, params)
+      assert changeset.errors == [transforms: {"can't be empty", []}]
+    end
+
     test "error if transforms are out of order" do
       %User{} = user = user_fixture()
       %Dataset{} = dataset = root_dataset_fixture()

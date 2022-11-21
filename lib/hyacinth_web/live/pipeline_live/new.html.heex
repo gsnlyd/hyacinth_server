@@ -1,11 +1,15 @@
-<header>
-  <h1>New Pipeline</h1>
-</header>
-
-<main class="mt-2 mx-auto max-w-screen-lg">
+<main class="mx-auto max-w-screen-lg">
   <div>
     <.form let={f} for={@pipeline_changeset} phx-change="validate_pipeline" phx-submit="save_pipeline">
-      <div class="card">
+      <div class="flex justify-between items-center">
+        <h1>New Pipeline</h1>
+        <%= submit class: "btn btn-icon btn-blue" do %>
+          <span class="opacity-80"><Icons.bookmark_solid /></span>
+          <span>Save Pipeline</span>
+        <% end %>
+      </div>
+
+      <div class="mt-3 card">
         <div class="form-content">
           <p>
             <%= label f, :name %>
@@ -16,18 +20,19 @@
       </div>
 
       <div class="mt-6 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
+        <div>
           <h1>Steps</h1>
-          <button type="button" class="btn btn-blue btn-icon" phx-click="add_transform">
-            <span class="opacity-90"><Icons.plus_circle_mini /></span>
-            <span>New Step</span>
-          </button>
+          <div class="mt-0.5 form-content"><%= error_tag f, :transforms %></div>
         </div>
       </div>
-      <div class="mt-3 space-y-6">
+
+      <div class="mt-2 space-y-6">
         <%= if length(inputs_for(f, :transforms)) == 0 do %>
-          <div class="p-4 mb-8 rounded border border-gray-800">
-            <div class="text-lg text-gray-400 text-center">No steps yet.</div>
+          <div class="p-4 rounded border border-gray-700">
+            <div class="mx-auto w-96 text-center text-gray-400 space-y-2">
+              <div class="text-2xl">No steps yet.</div>
+              <div>Pipeline steps can sample your datasets or transform them from one format to another. A pipeline must have at least one step.</div>
+            </div>
           </div>
         <% end %>
         <%= for {ft, i} <- Enum.with_index(inputs_for(f, :transforms)) do %>
@@ -37,10 +42,31 @@
                 <%= i + 1%>
               </div>
             </div>
-            <h3>Step <%= i + 1 %></h3>
+
+            <div class="flex items-center space-x-3">
+              <h3>Step <%= i + 1 %></h3>
+              <div>
+                <div class="flex items-center space-x-1">
+                  <%= if Driver.pure?(Ecto.Changeset.get_field(ft.source, :driver)) do %>
+                    <span class="tag">any</span>
+                    <span class="text-xs text-gray-400">&rarr;</span>
+                    <span class="tag">any</span>
+                  <% else %>
+                    <span class="tag">
+                      <%= Driver.input_format(Ecto.Changeset.get_field(ft.source, :driver), Ecto.Changeset.get_field(ft.source, :options)) %>
+                    </span>
+                    <span class="text-xs text-gray-400">&rarr;</span>
+                    <span class="tag">
+                      <%= Driver.output_format(Ecto.Changeset.get_field(ft.source, :driver), Ecto.Changeset.get_field(ft.source, :options)) %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+
             <div class="card mt-1 relative">
               <div class="absolute top-4 right-4">
-                <button type="button" class="text-gray-500 hover:text-red-500 transition" phx-click="delete_transform" phx-value-index={i}>
+                <button type="button" class="text-red-500 hover:text-red-600 transition" phx-click="delete_transform" phx-value-index={i}>
                   <Icons.trash_solid />
                 </button>
               </div>
@@ -52,10 +78,10 @@
                   <%= error_tag ft, :driver %>
                 </p>
               </div>
-              <div class="mt-5 pt-3 border-t-2 border-gray-600">
+              <div class="mt-5 pt-4 border-t-2 border-gray-700">
                 <div class="flex items-center space-x-1">
                   <div class="text-lg text-gray-300">Driver Options</div>
-                  <button type="button" class="text-blue-300 hover:text-blue-400" phx-click="edit_transform_options" phx-value-index={i}>
+                  <button type="button" class="text-blue-400 hover:text-blue-500" phx-click="edit_transform_options" phx-value-index={i}>
                     <Icons.pencil_square_mini />
                   </button>
                 </div>
@@ -73,11 +99,11 @@
         <% end %>
       </div>
 
-      <div class="mt-8 flex justify-center">
-        <%= submit class: "btn btn-xl btn-icon btn-blue" do %>
-          <span class="opacity-80"><Icons.bookmark_solid /></span>
-          <span>Save Pipeline</span>
-        <% end %>
+      <div class="mt-6 flex justify-center">
+        <button type="button" class="btn btn-blue btn-icon" phx-click="add_transform">
+          <span class="opacity-90"><Icons.plus_circle_mini /></span>
+          <span>Add Step</span>
+        </button>
       </div>
     </.form>
   </div>
