@@ -151,7 +151,7 @@ defmodule Hyacinth.AssemblyTest do
       assert tc2.valid? == true
       assert tc3.valid? == false
 
-      assert tc3.errors == [driver: {"requires format dicom, but previous step outputs png", []}]
+      assert tc3.errors == [driver: {"requires format %{expected}, but previous step outputs %{found}", [expected: :dicom, found: :png]}]
     end
 
     test "error if options are invalid" do

@@ -10,23 +10,31 @@ defmodule HyacinthWeb.ErrorHelpers do
 
   Options:
 
-    * `:always_show_errors`: If true, errors will be shown
+    * `:always_show_errors` - If true, errors will be shown
     even if a user has not yet modified the field.
+    * `:name` - A name to use in place of the field name.
 
   ## Examples
 
       iex> error_tag(some_form, :some_field)
       iex> error_tag(some_form, :some_field, always_show_errors: true)
+      iex> error_tag(some_form, :some_field, name: "MyField")
 
   """
   @spec error_tag(%Phoenix.HTML.Form{}, atom, keyword) :: any
   def error_tag(form, field, opts \\ []) when is_list(opts) do
     Enum.map(Keyword.get_values(form.errors, field), fn error ->
-      content_tag(:span, translate_error(error),
+      content_tag(:span, humanize_error(field, opts[:name], error),
         class: "invalid-feedback",
         phx_feedback_for: unless(opts[:always_show_errors], do: input_name(form, field))
       )
     end)
+  end
+
+  @spec humanize_error(atom, String.t | nil, {String.t, keyword}) :: String.t
+  defp humanize_error(field, name, error) do
+    name = name || Phoenix.HTML.Form.humanize(field)
+    name <> " " <> translate_error(error)
   end
 
   @doc """

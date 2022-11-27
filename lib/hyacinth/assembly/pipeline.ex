@@ -58,8 +58,9 @@ defmodule Hyacinth.Assembly.Pipeline do
     |> Enum.reduce(changeset, fn {{expected, found}, i}, %Ecto.Changeset{} = changeset ->
       update_change(changeset, :transforms, fn transforms ->
         List.update_at(transforms, i, fn transform_changeset ->
-          message = "requires format #{expected}, but previous step outputs #{found}"
-          add_error(transform_changeset, :driver, message)
+          message = "requires format %{expected}, but previous step outputs %{found}"
+          keys = [expected: expected, found: found]
+          add_error(transform_changeset, :driver, message, keys)
         end)
       end)
     end)
