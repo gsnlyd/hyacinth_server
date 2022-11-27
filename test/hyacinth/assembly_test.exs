@@ -118,12 +118,11 @@ defmodule Hyacinth.AssemblyTest do
 
     test "error if transforms are out of order" do
       %User{} = user = user_fixture()
-      %Dataset{} = dataset = root_dataset_fixture()
 
       params = %{
         name: "Some Pipeline",
         transforms: [
-          %{order_index: 0, driver: :slicer, options: %{}, input_id: dataset.id},
+          %{order_index: 0, driver: :slicer, options: %{}},
           %{order_index: 2, driver: :sample, options: %{}},
         ],
       }
@@ -133,7 +132,7 @@ defmodule Hyacinth.AssemblyTest do
     end
 
     test "error if inputs do not match outputs" do
-      user = user_fixture()
+      %User{} = user = user_fixture()
 
       params = %{
         name: "Some Pipeline",
@@ -157,12 +156,11 @@ defmodule Hyacinth.AssemblyTest do
 
     test "error if options are invalid" do
       %User{} = user = user_fixture()
-      %Dataset{} = dataset = root_dataset_fixture()
 
       params = %{
         name: "Some Pipeline",
         transforms: [
-          %{order_index: 0, driver: :slicer, options: %{orientation: "invalid value"}, input_id: dataset.id},
+          %{order_index: 0, driver: :slicer, options: %{orientation: "invalid value"}},
           %{order_index: 1, driver: :sample, options: %{}},
         ],
       }
