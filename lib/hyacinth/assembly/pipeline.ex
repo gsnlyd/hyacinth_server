@@ -55,11 +55,13 @@ defmodule Hyacinth.Assembly.Pipeline do
     |> Assembly.check_transform_formats()
     |> Enum.with_index()
     |> Enum.filter(&(elem(&1, 0) != nil))
-    |> Enum.map(fn {{expected, found}, i} ->
-      "Step #{i + 1} expected format #{expected}, got #{found}"
-    end)
-    |> Enum.reduce(changeset, fn error, %Ecto.Changeset{} = changeset ->
-      add_error(changeset, :transforms, error)
+    |> Enum.reduce(changeset, fn {{expected, found}, i}, %Ecto.Changeset{} = changeset ->
+      update_change(changeset, :transforms, fn transforms ->
+        List.update_at(transforms, i, fn transform_changeset ->
+          message = "requires format #{expected}, but previous step outputs #{found}"
+          add_error(transform_changeset, :driver, message)
+        end)
+      end)
     end)
   end
 end

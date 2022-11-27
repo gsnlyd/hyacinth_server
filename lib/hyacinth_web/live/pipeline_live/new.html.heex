@@ -75,7 +75,7 @@
                 <p>
                   <%= label ft, :driver %>
                   <%= select ft, :driver, Ecto.Enum.values(Transform, :driver) %>
-                  <%= error_tag ft, :driver %>
+                  <%= error_tag ft, :driver, always_show_errors: true %>
                 </p>
               </div>
               <div class="mt-5 pt-4 border-t-2 border-gray-700">

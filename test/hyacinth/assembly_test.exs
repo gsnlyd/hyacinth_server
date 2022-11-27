@@ -132,6 +132,29 @@ defmodule Hyacinth.AssemblyTest do
       assert changeset.errors == [transforms: {"can't be out of order", []}]
     end
 
+    test "error if inputs do not match outputs" do
+      user = user_fixture()
+
+      params = %{
+        name: "Some Pipeline",
+        transforms: [
+          %{order_index: 0, driver: :slicer, options: %{}},
+          %{order_index: 1, driver: :sample, options: %{}},
+          %{order_index: 2, driver: :dicom_to_nifti, options: %{}},
+        ]
+      }
+
+      {:error, %Ecto.Changeset{} = changeset} = Assembly.create_pipeline(user, params)
+      [tc1, tc2, tc3] = changeset.changes.transforms
+
+      assert changeset.valid? == false
+      assert tc1.valid? == true
+      assert tc2.valid? == true
+      assert tc3.valid? == false
+
+      assert tc3.errors == [driver: {"requires format dicom, but previous step outputs png", []}]
+    end
+
     test "error if options are invalid" do
       %User{} = user = user_fixture()
       %Dataset{} = dataset = root_dataset_fixture()

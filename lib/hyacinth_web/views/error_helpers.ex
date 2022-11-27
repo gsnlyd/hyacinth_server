@@ -7,12 +7,24 @@ defmodule HyacinthWeb.ErrorHelpers do
 
   @doc """
   Generates tag for inlined form input errors.
+
+  Options:
+
+    * `:always_show_errors`: If true, errors will be shown
+    even if a user has not yet modified the field.
+
+  ## Examples
+
+      iex> error_tag(some_form, :some_field)
+      iex> error_tag(some_form, :some_field, always_show_errors: true)
+
   """
-  def error_tag(form, field) do
+  @spec error_tag(%Phoenix.HTML.Form{}, atom, keyword) :: any
+  def error_tag(form, field, opts \\ []) when is_list(opts) do
     Enum.map(Keyword.get_values(form.errors, field), fn error ->
       content_tag(:span, translate_error(error),
         class: "invalid-feedback",
-        phx_feedback_for: input_name(form, field)
+        phx_feedback_for: unless(opts[:always_show_errors], do: input_name(form, field))
       )
     end)
   end
