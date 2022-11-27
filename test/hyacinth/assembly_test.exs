@@ -113,7 +113,7 @@ defmodule Hyacinth.AssemblyTest do
       }
 
       {:error, %Ecto.Changeset{} = changeset} = Assembly.create_pipeline(user, params)
-      assert changeset.errors == [transforms: {"can't be empty", []}]
+      assert changeset.errors == [transforms: {"can't be empty", [validation: :required]}]
     end
 
     test "error if transforms are out of order" do

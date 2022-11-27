@@ -23,20 +23,10 @@ defmodule Hyacinth.Assembly.Pipeline do
     pipeline
     |> cast(attrs, [:name])
     |> validate_required([:name])
-    |> cast_assoc(:transforms, with: &Transform.changeset/2)
+    |> cast_assoc(:transforms, with: &Transform.changeset/2, required: true, required_message: "can't be empty")
     |> validate_length(:name, min: 1, max: 30)
-    |> validate_transforms_not_empty()
     |> validate_transform_order()
     |> validate_transform_inputs_match_outputs()
-  end
-
-  defp validate_transforms_not_empty(%Ecto.Changeset{} = changeset) do
-    transforms = get_field(changeset, :transforms)
-    if length(transforms) == 0 do
-      add_error(changeset, :transforms, "can't be empty")
-    else
-      changeset
-    end
   end
 
   defp validate_transform_order(%Ecto.Changeset{} = changeset) do
