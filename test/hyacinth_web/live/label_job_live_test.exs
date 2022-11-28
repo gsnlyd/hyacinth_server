@@ -34,7 +34,7 @@ defmodule HyacinthWeb.LabelJobLiveTest do
       params = %{
         "dataset_id" => "1",
         "name" => "My New Job",
-        "label_type" => "classification",
+        "type" => "classification",
         "label_options_string" => "Label 1, Label 2, Label 3",
       }
 
@@ -53,14 +53,14 @@ defmodule HyacinthWeb.LabelJobLiveTest do
       params = %{
         "dataset_id" => "1",
         "name" => "My New Job",
-        "label_type" => "classification",
+        "type" => "classification",
         "label_options_string" => "Label 1, Label 2, Label 3",
       }
       assert {:error, {:live_redirect, %{kind: :push, to: "/jobs/1"}}} = render_change(view, :form_submit, %{"label_job" => params})
 
       [%LabelJob{} = job] = Labeling.list_label_jobs()
       assert job.name == "My New Job"
-      assert job.label_type == :classification
+      assert job.type == :classification
       assert job.label_options == ["Label 1", "Label 2", "Label 3"]
       assert job.dataset_id == 1
     end

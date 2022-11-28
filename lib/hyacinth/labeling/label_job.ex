@@ -8,7 +8,7 @@ defmodule Hyacinth.Labeling.LabelJob do
 
   schema "label_jobs" do
     field :name, :string
-    field :label_type, Ecto.Enum, values: [:classification, :comparison_exhaustive]
+    field :type, Ecto.Enum, values: [:classification, :comparison_exhaustive]
     field :label_options, {:array, :string}
 
     field :label_options_string, :string, virtual: true
@@ -24,8 +24,8 @@ defmodule Hyacinth.Labeling.LabelJob do
   @doc false
   def changeset(label_job, attrs) do
     label_job
-    |> cast(attrs, [:name, :label_type, :label_options_string, :dataset_id])
-    |> validate_required([:name, :label_type, :label_options_string, :dataset_id])
+    |> cast(attrs, [:name, :type, :label_options_string, :dataset_id])
+    |> validate_required([:name, :type, :label_options_string, :dataset_id])
     |> validate_length(:label_options_string, min: 1)
     |> parse_label_options_string()
   end

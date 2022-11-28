@@ -4,7 +4,7 @@ defmodule Hyacinth.Repo.Migrations.CreateLabelJobs do
   def change do
     create table(:label_jobs) do
       add :name, :string, null: false
-      add :label_type, :string, null: false
+      add :type, :string, null: false
       add :label_options, {:array, :string}, null: false
 
       add :dataset_id, references(:datasets, on_delete: :restrict, on_update: :restrict), null: false

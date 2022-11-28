@@ -14,7 +14,7 @@
   <div class="mt-2 flex justify-between items-start">
     <div class="flex items-center space-x-3">
       <h1><%= @job.name %></h1>
-      <%= case @job.label_type do %>
+      <%= case @job.type do %>
         <% :classification -> %>
           <div class="pill pill-lg pill-green">Classification Job</div>
         <% :comparison_exhaustive -> %>

@@ -33,9 +33,9 @@
       </p>
 
       <p>
-        <%= label f, :label_type %>
-        <%= select f, :label_type, Ecto.Enum.values(Hyacinth.Labeling.LabelJob, :label_type), prompt: "Choose a value" %>
-        <%= error_tag f, :label_type %>
+        <%= label f, :type %>
+        <%= select f, :type, Ecto.Enum.values(Hyacinth.Labeling.LabelJob, :type), prompt: "Choose a value" %>
+        <%= error_tag f, :type %>
       </p>
 
       <p>

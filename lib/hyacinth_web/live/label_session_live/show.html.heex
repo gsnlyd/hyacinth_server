@@ -19,7 +19,7 @@
       <div class="flex items-center space-x-3">
         <h1>Labeling Session</h1>
         <div class="mt-2">
-          <%= case @label_session.job.label_type do %>
+          <%= case @label_session.job.type do %>
             <% :classification -> %>
               <div class="pill pill-lg pill-green">Classification Session</div>
             <% :comparison_exhaustive -> %>

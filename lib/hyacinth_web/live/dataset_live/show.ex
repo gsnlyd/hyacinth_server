@@ -44,7 +44,7 @@ defmodule HyacinthWeb.DatasetLive.Show do
     %JobFilterForm{} = form = Ecto.Changeset.apply_changes(changeset)
 
     filter_func = fn %LabelJob{} = job ->
-      contains_search?(job.name, form.search) and value_matches?(job.label_type, form.type)
+      contains_search?(job.name, form.search) and value_matches?(job.type, form.type)
     end
 
     {sort_func, sorter} =

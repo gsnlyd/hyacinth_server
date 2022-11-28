@@ -68,7 +68,7 @@
           <div class="flex justify-between items-start space-x-4">
             <div class="shrink text-sm text-gray-300 font-medium"><%= job.name %></div>
             <div class="shrink-0">
-              <%= case job.label_type do %>
+              <%= case job.type do %>
               <% :classification -> %>
                 <div class="pill pill-green">Classification</div>
               <% :comparison_exhaustive -> %>

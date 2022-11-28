@@ -7,7 +7,7 @@ defmodule Hyacinth.LabelingTest do
 
   alias Hyacinth.Labeling.{LabelJob, LabelSession, LabelElement, LabelEntry}
 
-  @invalid_label_job_attrs %{name: nil, label_type: nil, label_options_string: nil, dataset_id: nil}
+  @invalid_label_job_attrs %{name: nil, type: nil, label_options_string: nil, dataset_id: nil}
 
   describe "list_label_jobs/0" do
     test "returns all label_jobs" do
@@ -68,13 +68,13 @@ defmodule Hyacinth.LabelingTest do
       dataset = root_dataset_fixture()
       valid_attrs = %{
         name: "some name",
-        label_type: :classification,
+        type: :classification,
         label_options_string: "option 1, option 2, option 3",
         dataset_id: dataset.id,
       }
 
       assert {:ok, %LabelJob{} = label_job} = Labeling.create_label_job(valid_attrs, user)
-      assert label_job.label_type == :classification
+      assert label_job.type == :classification
       assert label_job.name == "some name"
       assert label_job.label_options == ["option 1", "option 2", "option 3"]
     end
