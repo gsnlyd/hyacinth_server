@@ -1,15 +1,18 @@
 defmodule Hyacinth.Labeling.LabelJobType do
+  alias Hyacinth.Labeling.LabelJobType
+
   alias Hyacinth.Warehouse.Object
-  alias Hyacinth.Labeling.LabelJob
 
-  @callback name() :: atom()
+  @callback name() :: String.t
 
-  def name(%LabelJob{} = job), do: module_for(job).name()
+  @spec name(atom) :: String.t
+  def name(job_type), do: module_for(job_type).name()
 
   @callback group_objects([%Object{}]) :: [[%Object{}]]
 
-  def group_objects(%LabelJob{} = job, objects), do: module_for(job).group_objects(objects)
+  @spec group_objects(atom, [%Object{}]) :: [[%Object{}]]
+  def group_objects(job_type, objects), do: module_for(job_type).group_objects(objects)
 
-  defp module_for(%LabelJob{type: :classification}), do: Hyacinth.Labeling.LabelJobType.Classification
-  defp module_for(%LabelJob{type: :comparison_exhaustive}), do: Hyacinth.Labeling.LabelJobType.ComparisonExhaustive
+  defp module_for(:classification), do: LabelJobType.Classification
+  defp module_for(:comparison_exhaustive), do: LabelJobType.ComparisonExhaustive
 end

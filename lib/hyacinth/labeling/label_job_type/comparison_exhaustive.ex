@@ -4,7 +4,7 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonExhaustive do
   @behaviour LabelJobType
 
   @impl LabelJobType
-  def name, do: :comparison_exhaustive
+  def name, do: "Comparison (Exhaustive)"
 
   @impl LabelJobType
   def group_objects(objects) do

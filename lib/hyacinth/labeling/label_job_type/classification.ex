@@ -5,7 +5,7 @@ defmodule Hyacinth.Labeling.LabelJobType.Classification do
   @behaviour LabelJobType
 
   @impl LabelJobType
-  def name, do: :classification
+  def name, do: "Classification"
 
   @impl LabelJobType
   def group_objects(objects) do
