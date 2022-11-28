@@ -1,12 +1,12 @@
-defmodule Hyacinth.Labeling.LabelType.ComparisonExhaustive do
-  alias Hyacinth.Labeling.LabelType
+defmodule Hyacinth.Labeling.LabelJobType.ComparisonExhaustive do
+  alias Hyacinth.Labeling.LabelJobType
 
-  @behaviour LabelType
+  @behaviour LabelJobType
 
-  @impl LabelType
+  @impl LabelJobType
   def name, do: :comparison_exhaustive
 
-  @impl LabelType
+  @impl LabelJobType
   def group_objects(objects) do
     combinations(objects)
   end

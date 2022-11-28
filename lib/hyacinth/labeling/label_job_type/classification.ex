@@ -1,13 +1,13 @@
-defmodule Hyacinth.Labeling.LabelType.Classification do
-  alias Hyacinth.Labeling.LabelType
+defmodule Hyacinth.Labeling.LabelJobType.Classification do
+  alias Hyacinth.Labeling.LabelJobType
   alias Hyacinth.Warehouse.Object
 
-  @behaviour LabelType
+  @behaviour LabelJobType
 
-  @impl LabelType
+  @impl LabelJobType
   def name, do: :classification
 
-  @impl LabelType
+  @impl LabelJobType
   def group_objects(objects) do
     Enum.map(objects, fn %Object{} = o ->
       [o]
