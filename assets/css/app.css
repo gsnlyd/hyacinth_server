@@ -37,6 +37,9 @@ h3 {
 .btn-xl {
     @apply text-lg px-6 py-3;
 }
+.btn-jumbo {
+    @apply py-2 w-full text-lg flex justify-center items-center;
+}
 
 .btn-round {
     @apply p-0 rounded-full flex justify-center items-center;
@@ -187,6 +190,16 @@ h3 {
 
 .form-content button[type='submit'] {
     @apply mt-4 btn btn-blue;
+}
+
+.form-wide p {
+    @apply w-full;
+}
+
+.form-wide input[type="text"],
+.form-wide input[type="number"],
+.form-wide input[type="password"] {
+    @apply w-full;
 }
 
 /* Filter/Sort Forms */

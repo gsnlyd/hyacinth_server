@@ -75,7 +75,7 @@ defmodule HyacinthWeb.PipelineLiveTest do
 
       html = render(view)
       assert html =~ ~s(<option selected="selected" value="sample">)
-      assert html =~ "Object count:</span><span>9876</span>"
+      assert html =~ "9876"
 
       params = %{
         "name" => "",
@@ -87,7 +87,7 @@ defmodule HyacinthWeb.PipelineLiveTest do
 
       assert html =~ ~s(<option selected="selected" value="dicom_to_nifti">)
       refute html =~ ~s(<option selected="selected" value="sample">)
-      refute html =~ "Object count:</span><span>9876</span>"
+      refute html =~ "9876"
       refute html =~ "Object count"
     end
 
@@ -194,7 +194,7 @@ defmodule HyacinthWeb.PipelineLiveTest do
       _html = render_click(view, :add_transform, %{})
       html = render_click(view, :edit_transform_options, %{"index" => "0"})
 
-      refute html =~ "Object count:</span><span>9876</span>"
+      refute html =~ "9876"
 
       view
       |> element("#transform-options-modal-form")
@@ -207,7 +207,7 @@ defmodule HyacinthWeb.PipelineLiveTest do
       # and this is not reflected immediately in the html
       # received from render_submit/2
       html = render(view)
-      assert html =~ "Object count:</span><span>9876</span>"
+      assert html =~ "9876"
     end
 
     @tag :disable_login

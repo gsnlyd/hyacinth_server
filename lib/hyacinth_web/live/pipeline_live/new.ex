@@ -16,6 +16,30 @@ defmodule HyacinthWeb.PipelineLive.New do
     {:ok, socket}
   end
 
+  def driver_format_tags(assigns) do
+    assigns = assign_new(assigns, :light, fn -> false end)
+    assigns =
+      if Driver.pure?(assigns.driver) do
+        assign(assigns, %{
+          input_format: :any,
+          output_format: :any,
+        })
+      else
+        assign(assigns, %{
+          input_format: Driver.input_format(assigns.driver, assigns.options),
+          output_format: Driver.output_format(assigns.driver, assigns.options),
+        })
+      end
+
+    ~H"""
+    <div class="flex items-center space-x-1">
+      <span class={["tag", @light && "tag-light"]}><%= @input_format %></span>
+      <span class="text-xs text-gray-400">&rarr;</span>
+      <span class={["tag", @light && "tag-light"]}><%= @output_format %></span>
+    </div>
+    """
+  end
+
   @spec inject_options(%{String.t => term}, [{atom, map}]) :: {%{String.t => term}, [{atom, map}]}
   defp inject_options(transforms_params, options_params) do
     # This function injects options params into transform params
