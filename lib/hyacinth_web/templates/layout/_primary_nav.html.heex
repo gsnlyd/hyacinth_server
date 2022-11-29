@@ -1,7 +1,27 @@
 <nav class="py-2 bg-gray-800">
   <div class="mx-auto max-w-screen-lg flex justify-between items-center">
-    <div>
-      <%= link "Hyacinth", to: Routes.page_path(assigns[:conn] || assigns[:socket], :index), class: "text-2xl text-white hover:text-gray-300 hover:no-underline font-medium" %>
+    <div class="flex items-center space-x-8">
+      <div>
+        <%= link "Hyacinth",
+          to: Routes.page_path(assigns[:conn] || assigns[:socket], :index),
+          class: "text-xl text-gray-100 hover:text-gray-300 hover:no-underline font-semibold transition"
+        %>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <%= live_redirect "Datasets",
+          to: Routes.live_path(assigns[:conn] || assigns[:socket], HyacinthWeb.DatasetLive.Index),
+          class: "px-2 py-0.5 text-gray-400 hover:text-black hover:bg-blue-200 active:bg-blue-300 rounded"
+        %>
+        <%= live_redirect "Pipelines",
+          to: Routes.live_path(assigns[:conn] || assigns[:socket], HyacinthWeb.PipelineLive.Index),
+          class: "px-2 py-0.5 text-gray-400 hover:text-black hover:bg-blue-200 active:bg-blue-300 rounded"
+        %>
+        <%= live_redirect "Labeling Jobs",
+          to: Routes.live_path(assigns[:conn] || assigns[:socket], HyacinthWeb.DatasetLive.Index),
+          class: "px-2 py-0.5 text-gray-400 hover:text-black hover:bg-blue-200 active:bg-blue-300 rounded"
+        %>
+      </div>
     </div>
 
     <div>
