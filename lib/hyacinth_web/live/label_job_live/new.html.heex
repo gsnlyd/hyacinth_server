@@ -18,35 +18,83 @@
 </header>
 
 <main class="mt-2">
-  <.form let={f} for={@changeset} phx-change="form_change" phx-submit="form_submit">
-    <div class="form-content">
-      <p>
-        <%= label f, :dataset_id %>
-        <%= select f, :dataset_id, Enum.map(@datasets, fn d -> {d.name, d.id} end), prompt: "Choose a value" %>
-        <%= error_tag f, :dataset_id %>
-      </p>
+  <div>
+    <.form let={f} for={@changeset} phx-change="form_change" phx-submit="form_submit">
+      <div class="flex">
+        <div class="card w-2/3">
+          <div class="form-content form-wide">
+            <p>
+              <%= label f, :dataset_id %>
+              <%= select f, :dataset_id, Enum.map(@datasets, fn d -> {d.name, d.id} end), prompt: "Choose a value" %>
+              <%= error_tag f, :dataset_id %>
+            </p>
 
-      <p>
-        <%= label f, :name %>
-        <%= text_input f, :name, placeholder: "Job name" %>
-        <%= error_tag f, :name %>
-      </p>
+            <p>
+              <%= label f, :name %>
+              <%= text_input f, :name, placeholder: "Job name" %>
+              <%= error_tag f, :name %>
+            </p>
 
-      <p>
-        <%= label f, :type %>
-        <%= select f, :type, Ecto.Enum.values(Hyacinth.Labeling.LabelJob, :type), prompt: "Choose a value" %>
-        <%= error_tag f, :type %>
-      </p>
+            <p>
+              <%= label f, :type %>
+              <%= select f, :type, Ecto.Enum.values(Hyacinth.Labeling.LabelJob, :type) %>
+              <%= error_tag f, :type %>
+            </p>
 
-      <p>
-        <%= label f, :label_options_string %>
-        <%= text_input f, :label_options_string, placeholder: "Label1, Label2" %>
-        <%= error_tag f, :label_options_string %>
-      </p>
+            <p>
+              <%= label f, :label_options_string %>
+              <%= text_input f, :label_options_string, placeholder: "Label1, Label2" %>
+              <%= error_tag f, :label_options_string %>
+            </p>
+
+            <div>
+              <%= submit "Create Job" %>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <div class="flex items-center space-x-1">
+              <div class="text-gray-300">Options for <%= LabelJobType.name(Ecto.Changeset.get_field(@changeset, :type)) %></div>
+              <button
+                type="button"
+                class="p-0.5 text-blue-400 hover:text-blue-500 rounded focus:outline-none focus:ring-2 ring-blue-400 focus:hover:ring-blue-500 transition"
+                phx-click="edit_job_type_options"
+              >
+                <Icons.pencil_square_mini />
+              </button>
+            </div>
+
+            <table class="mt-1 text-sm">
+              <tbody>
+                <%= for {k, v} <- @options_params do %>
+                  <tr>
+                    <td class="pr-1 text-gray-400"><%= humanize(k) %></td>
+                    <td><%= v %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </.form>
+  </div>
+</main>
+
+<div>
+  <%= case @modal do %>
+  <% {:job_type_options, options_changeset} -> %>
+    <.modal size="sm">
+      <:header>Options for <%= LabelJobType.name(Ecto.Changeset.get_field(@changeset, :type)) %></:header>
 
       <div>
-        <%= submit "Create Job" %>
+        <.form let={f} for={options_changeset} as="options" phx-change="options_form_change" phx-submit="options_form_submit">
+          <LabelJobType.render_form job_type={Ecto.Changeset.get_field(@changeset, :type)} form={f} />
+          <%= submit "Save", class: "mt-6 btn btn-blue" %>
+        </.form>
       </div>
-    </div>
-  </.form>
-</main>
+    </.modal>
+  <% nil -> %>
+  <% end %>
+</div>

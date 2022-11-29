@@ -8,7 +8,7 @@ defmodule Hyacinth.Labeling.LabelJob do
 
   schema "label_jobs" do
     field :name, :string
-    field :type, Ecto.Enum, values: [:classification, :comparison_exhaustive]
+    field :type, Ecto.Enum, values: [:classification, :comparison_exhaustive], default: :classification
     field :label_options, {:array, :string}
 
     field :label_options_string, :string, virtual: true

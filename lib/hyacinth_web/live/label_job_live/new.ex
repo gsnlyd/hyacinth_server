@@ -2,7 +2,7 @@ defmodule HyacinthWeb.LabelJobLive.New do
   use HyacinthWeb, :live_view
 
   alias Hyacinth.{Warehouse, Labeling}
-  alias Hyacinth.Labeling.{LabelJob}
+  alias Hyacinth.Labeling.{LabelJob, LabelJobType}
 
   def mount(params, _session, socket) do
     dataset = if params["dataset"], do: Warehouse.get_dataset!(params["dataset"]), else: nil
@@ -11,6 +11,10 @@ defmodule HyacinthWeb.LabelJobLive.New do
       dataset: dataset,
       datasets: Warehouse.list_datasets(),
       changeset: LabelJob.changeset(%LabelJob{dataset_id: if(dataset, do: dataset.id, else: nil)}, %{}),
+
+      options_params: %{},
+
+      modal: nil,
     })
     {:ok, socket}
   end
@@ -34,5 +38,48 @@ defmodule HyacinthWeb.LabelJobLive.New do
         socket = assign(socket, :changeset, changeset)
         {:noreply, socket}
     end
+  end
+
+  def handle_event("options_form_change", %{"options" => params}, socket) do
+    options_changeset =
+      socket.assigns.changeset
+      |> Ecto.Changeset.get_field(:type)
+      |> LabelJobType.options_changeset(params)
+      |> Map.put(:action, :insert)
+
+    {:noreply, assign(socket, :modal, {:job_type_options, options_changeset})}
+  end
+
+  def handle_event("options_form_submit", %{"options" => params}, socket) do
+    options_changeset =
+      socket.assigns.changeset
+      |> Ecto.Changeset.get_field(:type)
+      |> LabelJobType.options_changeset(params)
+
+    case Ecto.Changeset.apply_action(options_changeset, :insert) do
+      {:ok, schema} ->
+        schema_params = Map.from_struct(schema)
+        socket = assign(socket, %{
+          options_params: schema_params,
+          modal: nil,
+        })
+
+        {:noreply, socket}
+
+      {:error, %Ecto.Changeset{} = options_changeset} ->
+        {:noreply, assign(socket, :modal, {:job_type_options, options_changeset})}
+    end
+  end
+
+  def handle_event("edit_job_type_options", _params, socket) do
+    options_changeset =
+      socket.assigns.changeset
+      |> Ecto.Changeset.get_field(:type)
+      |> LabelJobType.options_changeset(socket.assigns.options_params)
+    {:noreply, assign(socket, :modal, {:job_type_options, options_changeset})}
+  end
+
+  def handle_event("close_modal", _params, socket) do
+    {:noreply, assign(socket, :modal, nil)}
   end
 end
