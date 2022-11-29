@@ -3,17 +3,39 @@
     <div>
       <%= link "Hyacinth", to: Routes.page_path(assigns[:conn] || assigns[:socket], :index), class: "text-2xl text-white hover:text-gray-300 hover:no-underline font-medium" %>
     </div>
+
     <div>
-      <ul class="flex items-center space-x-4">
-        <%= if @current_user do %>
-          <li><%= @current_user.email %></li>
-          <li><%= link "Settings", to: Routes.user_settings_path(assigns[:conn] || assigns[:socket], :edit), class: "link" %></li>
-          <li><%= link "Log out", to: Routes.user_session_path(assigns[:conn] || assigns[:socket], :delete), method: :delete, class: "link" %></li>
-        <% else %>
-          <li><%= link "Register", to: Routes.user_registration_path(assigns[:conn] || assigns[:socket], :new), class: "link" %></li>
-          <li><%= link "Log in", to: Routes.user_session_path(assigns[:conn] || assigns[:socket], :new), class: "link" %></li>
-        <% end %>
-      </ul>
+      <%= if @current_user do %>
+        <div class="group relative bg-gray-900 rounded shadow">
+          <div class="px-2 py-1 text-sm text-gray-400 group-hover:text-gray-300 font-medium"><%= @current_user.email %></div>
+
+          <div class="absolute hidden group-hover:block w-full">
+            <div class="mt-1 text-sm text-gray-400 font-medium bg-gray-800 border border-gray-700 rounded shadow flex flex-col">
+
+              <%= link to: Routes.user_settings_path(assigns[:conn] || assigns[:socket], :edit) do %>
+                <div class="px-2 py-1 hover:text-gray-300 hover:bg-gray-700 flex items-center space-x-2">
+                  <span class="opacity-50"><HyacinthWeb.Components.Icons.user_circle_mini /></span>
+                  <span>Settings</span>
+                </div>
+              <% end %>
+
+              <%= link to: Routes.user_session_path(assigns[:conn] || assigns[:socket], :delete), method: :delete do %>
+                <div class="px-2 py-1 hover:text-gray-300 hover:bg-gray-700 flex items-center space-x-2">
+                  <span class="opacity-50"><HyacinthWeb.Components.Icons.pencil_square_mini /></span>
+                  <span>Log Out</span>
+                </div>
+              <% end %>
+
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="flex space-x-4">
+          <%= link "Register", to: Routes.user_registration_path(assigns[:conn] || assigns[:socket], :new), class: "link" %>
+          <%= link "Log in", to: Routes.user_session_path(assigns[:conn] || assigns[:socket], :new), class: "link" %>
+        </div>
+      <% end %>
     </div>
+
   </div>
 </nav>
