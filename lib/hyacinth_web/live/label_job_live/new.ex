@@ -29,6 +29,7 @@ defmodule HyacinthWeb.LabelJobLive.New do
   end
 
   def handle_event("form_submit", %{"label_job" => params}, socket) do
+    params = Map.put(params, "options", %{})  # TODO: inject real options_params
     case Labeling.create_label_job(params, socket.assigns.current_user) do
       {:ok, %LabelJob{} = job} ->
         socket = push_redirect(socket, to: Routes.live_path(socket, HyacinthWeb.LabelJobLive.Show, job))

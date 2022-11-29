@@ -68,8 +68,9 @@ defmodule Hyacinth.LabelingTest do
       dataset = root_dataset_fixture()
       valid_attrs = %{
         name: "some name",
-        type: :classification,
         label_options_string: "option 1, option 2, option 3",
+        type: :classification,
+        options: %{},
         dataset_id: dataset.id,
       }
 
