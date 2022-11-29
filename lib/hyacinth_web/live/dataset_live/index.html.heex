@@ -30,28 +30,28 @@
 <main class="mt-6">
   <div class="grid grid-cols-3 gap-4">
     <%= for {dataset, object_count, job_count} <- filter_datasets(@datasets, @dataset_filter_changeset) do %>
-      <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, dataset),
-          class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
-        <div class="flex justify-between items-start space-x-4">
-          <div class="shrink text-sm text-gray-300 font-medium"><%= dataset.name %></div>
-          <div class="shrink-0">
-            <%= case dataset.type do %>
-            <% :root -> %>
-              <div class="pill pill-violet">Root Dataset</div>
-            <% :derived -> %>
-              <div class="pill pill-orange">Derived Dataset</div>
-            <% end %>
+      <.link_card to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, dataset)}>
+        <:header><%= dataset.name %></:header>
+
+        <:tag>
+          <%= case dataset.type do %>
+          <% :root -> %>
+            <div class="pill pill-violet">Root Dataset</div>
+          <% :derived -> %>
+            <div class="pill pill-orange">Derived Dataset</div>
+          <% end %>
+        </:tag>
+
+        <:body>
+          <div class="text-gray-400">
+            <span><%= object_count %> objects</span>
+            &bull;
+            <span><%= job_count %> jobs</span>
           </div>
-        </div>
-        <div class="text-gray-400">
-          <span><%= object_count %> objects</span>
-          &bull;
-          <span><%= job_count %> jobs</span>
-        </div>
-        <div class="mt-2">
-          <div class="text-gray-500 text-xs">Created <%= Calendar.strftime(dataset.inserted_at, "%c") %></div>
-        </div>
-      <% end %>
+        </:body>
+
+        <:footer>Created <%= Calendar.strftime(dataset.inserted_at, "%c") %></:footer>
+      </.link_card>
     <% end %>
   </div>
 </main>

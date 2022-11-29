@@ -65,4 +65,32 @@ defmodule HyacinthWeb.Components.BasicComponents do
     </div>
     """
   end
+
+  def link_card(assigns) do
+    assigns =
+      assigns
+      |> assign_new(:tag, fn -> nil end)
+      |> assign_new(:body, fn -> nil end)
+
+    ~H"""
+    <%= live_redirect to: @to, class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
+      <div class="flex justify-between items-start">
+        <div class="shrink text-sm text-gray-300 font-medium"><%= render_slot(@header) %></div>
+        <%= if @tag do %>
+          <div class="ml-4">
+            <%= render_slot(@tag) %>
+          </div>
+        <% end %>
+      </div>
+
+      <div>
+        <%= if @body do %>
+          <%= render_slot(@body) %>
+        <% end %>
+      </div>
+
+      <div class="mt-2 text-xs text-gray-500"><%= render_slot(@footer) %></div>
+    <% end %>
+    """
+  end
 end

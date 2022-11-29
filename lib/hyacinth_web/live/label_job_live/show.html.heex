@@ -65,36 +65,36 @@
     </div>
     <div class="mt-4 grid grid-cols-3 gap-4">
       <%= for {sess, elements_labeled} <- filter_sessions(@sessions, @session_filter_changeset) do %>
-        <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, sess),
-            class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
-          <div class="flex justify-between items-center">
-            <div class="shrink text-sm text-gray-300 font-medium"><%= sess.user.email %></div>
+        <.link_card to={Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, sess)}>
+          <:header><%= sess.user.email %></:header>
+
+          <:tag>
             <%= if elements_labeled < length(@job.blueprint.elements) do %>
               <div class="pill pill-yellow">In Progress</div>
             <% else %>
               <div class="pill pill-green">Complete</div>
             <% end %>
-          </div>
+          </:tag>
 
-          <div class="mt-2 flex items-center space-x-2">
-            <div class="flex-1 h-1.5 bg-gray-600 rounded-full">
-              <div
-                class={["h-full rounded-full bg-opacity-70", if(elements_labeled < length(@job.blueprint.elements), do: "bg-yellow-400", else: "bg-green-400")]}
-                style={"width: #{if(elements_labeled == 0, do: 0, else: (elements_labeled / (length(@job.blueprint.elements)) * 100))}%"}
-              />
+          <:body>
+            <div class="mt-2 flex items-center space-x-2">
+              <div class="flex-1 h-1.5 bg-gray-600 rounded-full">
+                <div
+                  class={["h-full rounded-full bg-opacity-70", if(elements_labeled < length(@job.blueprint.elements), do: "bg-yellow-400", else: "bg-green-400")]}
+                  style={"width: #{if(elements_labeled == 0, do: 0, else: (elements_labeled / (length(@job.blueprint.elements)) * 100))}%"}
+                />
+              </div>
+
+              <div class="text-sm text-gray-400 font-medium">
+                <span><%= elements_labeled %></span>
+                <span>/</span>
+                <span><%= length(@job.blueprint.elements) %></span>
+              </div>
             </div>
+          </:body>
 
-            <div class="text-sm text-gray-400 font-medium">
-              <span><%= elements_labeled %></span>
-              <span>/</span>
-              <span><%= length(@job.blueprint.elements) %></span>
-            </div>
-          </div>
-
-          <div class="mt-2">
-            <div class="text-gray-500 text-xs">Created <%= Calendar.strftime(sess.inserted_at, "%c") %></div>
-          </div>
-        <% end %>
+          <:footer>Created <%= Calendar.strftime(sess.inserted_at, "%c") %></:footer>
+        </.link_card>
       <% end %>
     </div>
 

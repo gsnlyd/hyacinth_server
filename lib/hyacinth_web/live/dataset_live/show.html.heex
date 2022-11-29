@@ -63,23 +63,19 @@
     </div>
     <div class="mt-4 grid grid-cols-3 gap-4">
       <%= for %LabelJob{} = job <- filter_jobs(@jobs, @job_filter_changeset) do %>
-        <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelJobLive.Show, job),
-            class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
-          <div class="flex justify-between items-start space-x-4">
-            <div class="shrink text-sm text-gray-300 font-medium"><%= job.name %></div>
-            <div class="shrink-0">
-              <%= case job.type do %>
-              <% :classification -> %>
-                <div class="pill pill-green">Classification</div>
-              <% :comparison_exhaustive -> %>
-                <div class="pill pill-blue">Comparison</div>
-              <% end %>
-            </div>
-          </div>
-          <div class="mt-2">
-            <div class="text-gray-500 text-xs">Created <%= Calendar.strftime(job.inserted_at, "%c") %></div>
-          </div>
-        <% end %>
+        <.link_card to={Routes.live_path(@socket, HyacinthWeb.LabelJobLive.Show, job)}>
+          <:header><%= job.name %></:header>
+          <:tag>
+            <%= case job.type do %>
+            <% :classification -> %>
+              <div class="pill pill-green">Classification</div>
+            <% :comparison_exhaustive -> %>
+              <div class="pill pill-blue">Comparison</div>
+            <% end %>
+          </:tag>
+
+          <:footer>Created <%= Calendar.strftime(job.inserted_at, "%c") %></:footer>
+        </.link_card>
       <% end %>
     </div>
 
