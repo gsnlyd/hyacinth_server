@@ -20,6 +20,7 @@ defmodule HyacinthWeb.LabelJobLive.New do
   end
 
   def handle_event("form_change", %{"label_job" => params}, socket) do
+    params = Map.put(params, "options", socket.assigns.options_params)
     changeset =
       %LabelJob{}
       |> LabelJob.changeset(params)
@@ -29,7 +30,7 @@ defmodule HyacinthWeb.LabelJobLive.New do
   end
 
   def handle_event("form_submit", %{"label_job" => params}, socket) do
-    params = Map.put(params, "options", %{})  # TODO: inject real options_params
+    params = Map.put(params, "options", socket.assigns.options_params)
     case Labeling.create_label_job(params, socket.assigns.current_user) do
       {:ok, %LabelJob{} = job} ->
         socket = push_redirect(socket, to: Routes.live_path(socket, HyacinthWeb.LabelJobLive.Show, job))
@@ -59,9 +60,17 @@ defmodule HyacinthWeb.LabelJobLive.New do
 
     case Ecto.Changeset.apply_action(options_changeset, :insert) do
       {:ok, schema} ->
-        schema_params = Map.from_struct(schema)
+        validated_options = Map.from_struct(schema)
+
+        new_job_params = Map.put(socket.assigns.changeset.params, "options", validated_options)
+        changeset =
+          %LabelJob{}
+          |> LabelJob.changeset(new_job_params)
+          |> Map.put(:action, :insert)
+
         socket = assign(socket, %{
-          options_params: schema_params,
+          changeset: changeset,
+          options_params: validated_options,
           modal: nil,
         })
 

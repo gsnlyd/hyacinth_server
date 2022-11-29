@@ -68,16 +68,21 @@ defmodule Hyacinth.LabelingTest do
       dataset = root_dataset_fixture()
       valid_attrs = %{
         name: "some name",
+        description: "some description",
+        prompt: "some prompt",
         label_options_string: "option 1, option 2, option 3",
         type: :classification,
-        options: %{},
+        options: %{"randomize" => "false", "random_seed" => "9876"},
         dataset_id: dataset.id,
       }
 
       assert {:ok, %LabelJob{} = label_job} = Labeling.create_label_job(valid_attrs, user)
-      assert label_job.type == :classification
       assert label_job.name == "some name"
+      assert label_job.description == "some description"
+      assert label_job.prompt == "some prompt"
       assert label_job.label_options == ["option 1", "option 2", "option 3"]
+      assert label_job.type == :classification
+      assert label_job.options == %{"randomize" => false, "random_seed" => 9876}
     end
 
     test "with invalid data returns error changeset" do

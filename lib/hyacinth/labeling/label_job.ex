@@ -4,7 +4,7 @@ defmodule Hyacinth.Labeling.LabelJob do
 
   alias Hyacinth.Accounts.User
   alias Hyacinth.Warehouse.Dataset
-  alias Hyacinth.Labeling.LabelSession
+  alias Hyacinth.Labeling.{LabelSession, LabelJobType}
 
   schema "label_jobs" do
     field :name, :string
@@ -14,7 +14,7 @@ defmodule Hyacinth.Labeling.LabelJob do
     field :label_options, {:array, :string}
 
     field :type, Ecto.Enum, values: [:classification, :comparison_exhaustive], default: :classification
-    field :options, :map
+    field :options, :map, default: %{}
 
     field :label_options_string, :string, virtual: true
 
@@ -33,10 +33,10 @@ defmodule Hyacinth.Labeling.LabelJob do
     |> validate_required([:name, :label_options_string, :type, :options, :dataset_id])
     |> validate_length(:label_options_string, min: 1)
     |> parse_label_options_string()
+    |> validate_job_type_options()
   end
 
   def parse_label_options_string(%Ecto.Changeset{} = changeset) do
-
     if changeset.valid? do
       label_options_string = get_change(changeset, :label_options_string)
 
@@ -50,6 +50,26 @@ defmodule Hyacinth.Labeling.LabelJob do
       |> delete_change(:label_options_string)
     else
       changeset
+    end
+  end
+
+  defp validate_job_type_options(%Ecto.Changeset{} = changeset) do
+    job_type = get_field(changeset, :type)
+    options_params = get_field(changeset, :options)
+
+    options_changeset = LabelJobType.options_changeset(job_type, options_params)
+    if options_changeset.valid? do
+      validated_options =
+        options_changeset
+        |> Ecto.Changeset.apply_action!(:insert)
+        |> Map.from_struct()
+        |> Map.new(fn {k, v} -> {Atom.to_string(k), v} end)
+
+        put_change(changeset, :options, validated_options)
+    else
+      message = "not valid for type %{job_type}"
+      keys = [job_type: job_type]
+      add_error(changeset, :options, message, keys)
     end
   end
 end
