@@ -2,9 +2,9 @@
   <div class="mx-auto max-w-screen-lg flex justify-between items-center">
     <div class="flex items-center space-x-8">
       <div>
-        <%= link "Hyacinth",
-          to: Routes.page_path(assigns[:conn] || assigns[:socket], :index),
-          class: "text-xl text-gray-100 hover:text-gray-300 hover:no-underline font-semibold transition"
+        <%= live_redirect "Hyacinth",
+          to: Routes.live_path(assigns[:conn] || assigns[:socket], HyacinthWeb.HomeLive.Index),
+          class: "text-xl text-gray-100 hover:text-gray-300 hover:no-underline font-semibold"
         %>
       </div>
 
@@ -42,7 +42,7 @@
               <%= link to: Routes.user_session_path(assigns[:conn] || assigns[:socket], :delete), method: :delete do %>
                 <div class="px-2 py-1 hover:text-gray-300 hover:bg-gray-700 flex items-center space-x-2">
                   <span class="opacity-50"><HyacinthWeb.Components.Icons.pencil_square_mini /></span>
-                  <span>Log Out</span>
+                  <span>Log out</span>
                 </div>
               <% end %>
 

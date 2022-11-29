@@ -20,8 +20,6 @@ defmodule HyacinthWeb.Router do
   scope "/", HyacinthWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
-
     get "/jobs/:label_job_id/sessions/new", LabelSessionController, :new
 
     get "/object-image/:object_id", ImageController, :show
@@ -30,6 +28,8 @@ defmodule HyacinthWeb.Router do
   live_session :authenticated, on_mount: {HyacinthWeb.UserLiveAuth, :user} do
     scope "/", HyacinthWeb do
       pipe_through [:browser, :require_authenticated_user]
+
+      live "/", HomeLive.Index
 
       live "/datasets", DatasetLive.Index
       live "/datasets/:dataset_id", DatasetLive.Show
