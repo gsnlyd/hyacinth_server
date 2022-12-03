@@ -32,29 +32,32 @@
 <main class="mt-4">
   <div class="grid grid-cols-3 gap-4">
     <%= for pipeline <- filter_pipelines(@pipelines, @pipeline_filter_changeset) do %>
-      <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.PipelineLive.Show, pipeline), class: "card link-card" do %>
-        <div class="flex justify-between items-start space-x-4">
-          <div class="shrink text-sm text-gray-300 font-medium"><%= pipeline.name %></div>
+      <.link_card to={Routes.live_path(@socket, HyacinthWeb.PipelineLive.Show, pipeline)}>
+        <:header><%= pipeline.name %></:header>
+
+        <:tag>
           <%= if Enum.any?(pipeline.runs, &(&1.status == :running)) do %>
             <div class="pill pill-yellow">Running</div>
           <% else %>
             <div class="pill pill-green"><%= length(pipeline.runs) %> runs</div>
           <% end %>
-        </div>
-        <div class="mt-2 text-xs text-gray-400">
-          <%= for {transform, i} <- Enum.with_index(pipeline.transforms) do %>
-            <span>
-              <%= if i > 0 do %>
-                <span>&rarr;</span>
-              <% end %>
-              <span><%= transform.driver %></span>
-            </span>
-          <% end %>
-        </div>
-        <div class="mt-2">
-          <div class="text-gray-500 text-xs">Created <%= Calendar.strftime(pipeline.inserted_at, "%c") %></div>
-        </div>
-      <% end %>
+        </:tag>
+
+        <:body>
+          <div class="mt-1 text-xs text-gray-400">
+            <%= for {transform, i} <- Enum.with_index(pipeline.transforms) do %>
+              <span>
+                <%= if i > 0 do %>
+                  <span>&rarr;</span>
+                <% end %>
+                <span><%= transform.driver %></span>
+              </span>
+            <% end %>
+          </div>
+        </:body>
+
+        <:footer>Created <%= Calendar.strftime(pipeline.inserted_at, "%c") %></:footer>
+      </.link_card>
     <% end %>
   </div>
 </main>

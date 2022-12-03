@@ -56,66 +56,67 @@
 
       <div class="mt-4 grid grid-cols-3 gap-4">
         <%= for %PipelineRun{} = run <- filter_runs(@pipeline.runs, @run_filter_changeset) do %>
-          <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.PipelineRunLive.Show, run),
-              class: "p-2 bg-gray-800 rounded border border-gray-700 hover:border-gray-500 transition" do %>
-            <div class="flex justify-between items-start space-x-4">
-              <div class="shrink">
-                <span class="px-1 py-0.5 text-xs text-gray-400 bg-gray-700 rounded">Input</span>
-                <span class="text-sm text-gray-300 font-medium"><%= hd(run.transform_runs).input.name %></span>
-              </div>
-              <div class="shrink-0">
-                <%= case run.status do %>
-                <% :running -> %>
-                  <div class="pill pill-yellow">Running</div>
-                <% :complete -> %>
-                  <div class="pill pill-green">Complete</div>
+          <.link_card to={Routes.live_path(@socket, HyacinthWeb.PipelineRunLive.Show, run)}>
+            <:header>
+              <span class="px-1 py-0.5 text-xs text-gray-400 bg-gray-700 rounded">Input</span>
+              <span class="text-sm text-gray-300 font-medium"><%= hd(run.transform_runs).input.name %></span>
+            </:header>
+
+            <:tag>
+              <%= case run.status do %>
+              <% :running -> %>
+                <div class="pill pill-yellow">Running</div>
+              <% :complete -> %>
+                <div class="pill pill-green">Complete</div>
+              <% end %>
+            </:tag>
+
+            <:body>
+              <div class="mt-1 text-sm text-gray-400 flex items-center">
+                <div class="text-sm">
+                  <span class="text-gray-500">Ran by</span>
+                  <span><%= run.ran_by.email %></span>
+                </div>
+                <%= if run.completed_at do %>
+                  <div class="mx-1">&bull;</div>
+                  <div><%= format_time(DateTime.diff(run.completed_at, run.inserted_at)) %></div>
                 <% end %>
               </div>
-            </div>
 
-            <div class="mt-1 text-sm text-gray-400 flex items-center">
-              <div class="text-sm">
-                <span class="text-gray-500">Ran by</span>
-                <span><%= run.ran_by.email %></span>
-              </div>
-              <%= if run.completed_at do %>
-                <div class="mx-1">&bull;</div>
-                <div><%= format_time(DateTime.diff(run.completed_at, run.inserted_at)) %></div>
-              <% end %>
-            </div>
 
-            <div class="mt-2 text-sm text-gray-400">
-              <%= for tr <- run.transform_runs do %>
-                <div class="flex items-center space-x-1">
-                  <div>
-                    <%= case tr.status do %>
-                    <% :waiting -> %>
-                      <div class="text-gray-500 opacity-60">
-                        <Icons.minus_circle_mini />
-                      </div>
-                    <% :running -> %>
-                      <div class="text-yellow-400 animate-spin">
-                        <Icons.refresh_mini />
-                      </div>
-                    <% :complete -> %>
-                      <div class="text-green-400 opacity-60">
-                        <Icons.check_circle_mini />
-                      </div>
-                    <% end %>
+              <div class="mt-2 text-sm text-gray-400">
+                <%= for tr <- run.transform_runs do %>
+                  <div class="flex items-center space-x-1">
+                    <div>
+                      <%= case tr.status do %>
+                      <% :waiting -> %>
+                        <div class="text-gray-500 opacity-60">
+                          <Icons.minus_circle_mini />
+                        </div>
+                      <% :running -> %>
+                        <div class="text-yellow-400 animate-spin">
+                          <Icons.refresh_mini />
+                        </div>
+                      <% :complete -> %>
+                        <div class="text-green-400 opacity-60">
+                          <Icons.check_circle_mini />
+                        </div>
+                      <% end %>
+                    </div>
+                    <div>Step <%= tr.order_index + 1 %></div>
                   </div>
-                  <div>Step <%= tr.order_index + 1 %></div>
-                </div>
-              <% end %>
-            </div>
+                <% end %>
+              </div>
+            </:body>
 
-            <div class="mt-3">
+            <:footer>
               <%= if run.status == :complete do %>
                 <div class="text-gray-500 text-xs">Completed <%= Calendar.strftime(run.completed_at, "%c") %></div>
               <% else %>
                 <div class="text-gray-500 text-xs">Started <%= Calendar.strftime(run.inserted_at, "%c") %></div>
               <% end %>
-            </div>
-          <% end %>
+            </:footer>
+          </.link_card>
         <% end %>
       </div>
     </div>
