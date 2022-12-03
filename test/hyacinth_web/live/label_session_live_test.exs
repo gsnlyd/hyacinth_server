@@ -11,9 +11,14 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
   describe "LabelSessionLive.Show" do
     test "renders label session", %{conn: conn} do
       dataset = root_dataset_fixture("My Dataset", 3, "My Object No")
-      job = label_job_fixture(%{name: "My Job"}, dataset)
+      job = label_job_fixture(%{name: "My Job", labeling_options_string: "option 1, option 2, option 3"}, dataset)
       user = user_fixture(%{email: "someuser@example.com"})
       %LabelSession{} = label_session = label_session_fixture(job, user)
+
+      [e1, e2, _e3] = Labeling.get_label_session_with_elements!(label_session.id).elements
+      Labeling.create_label_entry!(e1, user, "option 1")
+      Labeling.create_label_entry!(e2, user, "option 2")
+      Labeling.create_label_entry!(e2, user, "option 3")  # Overwrite previous label
 
       {:ok, _view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Show, label_session))
       assert html =~ "My Job"
@@ -23,6 +28,10 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       assert html =~ "My Object No1"
       assert html =~ "My Object No2"
       assert html =~ "My Object No3"
+
+      assert html =~ "option 1</td>"
+      refute html =~ "option 2</td>"
+      assert html =~ "option 3</td>"
     end
 
     @tag :disable_login

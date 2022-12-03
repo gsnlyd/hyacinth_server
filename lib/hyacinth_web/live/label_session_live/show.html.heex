@@ -75,7 +75,7 @@
                 <% end %>
               </td>
               <%= if length(element.labels) > 0 do %>
-                <td><%= hd(element.labels).label_value %></td>
+                <td><%= hd(element.labels).value.option %></td>
                 <td><%= Calendar.strftime(hd(element.labels).inserted_at, "%c") %></td>
               <% else %>
                 <td>-</td>
