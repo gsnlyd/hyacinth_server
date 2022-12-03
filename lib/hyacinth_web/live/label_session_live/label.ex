@@ -31,7 +31,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
       element: element,
       labels: labels,
 
-      current_value: if(length(labels) == 0, do: nil, else: hd(labels).label_value),
+      current_value: if(length(labels) == 0, do: nil, else: hd(labels).value.option),
 
       modal: nil,
       notes_changeset: NotesForm.changeset(%NotesForm{}, %{}),
@@ -49,7 +49,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
     labels = Labeling.list_element_labels(socket.assigns.element)
     socket = assign(socket, %{
       labels: labels,
-      current_value: hd(labels).label_value,
+      current_value: hd(labels).value.option,
     })
     {:noreply, socket}
   end
@@ -64,7 +64,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
         labels = Labeling.list_element_labels(socket.assigns.element)
         socket = assign(socket, %{
           labels: labels,
-          current_value: hd(labels).label_value,
+          current_value: hd(labels).value.option,
         })
         {:noreply, socket}
 

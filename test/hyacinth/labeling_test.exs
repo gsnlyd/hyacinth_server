@@ -248,7 +248,7 @@ defmodule Hyacinth.LabelingTest do
 
       assert %LabelEntry{} = label_entry
       assert label_entry.element_id == element.id
-      assert label_entry.label_value == "valid option"
+      assert label_entry.value.option == "valid option"
 
       element_labels = Labeling.list_element_labels(element)
       assert length(element_labels) == 1
@@ -286,9 +286,9 @@ defmodule Hyacinth.LabelingTest do
 
       labels = Labeling.list_element_labels(element)
       assert length(labels) == 3
-      assert Enum.at(labels, 0).label_value == "third option"
-      assert Enum.at(labels, 1).label_value == "another option"
-      assert Enum.at(labels, 2).label_value == "valid option"
+      assert Enum.at(labels, 0).value.option == "third option"
+      assert Enum.at(labels, 1).value.option == "another option"
+      assert Enum.at(labels, 2).value.option == "valid option"
     end
 
     test "returns empty list for element with no labels", %{element: element} do

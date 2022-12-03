@@ -373,7 +373,16 @@ defmodule Hyacinth.Labeling do
           {:error, :invalid_label_value}
         end
       end)
-      |> Multi.insert(:label_entry, %LabelEntry{label_value: label_value, element_id: element.id})
+      |> Multi.insert(:label_entry, %LabelEntry{
+        value: %LabelEntry.Value{
+          option: label_value
+        },
+        metadata: %LabelEntry.Metadata{
+          started_at: DateTime.utc_now(),  # TODO: accept actual times
+          completed_at: DateTime.utc_now()
+        },
+        element_id: element.id,
+      })
       |> Repo.transaction()
 
     {:ok, %{label_entry: %LabelEntry{} = label_entry}} = result

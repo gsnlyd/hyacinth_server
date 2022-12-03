@@ -58,7 +58,7 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       assert html =~ "btn-dark-blue"
 
       %LabelElement{} = element = Labeling.get_label_element!(label_session, 0)
-      assert [%LabelEntry{label_value: "First Option"}] = Labeling.list_element_labels(element)
+      assert [%LabelEntry{value: %LabelEntry.Value{option: "First Option"}}] = Labeling.list_element_labels(element)
     end
 
     test "set_label_key event correctly adds a label entry", %{conn: conn, user: user} do
@@ -72,7 +72,7 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       assert html =~ "btn-dark-blue"
 
       %LabelElement{} = element = Labeling.get_label_element!(label_session, 0)
-      assert [%LabelEntry{label_value: "First Option"}] = Labeling.list_element_labels(element)
+      assert [%LabelEntry{value: %LabelEntry.Value{option: "First Option"}}] = Labeling.list_element_labels(element)
     end
 
     test "prev_element event redirects", %{conn: conn} do
