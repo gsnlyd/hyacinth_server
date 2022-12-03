@@ -9,6 +9,7 @@ defmodule Hyacinth.Assembly.Pipeline do
 
   schema "pipelines" do
     field :name, :string
+    field :description, :string
 
     belongs_to :creator, User
 
@@ -21,7 +22,7 @@ defmodule Hyacinth.Assembly.Pipeline do
   @doc false
   def changeset(pipeline, attrs) do
     pipeline
-    |> cast(attrs, [:name])
+    |> cast(attrs, [:name, :description])
     |> validate_required([:name])
     |> cast_assoc(:transforms, with: &Transform.changeset/2, required: true, required_message: "can't be empty")
     |> validate_length(:name, min: 1, max: 30)

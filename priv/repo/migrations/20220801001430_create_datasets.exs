@@ -4,6 +4,7 @@ defmodule Hyacinth.Repo.Migrations.CreateDatasets do
   def change do
     create table(:datasets) do
       add :name, :string, null: false
+      add :description, :string
       add :type, :string, null: false
 
       timestamps()

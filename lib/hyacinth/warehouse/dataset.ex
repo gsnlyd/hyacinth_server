@@ -7,6 +7,7 @@ defmodule Hyacinth.Warehouse.Dataset do
 
   schema "datasets" do
     field :name, :string
+    field :description, :string
     field :type, Ecto.Enum, values: [:root, :derived]
 
     has_many :dataset_objects, DatasetObject
@@ -20,7 +21,7 @@ defmodule Hyacinth.Warehouse.Dataset do
   @doc false
   def create_changeset(dataset, attrs) do
     dataset
-    |> cast(attrs, [:name, :type])
+    |> cast(attrs, [:name, :description, :type])
     |> validate_required([:name, :type])
   end
 end
