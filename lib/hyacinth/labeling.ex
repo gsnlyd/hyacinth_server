@@ -408,4 +408,24 @@ defmodule Hyacinth.Labeling do
       order_by: [desc: entry.inserted_at]
     )
   end
+
+  @doc """
+  Updates element notes.
+  """
+  @spec update_element_notes(%User{}, %LabelElement{}, map) :: {:ok, map} | {:error, atom, term, map}
+  def update_element_notes(%User{} = user, %LabelElement{} = element, params) do
+    Multi.new()
+    |> Multi.run(:label_session, fn _repo, _values ->
+      {:ok, get_label_session!(element.session_id)}
+    end)
+    |> Multi.run(:validate_user, fn _repo, %{label_session: %LabelSession{} = label_session} ->
+      if user.id == label_session.user_id do
+        {:ok, true}
+      else
+        {:error, :wrong_label_session_user}
+      end
+    end)
+    |> Multi.update(:label_element, LabelElement.update_notes_changeset(element, params))
+    |> Repo.transaction()
+  end
 end

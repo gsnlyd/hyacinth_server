@@ -295,4 +295,24 @@ defmodule Hyacinth.LabelingTest do
       assert Labeling.list_element_labels(element) == []
     end
   end
+
+  describe "update_element_notes/3" do
+    setup [:setup_session, :extract_element]
+
+    test "updates notes", %{user: user, element: element} do
+      params = %{"notes" => "some notes"}
+      {:ok, _value} = Labeling.update_element_notes(user, element, params)
+
+      assert Labeling.get_label_element!(element.id).notes == "some notes"
+    end
+
+    test "fails if session does not belong to user", %{element: element} do
+      wrong_user = user_fixture()
+
+      params = %{"notes" => "some notes"}
+      {:error, :validate_user, :wrong_label_session_user, _changes} = Labeling.update_element_notes(wrong_user, element, params)
+
+      assert Labeling.get_label_element!(element.id).notes == nil
+    end
+  end
 end

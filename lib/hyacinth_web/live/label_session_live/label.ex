@@ -2,24 +2,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
   use HyacinthWeb, :live_view
 
   alias Hyacinth.Labeling
-
-  defmodule NotesForm do
-    use Ecto.Schema
-    import Ecto.Changeset
-
-    @primary_key false
-    embedded_schema do
-      field :notes, :string, default: ""
-    end
-
-    @doc false
-    def changeset(filter_options, attrs) do
-      filter_options
-      |> cast(attrs, [:notes])
-      |> validate_required([:notes])
-    end
-  end
-
+  alias Hyacinth.Labeling.LabelElement
 
   def mount(params, _session, socket) do
     label_session = Labeling.get_label_session_with_elements!(params["label_session_id"])
@@ -34,7 +17,6 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
       current_value: if(length(labels) == 0, do: nil, else: hd(labels).value.option),
 
       modal: nil,
-      notes_changeset: NotesForm.changeset(%NotesForm{}, %{}),
 
       disable_primary_nav: true,
       use_wide_layout: true,
@@ -75,6 +57,30 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
   def handle_event("set_label_key", _value, socket), do: {:noreply, socket}
 
+  def handle_event("notes_change", %{"label_element" => params}, socket) do
+    changeset =
+      socket.assigns.element
+      |> LabelElement.update_notes_changeset(params)
+      |> Map.put(:action, :insert)
+
+    {:noreply, assign(socket, :modal, {:notes, changeset})}
+  end
+
+  def handle_event("notes_submit", %{"label_element" => params}, socket) do
+    case Labeling.update_element_notes(socket.assigns.current_user, socket.assigns.element, params) do
+      {:ok, %{label_element: %LabelElement{} = element}} ->
+        socket = assign(socket, %{
+          element: Labeling.get_label_element!(socket.assigns.label_session, element.element_index),
+          modal: nil,
+        })
+
+        {:noreply, socket}
+
+      {:error, :label_element, %Ecto.Changeset{} = changeset, _changes} ->
+        {:noreply, assign(socket, :modal, {:notes, changeset})}
+    end
+  end
+
   def handle_event("prev_element", _value, socket) do
     new_index = max(socket.assigns.element.element_index - 1, 0)
     path = Routes.live_path(socket, HyacinthWeb.LabelSessionLive.Label, socket.assigns.label_session, new_index)
@@ -92,7 +98,8 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
   end
 
   def handle_event("open_modal_notes", _value, socket) do
-    {:noreply, assign(socket, :modal, :notes)}
+    changeset = LabelElement.update_notes_changeset(socket.assigns.element, %{})
+    {:noreply, assign(socket, :modal, {:notes, changeset})}
   end
 
   def handle_event("close_modal", _value, socket) do

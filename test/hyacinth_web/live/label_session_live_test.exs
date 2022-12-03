@@ -120,6 +120,22 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       assert html =~ "<h1>Notes</h1>"
     end
 
+    test "notes_submit event updates notes", %{conn: conn, user: user} do
+      %LabelSession{} = label_session = label_session_fixture(nil, user)
+      {:ok, view, _html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 1))
+
+      html = render_click(view, :open_modal_notes, %{})
+      assert html =~ "<h1>Notes</h1>"
+      refute html =~ "These are my notes."
+
+      params = %{"notes" => "These are my notes."}
+      render_submit(view, :notes_submit, %{"label_element" => params})
+
+      html = render_click(view, :open_modal_notes, %{})
+      assert html =~ "<h1>Notes</h1>"
+      assert html =~ "These are my notes."
+    end
+
     @tag :disable_login
     test "fails if user is not logged in", %{conn: conn} do
       %LabelSession{} = label_session = label_session_fixture()

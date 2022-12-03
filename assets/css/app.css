@@ -174,11 +174,16 @@ h3 {
 
 .form-content input[type="text"],
 .form-content input[type="number"],
-.form-content input[type="password"] {
+.form-content input[type="password"],
+.form-content textarea {
     @apply px-2 py-1;
     @apply placeholder-gray-500;
     @apply bg-gray-700 rounded;
     @apply border-gray-500 hover:border-gray-300 focus:border-blue-500 focus:ring-blue-500;
+}
+
+.form-content textarea {
+    @apply h-64;
 }
 
 .form-content select {
@@ -198,7 +203,8 @@ h3 {
 
 .form-wide input[type="text"],
 .form-wide input[type="number"],
-.form-wide input[type="password"] {
+.form-wide input[type="password"],
+.form-wide textarea {
     @apply w-full;
 }
 

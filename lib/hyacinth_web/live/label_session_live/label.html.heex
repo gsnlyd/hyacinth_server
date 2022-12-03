@@ -103,22 +103,23 @@
       </div>
     </.modal>
 
-  <% :notes -> %>
+  <% {:notes, %Ecto.Changeset{} = element_notes_changeset} -> %>
     <.modal size="sm">
       <:header>Notes</:header>
 
       <div class="mt-2">
-        <.form let={f} for={@notes_changeset} phx-submit="save_notes">
-          <%= textarea f, :notes, placeholder: "Add notes for this element here.",
-            class: "w-full h-64 px-2 py-1 placeholder-gray-500 resize-none
-            bg-gray-800 rounded
-            border-gray-500 hover:border-gray-300 focus:border-blue-500 focus:ring-blue-300"
-          %>
+        <.form let={f} for={element_notes_changeset} phx-change="notes_change" phx-submit="notes_submit">
+          <div class="form-content form-wide">
+            <p>
+              <%= textarea f, :notes, placeholder: "Add notes here." %>
+              <%= error_tag f, :notes %>
+            </p>
 
-          <div class="mt-4 flex justify-end space-x-2">
-            <button type="button" class="btn btn-gray" phx-click="close_modal">Cancel</button>
-            <%= submit "Save", class: "btn btn-blue" %>
           </div>
+            <div class="mt-4 flex justify-end space-x-2">
+              <button type="button" class="btn btn-gray" phx-click="close_modal">Cancel</button>
+              <%= submit "Save", class: "btn btn-blue" %>
+            </div>
         </.form>
       </div>
     </.modal>
