@@ -77,7 +77,7 @@ defmodule HyacinthWeb.Components.BasicComponents do
       <div class="flex justify-between items-start">
         <div class="shrink text-sm text-gray-300 font-medium"><%= render_slot(@header) %></div>
         <%= if @tag do %>
-          <div class="ml-4">
+          <div class="shrink-0 ml-4">
             <%= render_slot(@tag) %>
           </div>
         <% end %>
