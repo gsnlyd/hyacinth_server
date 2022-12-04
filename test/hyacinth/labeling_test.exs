@@ -5,7 +5,7 @@ defmodule Hyacinth.LabelingTest do
 
   import Hyacinth.{AccountsFixtures, WarehouseFixtures, LabelingFixtures}
 
-  alias Hyacinth.Labeling.{LabelJob, LabelSession, LabelElement, LabelEntry}
+  alias Hyacinth.Labeling.{LabelJob, LabelSession, LabelElement, LabelEntry, Note}
 
   @invalid_label_job_attrs %{name: nil, type: nil, label_options_string: nil, dataset_id: nil}
 
@@ -203,6 +203,26 @@ defmodule Hyacinth.LabelingTest do
     end
   end
 
+  describe "get_label_element_preloaded!/1" do
+    test "returns element" do
+      session = label_session_fixture()
+      original_element = hd(Labeling.get_label_session_with_elements!(session.id).elements)
+
+      element = Labeling.get_label_element_preloaded!(original_element.id)
+      assert %LabelElement{} = element
+      assert element.id == original_element.id
+
+      assert Ecto.assoc_loaded?(element.objects)
+      assert Ecto.assoc_loaded?(element.note)
+    end
+
+    test "raises if element does not exist" do
+      assert_raise Ecto.NoResultsError, fn ->
+        Labeling.get_label_element_preloaded!(123)
+      end
+    end
+  end
+
   describe "get_label_element/2" do
     test "returns element at given index from given session" do
       session = label_session_fixture()
@@ -296,23 +316,48 @@ defmodule Hyacinth.LabelingTest do
     end
   end
 
-  describe "update_element_notes/3" do
+  describe "create_note/3" do
     setup [:setup_session, :extract_element]
 
-    test "updates notes", %{user: user, element: element} do
-      params = %{"notes" => "some notes"}
-      {:ok, _value} = Labeling.update_element_notes(user, element, params)
+    test "creates note", %{user: user, element: element} do
+      params = %{"text" => "some text"}
+      {:ok, _values} = Labeling.create_note(user, element, params)
 
-      assert Labeling.get_label_element!(element.id).notes == "some notes"
+      assert Labeling.get_label_element_preloaded!(element.id).note.text == "some text"
     end
 
     test "fails if session does not belong to user", %{element: element} do
       wrong_user = user_fixture()
 
-      params = %{"notes" => "some notes"}
-      {:error, :validate_user, :wrong_label_session_user, _changes} = Labeling.update_element_notes(wrong_user, element, params)
+      params = %{"text" => "some text"}
+      {:error, :validate_user, :wrong_label_session_user, _changes} = Labeling.create_note(wrong_user, element, params)
 
-      assert Labeling.get_label_element!(element.id).notes == nil
+      assert Labeling.get_label_element_preloaded!(element.id).note == nil
+    end
+  end
+
+  describe "update_note/3" do
+    setup [:setup_session, :extract_element]
+
+    setup %{user: user, element: element} do
+      {:ok, %{note: %Note{} = note}} = Labeling.create_note(user, element, %{"text" => "some text"})
+      %{note: note}
+    end
+
+    test "updates note", %{user: user, element: element, note: note} do
+      params = %{"text" => "some updated text"}
+      {:ok, _values} = Labeling.update_note(user, note, params)
+
+      assert Labeling.get_label_element_preloaded!(element.id).note.text == "some updated text"
+    end
+
+    test "fails if session does not belong to user", %{element: element, note: note} do
+      wrong_user = user_fixture()
+
+      params = %{"text" => "some updated text"}
+      {:error, :validate_user, :wrong_label_session_user, _changes} = Labeling.update_note(wrong_user, note, params)
+
+      assert Labeling.get_label_element_preloaded!(element.id).note.text == "some text"
     end
   end
 end

@@ -12,7 +12,7 @@ defmodule Hyacinth.Labeling do
 
   alias Hyacinth.Accounts.{User}
   alias Hyacinth.Warehouse.{Dataset, Object}
-  alias Hyacinth.Labeling.{LabelJobType, LabelJob, LabelSession, LabelElement, LabelElementObject, LabelEntry}
+  alias Hyacinth.Labeling.{LabelJobType, LabelJob, LabelSession, LabelElement, LabelElementObject, LabelEntry, Note}
 
   @doc """
   Returns a list of all LabelJobs.
@@ -317,6 +317,32 @@ defmodule Hyacinth.Labeling do
   def get_label_element!(id), do: Repo.get!(LabelElement, id)
 
   @doc """
+  Gets a single LabelElement.
+
+  The following fields are preloaded:
+    * `objects`
+    * `note`
+
+  ## Examples
+
+      iex> get_label_element_preloaded!(123)
+      %LabelElement{...}
+
+      iex> get_label_element_preloaded!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec get_label_element_preloaded!(term) :: %LabelElement{}
+  def get_label_element_preloaded!(id) do
+    Repo.one!(
+      from le in LabelElement,
+      where: le.id == ^id,
+      select: le,
+      preload: [:objects, :note]
+    )
+  end
+
+  @doc """
   Gets a single LabelElement with the given element_index from a LabelSesssion.
 
   ## Examples
@@ -331,7 +357,7 @@ defmodule Hyacinth.Labeling do
       from le in LabelElement,
       where: le.session_id == ^session.id and le.element_index == ^element_index,
       select: le,
-      preload: :objects
+      preload: [:objects, :note]
     )
   end
 
@@ -410,22 +436,53 @@ defmodule Hyacinth.Labeling do
   end
 
   @doc """
-  Updates element notes.
+  Creates a note for the given element.
   """
-  @spec update_element_notes(%User{}, %LabelElement{}, map) :: {:ok, map} | {:error, atom, term, map}
-  def update_element_notes(%User{} = user, %LabelElement{} = element, params) do
+  @spec create_note(%User{}, %LabelElement{}, map) :: {:ok, map} | {:error, atom, term, map}
+  def create_note(%User{} = user, %LabelElement{} = element, params) do
     Multi.new()
-    |> Multi.run(:label_session, fn _repo, _values ->
-      {:ok, get_label_session!(element.session_id)}
-    end)
-    |> Multi.run(:validate_user, fn _repo, %{label_session: %LabelSession{} = label_session} ->
-      if user.id == label_session.user_id do
+    |> Multi.run(:validate_user, fn _repo, _values ->
+      %User{} = session_user =
+        Repo.one(
+          from sess in LabelSession,
+          where: sess.id == ^element.session_id,
+          inner_join: u in assoc(sess, :user),
+          select: u
+        )
+
+      if user.id == session_user.id do
         {:ok, true}
       else
         {:error, :wrong_label_session_user}
       end
     end)
-    |> Multi.update(:label_element, LabelElement.update_notes_changeset(element, params))
+    |> Multi.insert(:note, Note.changeset(%Note{element_id: element.id}, params))
+    |> Repo.transaction()
+  end
+
+  @doc """
+  Updates a note.
+  """
+  @spec update_note(%User{}, %Note{}, map) :: {:ok, map} | {:error, atom, term, map}
+  def update_note(%User{} = user, %Note{} = note, params) do
+    Multi.new()
+    |> Multi.run(:validate_user, fn _repo, _values ->
+      %User{} = session_user =
+        Repo.one(
+          from el in LabelElement,
+          where: el.id == ^note.element_id,
+          inner_join: sess in assoc(el, :session),
+          inner_join: u in assoc(sess, :user),
+          select: u
+        )
+
+      if user.id == session_user.id do
+        {:ok, true}
+      else
+        {:error, :wrong_label_session_user}
+      end
+    end)
+    |> Multi.update(:note, Note.changeset(note, params))
     |> Repo.transaction()
   end
 end

@@ -108,11 +108,11 @@
       <:header>Notes</:header>
 
       <div class="mt-2">
-        <.form let={f} for={element_notes_changeset} phx-change="notes_change" phx-submit="notes_submit">
+        <.form let={f} for={element_notes_changeset} phx-change="note_change" phx-submit="note_submit">
           <div class="form-content form-wide">
             <p>
-              <%= textarea f, :notes, placeholder: "Add notes here." %>
-              <%= error_tag f, :notes %>
+              <%= textarea f, :text, placeholder: "Add notes here." %>
+              <%= error_tag f, :text, name: "Notes" %>
             </p>
 
           </div>

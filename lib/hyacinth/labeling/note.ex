@@ -16,6 +16,6 @@ defmodule Hyacinth.Labeling.Note do
   def changeset(note, attrs) do
     note
     |> cast(attrs, [:text])
-    |> validate_required([:text])
+    |> validate_length(:text, max: 1000)
   end
 end
