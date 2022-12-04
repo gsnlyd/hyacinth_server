@@ -205,17 +205,24 @@ defmodule Hyacinth.Labeling do
   end
 
   defp sessions_with_progress_query do
-    elements_with_labels =
+    num_labeled_query =
       from el in LabelElement,
-      inner_join: lab in assoc(el, :labels),
-      group_by: el.id,
-      select: el
+      left_join: lab in assoc(el, :labels),
+      group_by: el.session_id,
+      select: %{session_id: el.session_id, num_labeled: count(lab.element_id, :distinct)}
+
+    num_total_query =
+      from el in LabelElement,
+      group_by: el.session_id,
+      select: %{session_id: el.session_id, num_total: count(el.id)}
 
     from ls in LabelSession,
-    left_join: el in subquery(elements_with_labels),
-    on: el.session_id == ls.id,
+    inner_join: nlquery in subquery(num_labeled_query),
+    on: nlquery.session_id == ls.id,
+    inner_join: ntquery in subquery(num_total_query),
+    on: ntquery.session_id == ls.id,
     group_by: ls.id,
-    select: %LabelSessionProgress{session: ls, num_labeled: count(el.id), num_total: 100},
+    select: %LabelSessionProgress{session: ls, num_labeled: nlquery.num_labeled, num_total: ntquery.num_total},
     preload: [:user, :job]
   end
 
@@ -224,17 +231,21 @@ defmodule Hyacinth.Labeling do
   along with the number of elements within that session
   which have been labeled.
 
+  The following fields are preloaded on the LabelSession:
+    * `user`
+    * `job`
+
   ## Examples
 
-      iex> list_sessions_with_progress(some_job)
+      iex> list_sessions_with_progress(job_or_user)
       [
-        {%LabelSession{...}, 10},
-        {%LabelSession{...}, 3},
-        {%LabelSession{...}, 0},
+        %LabelSessionProgress{session: %LabelSession{...}, num_labeled: 10, num_total: 30},
+        %LabelSessionProgress{session: %LabelSession{...}, num_labeled: 3, num_total: 30},
+        %LabelSessionProgress{session: %LabelSession{...}, num_labeled: 0, num_total: 30},
       ]
 
   """
-  @spec list_sessions_with_progress(%LabelJob{} | %User{}) :: [{%LabelSession{}, integer}]
+  @spec list_sessions_with_progress(%LabelJob{} | %User{}) :: [%LabelSessionProgress{}]
   def list_sessions_with_progress(%LabelJob{} = job) do
     sessions_with_progress_query()
     |> where([ls], ls.job_id == ^job.id and (not ls.blueprint))

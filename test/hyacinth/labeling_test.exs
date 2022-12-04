@@ -146,7 +146,7 @@ defmodule Hyacinth.LabelingTest do
       assert %LabelSession{} = prog1.session
       assert prog1.session.id == sess1.id
       assert prog1.num_labeled == 3
-      assert prog1.num_total == 100
+      assert prog1.num_total == 3
 
       assert Ecto.assoc_loaded?(prog1.session.user)
       assert Ecto.assoc_loaded?(prog1.session.job)
@@ -155,7 +155,7 @@ defmodule Hyacinth.LabelingTest do
       assert %LabelSession{} = prog2.session
       assert prog2.session.id == sess2.id
       assert prog2.num_labeled == 0
-      assert prog2.num_total == 100
+      assert prog2.num_total == 3
 
       assert Ecto.assoc_loaded?(prog2.session.user)
       assert Ecto.assoc_loaded?(prog2.session.job)
@@ -189,7 +189,7 @@ defmodule Hyacinth.LabelingTest do
       assert %LabelSession{} = prog1.session
       assert prog1.session.id == sess1.id
       assert prog1.num_labeled == 3
-      assert prog1.num_total == 100
+      assert prog1.num_total == 3
 
       assert Ecto.assoc_loaded?(prog1.session.user)
       assert Ecto.assoc_loaded?(prog1.session.job)
@@ -198,7 +198,7 @@ defmodule Hyacinth.LabelingTest do
       assert %LabelSession{} = prog2.session
       assert prog2.session.id == sess2.id
       assert prog2.num_labeled == 0
-      assert prog2.num_total == 100
+      assert prog2.num_total == 3
 
       assert Ecto.assoc_loaded?(prog2.session.user)
       assert Ecto.assoc_loaded?(prog2.session.job)
