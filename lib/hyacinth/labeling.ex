@@ -195,7 +195,7 @@ defmodule Hyacinth.Labeling do
   end
 
   @doc """
-  Lists all (non-blueprint) sessions for the given LabelJob,
+  Lists all (non-blueprint) sessions for the given LabelJob or User,
   along with the number of elements within that session
   which have been labeled.
 
@@ -209,7 +209,7 @@ defmodule Hyacinth.Labeling do
       ]
 
   """
-  @spec list_sessions_with_progress(%LabelJob{}) :: [{%LabelSession{}, integer}]
+  @spec list_sessions_with_progress(%LabelJob{} | %User{}) :: [{%LabelSession{}, integer}]
   def list_sessions_with_progress(%LabelJob{} = job) do
     elements_with_labels =
       from el in LabelElement,
@@ -227,6 +227,25 @@ defmodule Hyacinth.Labeling do
       preload: :user
     )
   end
+
+  def list_sessions_with_progress(%User{} = user) do
+    elements_with_labels =
+      from el in LabelElement,
+      inner_join: lab in assoc(el, :labels),
+      group_by: el.id,
+      select: el
+
+    Repo.all(
+      from ls in LabelSession,
+      where: (ls.user_id == ^user.id),
+      left_join: el in subquery(elements_with_labels),
+      on: el.session_id == ls.id,
+      group_by: ls.id,
+      select: {ls, count(el.id)},
+      preload: [:user, :job]
+    )
+  end
+
 
   @doc """
   Gets a single LabelSession.

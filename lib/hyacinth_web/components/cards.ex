@@ -81,4 +81,46 @@ defmodule HyacinthWeb.Components.Cards do
     </.link_card>
     """
   end
+
+  def label_session_card(assigns) do
+    assigns = assign_new(assigns, :use_job_for_header, fn -> false end)
+    ~H"""
+    <.link_card to={Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @sess)}>
+      <:header>
+        <%= if @use_job_for_header do %>
+          <%= @sess.job.name %>
+        <% else %>
+          <%= @sess.user.email %>
+        <% end %>
+      </:header>
+
+      <:tag>
+        <%= if @elements_labeled < @total_elements do %>
+          <div class="pill pill-yellow">In Progress</div>
+        <% else %>
+          <div class="pill pill-green">Complete</div>
+        <% end %>
+      </:tag>
+
+      <:body>
+        <div class="mt-2 flex items-center space-x-2">
+          <div class="flex-1 h-1.5 bg-gray-600 rounded-full">
+            <div
+              class={["h-full rounded-full bg-opacity-70", if(@elements_labeled < @total_elements, do: "bg-yellow-400", else: "bg-green-400")]}
+              style={"width: #{if(@elements_labeled == 0, do: 0, else: (@elements_labeled / (@total_elements) * 100))}%"}
+            />
+          </div>
+
+          <div class="text-sm text-gray-400 font-medium">
+            <span><%= @elements_labeled %></span>
+            <span>/</span>
+            <span><%= @total_elements %></span>
+          </div>
+        </div>
+      </:body>
+
+      <:footer>Created <%= Calendar.strftime(@sess.inserted_at, "%c") %></:footer>
+    </.link_card>
+    """
+  end
 end

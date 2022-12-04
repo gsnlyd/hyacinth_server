@@ -128,11 +128,6 @@ defmodule Hyacinth.LabelingTest do
   end
 
   describe "list_sessions_with_progress/1" do
-    test "returns empty list when there are no sessions" do
-      job = label_job_fixture()
-      assert Labeling.list_sessions_with_progress(job) == []
-    end
-
     test "returns non-blueprint sessions with progress for job" do
       job = label_job_fixture()
       user = user_fixture()
@@ -151,6 +146,49 @@ defmodule Hyacinth.LabelingTest do
       assert sess1_count == 3
       assert final_sess2.id == sess2.id
       assert sess2_count == 0
+
+      assert Ecto.assoc_loaded?(final_sess1.user)
+      assert Ecto.assoc_loaded?(final_sess2.user)
+    end
+
+    test "returns empty list when there are no sessions for job" do
+      job = label_job_fixture()
+      assert Labeling.list_sessions_with_progress(job) == []
+    end
+
+    test "returns sessions with progress for user" do
+      job1 = label_job_fixture()
+      job2 = label_job_fixture()
+
+      user = user_fixture()
+      other_user = user_fixture()
+
+      sess1 = label_session_fixture(job1, user)
+      sess2 = label_session_fixture(job2, user)
+
+      label_session_fixture(job1, other_user)
+
+      sess1 = Labeling.get_label_session_with_elements!(sess1.id)
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 1")
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 2")
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 1), user, "option 1")
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 2), user, "option 1")
+
+      [{s1, s1_count}, {s2, s2_count}] = Labeling.list_sessions_with_progress(user)
+      assert s1.id == sess1.id
+      assert s1_count == 3
+      assert s2.id == sess2.id
+      assert s2_count == 0
+
+      assert Ecto.assoc_loaded?(s1.user)
+      assert Ecto.assoc_loaded?(s1.job)
+      assert Ecto.assoc_loaded?(s2.user)
+      assert Ecto.assoc_loaded?(s2.job)
+    end
+
+    test "returns empty list when there are no sessions for user" do
+      user = user_fixture()
+      assert Labeling.list_sessions_with_progress(user) == []
     end
   end
 

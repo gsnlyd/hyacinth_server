@@ -1,5 +1,17 @@
 <main>
-  <div class="flex space-x-6">
+  <div>
+    <div>
+      <h3>Your Labeling Sessions</h3>
+    </div>
+
+    <div class="mt-2 grid grid-cols-3 gap-4">
+      <%= for {sess, elements_labeled} <- @user_sessions do %>
+        <Cards.label_session_card sess={sess} elements_labeled={elements_labeled} total_elements={100} use_job_for_header={true} socket={@socket} />
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-8 flex space-x-6">
 
     <div class="w-1/3">
       <div>

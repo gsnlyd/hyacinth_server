@@ -65,36 +65,7 @@
     </div>
     <div class="mt-4 grid grid-cols-3 gap-4">
       <%= for {sess, elements_labeled} <- filter_sessions(@sessions, @session_filter_changeset) do %>
-        <.link_card to={Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, sess)}>
-          <:header><%= sess.user.email %></:header>
-
-          <:tag>
-            <%= if elements_labeled < length(@job.blueprint.elements) do %>
-              <div class="pill pill-yellow">In Progress</div>
-            <% else %>
-              <div class="pill pill-green">Complete</div>
-            <% end %>
-          </:tag>
-
-          <:body>
-            <div class="mt-2 flex items-center space-x-2">
-              <div class="flex-1 h-1.5 bg-gray-600 rounded-full">
-                <div
-                  class={["h-full rounded-full bg-opacity-70", if(elements_labeled < length(@job.blueprint.elements), do: "bg-yellow-400", else: "bg-green-400")]}
-                  style={"width: #{if(elements_labeled == 0, do: 0, else: (elements_labeled / (length(@job.blueprint.elements)) * 100))}%"}
-                />
-              </div>
-
-              <div class="text-sm text-gray-400 font-medium">
-                <span><%= elements_labeled %></span>
-                <span>/</span>
-                <span><%= length(@job.blueprint.elements) %></span>
-              </div>
-            </div>
-          </:body>
-
-          <:footer>Created <%= Calendar.strftime(sess.inserted_at, "%c") %></:footer>
-        </.link_card>
+        <Cards.label_session_card sess={sess} elements_labeled={elements_labeled} total_elements={length(@job.blueprint.elements)} socket={@socket} />
       <% end %>
     </div>
 
