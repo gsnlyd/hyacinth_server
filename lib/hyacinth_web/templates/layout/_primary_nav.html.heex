@@ -27,21 +27,26 @@
     <div>
       <%= if @current_user do %>
         <div class="group relative bg-gray-900 rounded shadow">
-          <div class="px-2 py-1 text-sm text-gray-400 group-hover:text-gray-300 font-medium"><%= @current_user.email %></div>
+          <div class="px-2 py-1 text-sm text-gray-400 group-hover:text-gray-300 font-medium flex items-center space-x-2">
+            <span><%= @current_user.email %></span>
+            <span class="opacity-60">
+              <HyacinthWeb.Components.Icons.chevron_down_mini />
+            </span>
+          </div>
 
-          <div class="absolute hidden group-hover:block w-full">
-            <div class="mt-1 text-sm text-gray-400 font-medium bg-gray-800 border border-gray-700 rounded shadow flex flex-col">
+          <div class="absolute z-10 hidden group-hover:block w-full">
+            <div class="mt-1 p-1 text-sm text-gray-400 font-medium bg-gray-800 border border-gray-700 rounded shadow-lg shadow-black flex flex-col">
 
               <%= link to: Routes.user_settings_path(assigns[:conn] || assigns[:socket], :edit) do %>
-                <div class="px-2 py-1 hover:text-gray-300 hover:bg-gray-700 flex items-center space-x-2">
-                  <span class="opacity-50"><HyacinthWeb.Components.Icons.user_circle_mini /></span>
+                <div class="p-2 hover:text-gray-300 hover:bg-gray-900 rounded flex items-center space-x-2 transition">
+                  <span class="opacity-60"><HyacinthWeb.Components.Icons.cog_6_tooth_mini /></span>
                   <span>Settings</span>
                 </div>
               <% end %>
 
               <%= link to: Routes.user_session_path(assigns[:conn] || assigns[:socket], :delete), method: :delete do %>
-                <div class="px-2 py-1 hover:text-gray-300 hover:bg-gray-700 flex items-center space-x-2">
-                  <span class="opacity-50"><HyacinthWeb.Components.Icons.pencil_square_mini /></span>
+                <div class="p-2 hover:text-gray-300 hover:bg-gray-900 rounded flex items-center space-x-2 transition">
+                  <span class="opacity-60"><HyacinthWeb.Components.Icons.arrow_left_circle_mini /></span>
                   <span>Log out</span>
                 </div>
               <% end %>
