@@ -9,6 +9,6 @@ defmodule Hyacinth.Repo.Migrations.CreateNotes do
       timestamps()
     end
 
-    create index(:notes, [:element_id])
+    create unique_index(:notes, [:element_id])
   end
 end

@@ -2,7 +2,7 @@ defmodule Hyacinth.Labeling.LabelElement do
   use Hyacinth.Schema
   import Ecto.Changeset
 
-  alias Hyacinth.Labeling.{LabelSession, LabelElementObject, LabelEntry}
+  alias Hyacinth.Labeling.{LabelSession, LabelElementObject, LabelEntry, Note}
 
   schema "label_elements" do
     field :element_index, :integer
@@ -15,6 +15,8 @@ defmodule Hyacinth.Labeling.LabelElement do
     has_many :objects, through: [:label_element_objects, :object]
 
     has_many :labels, LabelEntry, foreign_key: :element_id, preload_order: [desc: :inserted_at]
+
+    has_one :note, Note, foreign_key: :element_id
 
     timestamps()
   end

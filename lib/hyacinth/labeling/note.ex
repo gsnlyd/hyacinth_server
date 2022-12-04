@@ -1,10 +1,13 @@
 defmodule Hyacinth.Labeling.Note do
-  use Ecto.Schema
+  use Hyacinth.Schema
   import Ecto.Changeset
+
+  alias Hyacinth.Labeling.LabelElement
 
   schema "notes" do
     field :text, :string
-    field :element_id, :id
+
+    belongs_to :element, LabelElement
 
     timestamps()
   end
