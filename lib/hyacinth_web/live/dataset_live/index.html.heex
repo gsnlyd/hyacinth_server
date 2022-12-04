@@ -30,28 +30,7 @@
 <main class="mt-6">
   <div class="grid grid-cols-3 gap-4">
     <%= for {dataset, object_count, job_count} <- filter_datasets(@datasets, @dataset_filter_changeset) do %>
-      <.link_card to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, dataset)}>
-        <:header><%= dataset.name %></:header>
-
-        <:tag>
-          <%= case dataset.type do %>
-          <% :root -> %>
-            <div class="pill pill-violet">Root Dataset</div>
-          <% :derived -> %>
-            <div class="pill pill-orange">Derived Dataset</div>
-          <% end %>
-        </:tag>
-
-        <:body>
-          <div class="text-gray-400">
-            <span><%= object_count %> objects</span>
-            &bull;
-            <span><%= job_count %> jobs</span>
-          </div>
-        </:body>
-
-        <:footer>Created <%= Calendar.strftime(dataset.inserted_at, "%c") %></:footer>
-      </.link_card>
+      <Cards.dataset_card dataset={dataset} object_count={object_count} job_count={job_count} socket={@socket} />
     <% end %>
   </div>
 </main>

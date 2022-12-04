@@ -63,19 +63,7 @@
     </div>
     <div class="mt-4 grid grid-cols-3 gap-4">
       <%= for %LabelJob{} = job <- filter_jobs(@jobs, @job_filter_changeset) do %>
-        <.link_card to={Routes.live_path(@socket, HyacinthWeb.LabelJobLive.Show, job)}>
-          <:header><%= job.name %></:header>
-          <:tag>
-            <%= case job.type do %>
-            <% :classification -> %>
-              <div class="pill pill-green">Classification</div>
-            <% :comparison_exhaustive -> %>
-              <div class="pill pill-blue">Comparison</div>
-            <% end %>
-          </:tag>
-
-          <:footer>Created <%= Calendar.strftime(job.inserted_at, "%c") %></:footer>
-        </.link_card>
+        <Cards.label_job_card job={job} socket={@socket} />
       <% end %>
     </div>
 

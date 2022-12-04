@@ -1,1 +1,56 @@
-<div>home</div>
+<main>
+  <div class="flex space-x-6">
+
+    <div class="w-1/3">
+      <div>
+        <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.DatasetLive.Index) do %>
+          <div class="text-xl text-gray-400 hover:text-blue-300 active:text-blue-400 flex items-center transition">
+            <div>Datasets</div>
+            <span class="mt-0.5 ml-0.5 opacity-70"><Icons.chevron_right_mini /></span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="mt-2 flex flex-col space-y-4">
+        <%= for {dataset, object_count, job_count} <- @datasets do %>
+          <Cards.dataset_card dataset={dataset} object_count={object_count} job_count={job_count} socket={@socket} />
+        <% end %>
+      </div>
+    </div>
+
+    <div class="w-1/3">
+      <div>
+        <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.PipelineLive.Index) do %>
+          <div class="text-xl text-gray-400 hover:text-blue-300 active:text-blue-400 flex items-center transition">
+            <div>Pipelines</div>
+            <span class="mt-0.5 ml-0.5 opacity-70"><Icons.chevron_right_mini /></span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="mt-2 flex flex-col space-y-4">
+        <%= for pipeline <- @pipelines do %>
+          <Cards.pipeline_card pipeline={pipeline} socket={@socket} />
+        <% end %>
+      </div>
+    </div>
+
+    <div class="w-1/3">
+      <div>
+        <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.DatasetLive.Index) do %>
+          <div class="text-xl text-gray-400 hover:text-blue-300 active:text-blue-400 flex items-center transition">
+            <div>Labeling Jobs</div>
+            <span class="mt-0.5 ml-0.5 opacity-70"><Icons.chevron_right_mini /></span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="mt-2 flex flex-col space-y-4">
+        <%= for job <- @jobs do %>
+          <Cards.label_job_card job={job} socket={@socket} />
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+</main>
