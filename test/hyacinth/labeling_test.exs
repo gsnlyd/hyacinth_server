@@ -141,14 +141,24 @@ defmodule Hyacinth.LabelingTest do
       Labeling.create_label_entry!(Enum.at(sess1.elements, 1), user, "option 1")
       Labeling.create_label_entry!(Enum.at(sess1.elements, 2), user, "option 1")
 
-      [{final_sess1, sess1_count}, {final_sess2, sess2_count}] = Labeling.list_sessions_with_progress(job)
-      assert final_sess1.id == sess1.id
-      assert sess1_count == 3
-      assert final_sess2.id == sess2.id
-      assert sess2_count == 0
+      [prog1, prog2] = Labeling.list_sessions_with_progress(user)
+      assert %Labeling.LabelSessionProgress{} = prog1
+      assert %LabelSession{} = prog1.session
+      assert prog1.session.id == sess1.id
+      assert prog1.num_labeled == 3
+      assert prog1.num_total == 100
 
-      assert Ecto.assoc_loaded?(final_sess1.user)
-      assert Ecto.assoc_loaded?(final_sess2.user)
+      assert Ecto.assoc_loaded?(prog1.session.user)
+      assert Ecto.assoc_loaded?(prog1.session.job)
+
+      assert %Labeling.LabelSessionProgress{} = prog2
+      assert %LabelSession{} = prog2.session
+      assert prog2.session.id == sess2.id
+      assert prog2.num_labeled == 0
+      assert prog2.num_total == 100
+
+      assert Ecto.assoc_loaded?(prog2.session.user)
+      assert Ecto.assoc_loaded?(prog2.session.job)
     end
 
     test "returns empty list when there are no sessions for job" do
@@ -174,16 +184,24 @@ defmodule Hyacinth.LabelingTest do
       Labeling.create_label_entry!(Enum.at(sess1.elements, 1), user, "option 1")
       Labeling.create_label_entry!(Enum.at(sess1.elements, 2), user, "option 1")
 
-      [{s1, s1_count}, {s2, s2_count}] = Labeling.list_sessions_with_progress(user)
-      assert s1.id == sess1.id
-      assert s1_count == 3
-      assert s2.id == sess2.id
-      assert s2_count == 0
+      [prog1, prog2] = Labeling.list_sessions_with_progress(user)
+      assert %Labeling.LabelSessionProgress{} = prog1
+      assert %LabelSession{} = prog1.session
+      assert prog1.session.id == sess1.id
+      assert prog1.num_labeled == 3
+      assert prog1.num_total == 100
 
-      assert Ecto.assoc_loaded?(s1.user)
-      assert Ecto.assoc_loaded?(s1.job)
-      assert Ecto.assoc_loaded?(s2.user)
-      assert Ecto.assoc_loaded?(s2.job)
+      assert Ecto.assoc_loaded?(prog1.session.user)
+      assert Ecto.assoc_loaded?(prog1.session.job)
+
+      assert %Labeling.LabelSessionProgress{} = prog2
+      assert %LabelSession{} = prog2.session
+      assert prog2.session.id == sess2.id
+      assert prog2.num_labeled == 0
+      assert prog2.num_total == 100
+
+      assert Ecto.assoc_loaded?(prog2.session.user)
+      assert Ecto.assoc_loaded?(prog2.session.job)
     end
 
     test "returns empty list when there are no sessions for user" do

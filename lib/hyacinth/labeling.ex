@@ -194,6 +194,31 @@ defmodule Hyacinth.Labeling do
     )
   end
 
+  defmodule LabelSessionProgress do
+    @type t :: %__MODULE__{
+      session: %LabelSession{},
+      num_labeled: integer,
+      num_total: integer,
+    }
+    @enforce_keys [:session, :num_labeled, :num_total]
+    defstruct @enforce_keys
+  end
+
+  defp sessions_with_progress_query do
+    elements_with_labels =
+      from el in LabelElement,
+      inner_join: lab in assoc(el, :labels),
+      group_by: el.id,
+      select: el
+
+    from ls in LabelSession,
+    left_join: el in subquery(elements_with_labels),
+    on: el.session_id == ls.id,
+    group_by: ls.id,
+    select: %LabelSessionProgress{session: ls, num_labeled: count(el.id), num_total: 100},
+    preload: [:user, :job]
+  end
+
   @doc """
   Lists all (non-blueprint) sessions for the given LabelJob or User,
   along with the number of elements within that session
@@ -211,39 +236,15 @@ defmodule Hyacinth.Labeling do
   """
   @spec list_sessions_with_progress(%LabelJob{} | %User{}) :: [{%LabelSession{}, integer}]
   def list_sessions_with_progress(%LabelJob{} = job) do
-    elements_with_labels =
-      from el in LabelElement,
-      inner_join: lab in assoc(el, :labels),
-      group_by: el.id,
-      select: el
-
-    Repo.all(
-      from ls in LabelSession,
-      where: (ls.job_id == ^job.id) and (not ls.blueprint),
-      left_join: el in subquery(elements_with_labels),
-      on: el.session_id == ls.id,
-      group_by: ls.id,
-      select: {ls, count(el.id)},
-      preload: :user
-    )
+    sessions_with_progress_query()
+    |> where([ls], ls.job_id == ^job.id and (not ls.blueprint))
+    |> Repo.all()
   end
 
   def list_sessions_with_progress(%User{} = user) do
-    elements_with_labels =
-      from el in LabelElement,
-      inner_join: lab in assoc(el, :labels),
-      group_by: el.id,
-      select: el
-
-    Repo.all(
-      from ls in LabelSession,
-      where: (ls.user_id == ^user.id),
-      left_join: el in subquery(elements_with_labels),
-      on: el.session_id == ls.id,
-      group_by: ls.id,
-      select: {ls, count(el.id)},
-      preload: [:user, :job]
-    )
+    sessions_with_progress_query()
+    |> where([ls], ls.user_id == ^user.id)
+    |> Repo.all()
   end
 
 

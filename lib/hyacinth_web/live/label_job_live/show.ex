@@ -3,7 +3,7 @@ defmodule HyacinthWeb.LabelJobLive.Show do
 
   alias Hyacinth.Labeling
   alias Hyacinth.Warehouse.Object
-  alias Hyacinth.Labeling.{LabelSession, LabelElement}
+  alias Hyacinth.Labeling.{LabelSessionProgress, LabelElement}
 
   defmodule SessionFilterForm do
     use Ecto.Schema
@@ -41,14 +41,14 @@ defmodule HyacinthWeb.LabelJobLive.Show do
   def filter_sessions(sessions, %Ecto.Changeset{} = changeset) when is_list(sessions) do
     %SessionFilterForm{} = form = Ecto.Changeset.apply_changes(changeset)
 
-    filter_func = fn {%LabelSession{} = session, _} ->
-      contains_search?(session.user.email, form.search)
+    filter_func = fn %LabelSessionProgress{} = progress ->
+      contains_search?(progress.session.user.email, form.search)
     end
 
     {sort_func, sorter} =
       case form.sort_by do
-        :user -> {&(elem(&1, 0).user.email), form.order}
-        :date_created -> {&(elem(&1, 0).inserted_at), {form.order, DateTime}}
+        :user -> {&(&1.session.user.email), form.order}
+        :date_created -> {&(&1.session.inserted_at), {form.order, DateTime}}
       end
 
     sessions

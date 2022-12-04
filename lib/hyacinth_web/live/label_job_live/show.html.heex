@@ -64,8 +64,8 @@
       </.form>
     </div>
     <div class="mt-4 grid grid-cols-3 gap-4">
-      <%= for {sess, elements_labeled} <- filter_sessions(@sessions, @session_filter_changeset) do %>
-        <Cards.label_session_card sess={sess} elements_labeled={elements_labeled} total_elements={length(@job.blueprint.elements)} socket={@socket} />
+      <%= for progress <- filter_sessions(@sessions, @session_filter_changeset) do %>
+        <Cards.label_session_progress_card progress={progress} socket={@socket} />
       <% end %>
     </div>
 

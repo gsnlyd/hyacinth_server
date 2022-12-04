@@ -82,20 +82,20 @@ defmodule HyacinthWeb.Components.Cards do
     """
   end
 
-  def label_session_card(assigns) do
+  def label_session_progress_card(assigns) do
     assigns = assign_new(assigns, :use_job_for_header, fn -> false end)
     ~H"""
-    <.link_card to={Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @sess)}>
+    <.link_card to={Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @progress.session)}>
       <:header>
         <%= if @use_job_for_header do %>
-          <%= @sess.job.name %>
+          <%= @progress.session.job.name %>
         <% else %>
-          <%= @sess.user.email %>
+          <%= @progress.session.user.email %>
         <% end %>
       </:header>
 
       <:tag>
-        <%= if @elements_labeled < @total_elements do %>
+        <%= if @progress.num_labeled < @progress.num_total do %>
           <div class="pill pill-yellow">In Progress</div>
         <% else %>
           <div class="pill pill-green">Complete</div>
@@ -106,20 +106,20 @@ defmodule HyacinthWeb.Components.Cards do
         <div class="mt-2 flex items-center space-x-2">
           <div class="flex-1 h-1.5 bg-gray-600 rounded-full">
             <div
-              class={["h-full rounded-full bg-opacity-70", if(@elements_labeled < @total_elements, do: "bg-yellow-400", else: "bg-green-400")]}
-              style={"width: #{if(@elements_labeled == 0, do: 0, else: (@elements_labeled / (@total_elements) * 100))}%"}
+              class={["h-full rounded-full bg-opacity-70", if(@progress.num_labeled < @progress.num_total, do: "bg-yellow-400", else: "bg-green-400")]}
+              style={"width: #{if(@progress.num_labeled == 0, do: 0, else: (@progress.num_labeled / (@progress.num_total) * 100))}%"}
             />
           </div>
 
           <div class="text-sm text-gray-400 font-medium">
-            <span><%= @elements_labeled %></span>
+            <span><%= @progress.num_labeled %></span>
             <span>/</span>
-            <span><%= @total_elements %></span>
+            <span><%= @progress.num_total %></span>
           </div>
         </div>
       </:body>
 
-      <:footer>Created <%= Calendar.strftime(@sess.inserted_at, "%c") %></:footer>
+      <:footer>Created <%= Calendar.strftime(@progress.session.inserted_at, "%c") %></:footer>
     </.link_card>
     """
   end
