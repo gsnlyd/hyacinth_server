@@ -2,7 +2,6 @@ defmodule HyacinthWeb.DatasetLive.Index do
   use HyacinthWeb, :live_view
 
   alias Hyacinth.Warehouse
-  alias Hyacinth.Warehouse.Dataset
 
   defmodule DatasetFilterForm do
     use Ecto.Schema
@@ -26,7 +25,7 @@ defmodule HyacinthWeb.DatasetLive.Index do
 
   def mount(_params, _session, socket) do
     socket = assign(socket, %{
-      datasets: Warehouse.list_datasets_with_counts(),
+      datasets: Warehouse.list_datasets_with_stats(),
 
       dataset_filter_changeset: DatasetFilterForm.changeset(%DatasetFilterForm{}, %{}),
     })
@@ -36,14 +35,14 @@ defmodule HyacinthWeb.DatasetLive.Index do
   def filter_datasets(datasets, %Ecto.Changeset{} = changeset) when is_list(datasets) do
     %DatasetFilterForm{} = form = Ecto.Changeset.apply_changes(changeset)
 
-    filter_func = fn {%Dataset{} = dataset, _, _} ->
+    filter_func = fn %Warehouse.DatasetStats{dataset: dataset} ->
       contains_search?(dataset.name, form.search) and value_matches?(dataset.type, form.type)
     end
 
     {sort_func, sorter} =
       case form.sort_by do
-        :name -> {&String.downcase(elem(&1, 0).name), form.order}
-        :date_created -> {&(elem(&1, 0).inserted_at), {form.order, DateTime}}
+        :name -> {&String.downcase(&1.dataset.name), form.order}
+        :date_created -> {&(&1.dataset.inserted_at), {form.order, DateTime}}
       end
 
     datasets

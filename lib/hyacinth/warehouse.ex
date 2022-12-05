@@ -25,32 +25,38 @@ defmodule Hyacinth.Warehouse do
     Repo.all(Dataset)
   end
 
+  defmodule DatasetStats do
+    @type t :: %__MODULE__{
+      dataset: %Dataset{},
+      num_objects: integer,
+      num_jobs: integer,
+    }
+    @enforce_keys [:dataset, :num_objects, :num_jobs]
+    defstruct @enforce_keys
+  end
+
   @doc """
   Returns a list of all datasets along with
   the number of objects and jobs each has.
 
-  Returned data is a list of tuples containing
-  `{dataset, object_count, label_job_count}`.
-
   ## Examples
 
-      iex> list_datasets_with_counts()
+      iex> list_datasets_with_stats()
       [
-        {%Dataset{...}, 100, 0},
-        {%Dataset{...}, 20, 2},
-        {%Dataset{...}, 30, 10},
-        ...
+        %DatasetStats{dataset: %Dataset{...}, num_objects: 100, num_jobs: 0},
+        %DatasetStats{dataset: %Dataset{...}, num_objects: 20, num_jobs: 2},
+        %DatasetStats{dataset: %Dataset{...}, num_objects: 30, num_jobs: 10},
       ]
 
   """
-  @spec list_datasets_with_counts() :: [{%Dataset{}, pos_integer, pos_integer}]
-  def list_datasets_with_counts do
+  @spec list_datasets_with_stats() :: [%DatasetStats{}]
+  def list_datasets_with_stats do
     Repo.all(
       from d in Dataset,
       left_join: dobj in assoc(d, :dataset_objects),
       left_join: lj in assoc(d, :jobs),
       group_by: d.id,
-      select: {d, count(dobj.id, :distinct), count(lj.id, :distinct)}
+      select: %DatasetStats{dataset: d, num_objects: count(dobj.id, :distinct), num_jobs: count(lj.id, :distinct)}
     )
   end
 

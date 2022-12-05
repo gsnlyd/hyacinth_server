@@ -29,8 +29,8 @@
 
 <main class="mt-6">
   <div class="grid grid-cols-3 gap-4">
-    <%= for {dataset, object_count, job_count} <- filter_datasets(@datasets, @dataset_filter_changeset) do %>
-      <Cards.dataset_card dataset={dataset} object_count={object_count} job_count={job_count} socket={@socket} />
+    <%= for dataset_stats <- filter_datasets(@datasets, @dataset_filter_changeset) do %>
+      <Cards.dataset_card dataset_stats={dataset_stats} socket={@socket} />
     <% end %>
   </div>
 </main>

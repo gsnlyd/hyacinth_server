@@ -18,7 +18,7 @@ defmodule Hyacinth.WarehouseTest do
     end
   end
 
-  describe "list_datasets_with_counts/0" do
+  describe "list_datasets_with_stats/0" do
     test "returns all datasets with counts" do
       dataset1 = root_dataset_fixture()
       dataset2 = root_dataset_fixture(nil, 10)
@@ -26,15 +26,15 @@ defmodule Hyacinth.WarehouseTest do
       label_job_fixture(%{}, dataset3)
       label_job_fixture(%{}, dataset3)
 
-      assert Warehouse.list_datasets_with_counts == [
-        {dataset1, 3, 0},
-        {dataset2, 10, 0},
-        {dataset3, 3, 2},
+      assert Warehouse.list_datasets_with_stats == [
+        %Warehouse.DatasetStats{dataset: dataset1, num_objects: 3, num_jobs: 0},
+        %Warehouse.DatasetStats{dataset: dataset2, num_objects: 10, num_jobs: 0},
+        %Warehouse.DatasetStats{dataset: dataset3, num_objects: 3, num_jobs: 2},
       ]
     end
 
     test "returns empty list if there are no datasets" do
-      assert Warehouse.list_datasets_with_counts() == []
+      assert Warehouse.list_datasets_with_stats() == []
     end
   end
 

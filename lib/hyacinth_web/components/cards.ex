@@ -4,13 +4,15 @@ defmodule HyacinthWeb.Components.Cards do
 
   import HyacinthWeb.Components.BasicComponents
 
-  def dataset_card(assigns) do
+  alias Hyacinth.Warehouse.DatasetStats
+
+  def dataset_card(%{dataset_stats: %DatasetStats{}} = assigns) do
     ~H"""
-    <.link_card to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, @dataset)}>
-      <:header><%= @dataset.name %></:header>
+    <.link_card to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, @dataset_stats.dataset)}>
+      <:header><%= @dataset_stats.dataset.name %></:header>
 
       <:tag>
-        <%= case @dataset.type do %>
+        <%= case @dataset_stats.dataset.type do %>
         <% :root -> %>
           <div class="pill pill-violet">Root Dataset</div>
         <% :derived -> %>
@@ -19,16 +21,14 @@ defmodule HyacinthWeb.Components.Cards do
       </:tag>
 
       <:body>
-        <%= if @object_count && @job_count do %>
-          <div class="mt-1 text-sm text-gray-500">
-            <span><%= @object_count %> images</span>
-            &bull;
-            <span><%= @job_count %> labeling jobs</span>
-          </div>
-        <% end %>
+        <div class="mt-1 text-sm text-gray-500">
+          <span><%= @dataset_stats.num_objects %> images</span>
+          &bull;
+          <span><%= @dataset_stats.num_jobs %> labeling jobs</span>
+        </div>
       </:body>
 
-      <:footer>Created <%= Calendar.strftime(@dataset.inserted_at, "%c") %></:footer>
+      <:footer>Created <%= Calendar.strftime(@dataset_stats.dataset.inserted_at, "%c") %></:footer>
     </.link_card>
     """
   end

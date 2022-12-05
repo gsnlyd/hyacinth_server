@@ -24,8 +24,8 @@
       </div>
 
       <div class="mt-2 flex flex-col space-y-4">
-        <%= for {dataset, object_count, job_count} <- @datasets do %>
-          <Cards.dataset_card dataset={dataset} object_count={object_count} job_count={job_count} socket={@socket} />
+        <%= for dataset_stats <- @datasets do %>
+          <Cards.dataset_card dataset_stats={dataset_stats} socket={@socket} />
         <% end %>
       </div>
     </div>
