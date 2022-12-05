@@ -20,10 +20,10 @@ defmodule HyacinthWeb.Components.Cards do
 
       <:body>
         <%= if @object_count && @job_count do %>
-          <div class="text-gray-400">
-            <span><%= @object_count %> objects</span>
+          <div class="mt-1 text-sm text-gray-500">
+            <span><%= @object_count %> images</span>
             &bull;
-            <span><%= @job_count %> jobs</span>
+            <span><%= @job_count %> labeling jobs</span>
           </div>
         <% end %>
       </:body>
@@ -42,7 +42,14 @@ defmodule HyacinthWeb.Components.Cards do
         <%= if Enum.any?(@pipeline.runs, &(&1.status == :running)) do %>
           <div class="pill pill-yellow">Running</div>
         <% else %>
-          <div class="pill pill-green"><%= length(@pipeline.runs) %> runs</div>
+          <%= case length(@pipeline.runs) do %>
+          <% 0 -> %>
+            <div class="pill pill-gray">0 runs</div>
+          <% 1 -> %>
+            <div class="pill pill-green">1 run</div>
+          <% num_runs -> %>
+            <div class="pill pill-green"><%= num_runs %> runs</div>
+          <% end %>
         <% end %>
       </:tag>
 
@@ -77,6 +84,12 @@ defmodule HyacinthWeb.Components.Cards do
         <% end %>
       </:tag>
 
+      <:body>
+        <div class="mt-1 text-xs text-gray-500">
+          <%= @job.description || "No description." %>
+        </div>
+      </:body>
+
       <:footer>Created <%= Calendar.strftime(@job.inserted_at, "%c") %></:footer>
     </.link_card>
     """
@@ -88,22 +101,26 @@ defmodule HyacinthWeb.Components.Cards do
     <.link_card to={Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @progress.session)}>
       <:header>
         <%= if @use_job_for_header do %>
-          <%= @progress.session.job.name %>
+          <div><%= @progress.session.job.name %></div>
+          <div class="text-xs text-gray-500 font-normal"><%= @progress.session.user.email %></div>
         <% else %>
           <%= @progress.session.user.email %>
         <% end %>
       </:header>
 
       <:tag>
-        <%= if @progress.num_labeled < @progress.num_total do %>
+        <%= cond do %>
+        <% @progress.num_labeled == 0 -> %>
+          <div class="pill pill-gray">Not Started</div>
+        <% @progress.num_labeled < @progress.num_total -> %>
           <div class="pill pill-yellow">In Progress</div>
-        <% else %>
+        <% true -> %>
           <div class="pill pill-green">Complete</div>
         <% end %>
       </:tag>
 
       <:body>
-        <div class="mt-2 flex items-center space-x-2">
+        <div class="mt-1 flex items-center space-x-2">
           <div class="flex-1 h-1.5 bg-gray-600 rounded-full">
             <div
               class={["h-full rounded-full bg-opacity-70", if(@progress.num_labeled < @progress.num_total, do: "bg-yellow-400", else: "bg-green-400")]}
