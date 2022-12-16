@@ -89,6 +89,9 @@
                 <td class="text-xs"><%= object.hash %></td>
                 <td><%= object.type %></td>
                 <td><%= Calendar.strftime(object.inserted_at, "%c") %></td>
+                <td>
+                  <%= link "View", to: Routes.live_path(@socket, HyacinthWeb.ViewerLive.Show, object), class: "link" %>
+                </td>
               </tr>
             <% end %>
           </tbody>

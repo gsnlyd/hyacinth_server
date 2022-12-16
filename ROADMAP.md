@@ -13,7 +13,7 @@
 - [ ] Update design for PipelineLive.Show steps tab
 - [ ] Add runnning pipelines to home page
 - [ ] Add LabelJob.Index page to show all jobs
-- [ ] Add viewer abstraction
+- [x] Add viewer abstraction
 - [ ] Add advanced PNG viewer
 - [ ] Add release action to CI
 

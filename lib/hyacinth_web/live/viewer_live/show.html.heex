@@ -1,0 +1,19 @@
+<header>
+  <.form let={f} for={@viewer_select_changeset} phx-change="form_change">
+    <div class="filter-form-content flex justify-between items-center">
+      <p>
+        <%= label f, :viewer %>
+        <%= select f, :viewer, humanize_enum(ViewerSelectForm, :viewer) %>
+      </p>
+    </div>
+  </.form>
+</header>
+
+<main class="mt-6">
+  <%= case Ecto.Changeset.get_field(@viewer_select_changeset, :viewer) do %>
+    <% :web_image -> %>
+      <%= live_render(@socket, HyacinthWeb.ViewerLive.Viewers.WebImage, session: %{"object_id" => @object.id}, id: "viewer-web-image") %>
+    <% :advanced_png -> %>
+      <%= live_render(@socket, HyacinthWeb.ViewerLive.Viewers.AdvancedPNG, session: %{"object_id" => @object.id}, id: "viewer-advanced-png") %>
+  <% end %>
+</main>
