@@ -11,7 +11,7 @@ defmodule HyacinthWeb.LabelJobLiveTest do
   describe "LabelJobLive.New" do
     test "renders page", %{conn: conn} do
       {:ok, _view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelJobLive.New))
-      assert html =~ "<h1>New Job</h1>"
+      assert html =~ "<h1>New Labeling Job</h1>"
     end
 
     test "renders page with correct dataset options", %{conn: conn} do
@@ -20,7 +20,7 @@ defmodule HyacinthWeb.LabelJobLiveTest do
       root_dataset_fixture("My Third Dataset")
 
       {:ok, _view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelJobLive.New))
-      assert html =~ "<h1>New Job</h1>"
+      assert html =~ "<h1>New Labeling Job</h1>"
 
       assert html =~ "My First Dataset</option>"
       assert html =~ "My Second Dataset</option>"

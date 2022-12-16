@@ -2,7 +2,7 @@
 
 ## 1.0
 - [ ] Add names to users
-- [ ] Finish job create form
+- [x] Finish LabelJobLive.New form
 - [ ] Add additional options to job types
 - [ ] Allow labeling of comparisons by clicking image
 - [ ] Fix icons on labeling page

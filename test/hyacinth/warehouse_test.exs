@@ -45,6 +45,16 @@ defmodule Hyacinth.WarehouseTest do
     end
   end
 
+  describe "get_dataset_stats!/1" do
+    test "returns the dataset stats for the dataset with the given id" do
+      dataset = root_dataset_fixture()
+      label_job_fixture(%{}, dataset)
+      label_job_fixture(%{}, dataset)
+
+      assert Warehouse.get_dataset_stats!(dataset.id) == %Warehouse.DatasetStats{dataset: dataset, num_objects: 3, num_jobs: 2}
+    end
+  end
+
   describe "create_dataset/2" do
     test "creates a flat (png) root dataset" do
       object_params = many_object_params_fixtures()

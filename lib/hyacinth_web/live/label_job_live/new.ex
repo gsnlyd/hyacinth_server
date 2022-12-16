@@ -10,6 +10,7 @@ defmodule HyacinthWeb.LabelJobLive.New do
     socket = assign(socket, %{
       dataset: dataset,
       datasets: Warehouse.list_datasets(),
+      selected_dataset_stats: dataset && Warehouse.get_dataset_stats!(dataset.id),
       changeset: LabelJob.changeset(%LabelJob{dataset_id: if(dataset, do: dataset.id, else: nil)}, %{}),
 
       options_params: %{},
@@ -25,6 +26,17 @@ defmodule HyacinthWeb.LabelJobLive.New do
       %LabelJob{}
       |> LabelJob.changeset(params)
       |> Map.put(:action, :insert)
+
+    selected_dataset_stats =
+      case params["dataset_id"] do
+        "" -> nil
+        id -> Warehouse.get_dataset_stats!(id)
+      end
+
+    socket = assign(socket, %{
+      changeset: changeset,
+      selected_dataset_stats: selected_dataset_stats,
+    })
 
     {:noreply, assign(socket, :changeset, changeset)}
   end

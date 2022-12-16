@@ -183,7 +183,7 @@ h3 {
 }
 
 .form-content textarea {
-    @apply h-64;
+    @apply h-32 min-h-[2rem];
 }
 
 .form-content select {

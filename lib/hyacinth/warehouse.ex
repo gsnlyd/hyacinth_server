@@ -63,7 +63,7 @@ defmodule Hyacinth.Warehouse do
   @doc """
   Gets a single dataset.
 
-  Raises `Ecto.NoResultsError` if the Dataset does not exist.
+  Raises `Ecto.NoResultsError` if the dataset does not exist.
 
   ## Examples
 
@@ -74,7 +74,34 @@ defmodule Hyacinth.Warehouse do
       ** (Ecto.NoResultsError)
 
   """
+  @spec get_dataset!(term) :: %Dataset{}
   def get_dataset!(id), do: Repo.get!(Dataset, id)
+
+  @doc """
+  Gets stats for a single dataset.
+
+  Raises `Ecto.NoResultsError` if the dataset does not exist.
+
+  ## Examples
+
+      iex> get_dataset_stats!(123)
+      %DatasetStats{...}
+
+      iex> get_dataset_stats!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  @spec get_dataset_stats!(term) :: %DatasetStats{}
+  def get_dataset_stats!(id) do
+    Repo.one!(
+      from d in Dataset,
+      where: d.id == ^id,
+      left_join: dobj in assoc(d, :dataset_objects),
+      left_join: lj in assoc(d, :jobs),
+      group_by: d.id,
+      select: %DatasetStats{dataset: d, num_objects: count(dobj.id, :distinct), num_jobs: count(lj.id, :distinct)}
+    )
+  end
 
   @doc """
   Creates a root dataset (a dataset with no parent).
