@@ -1,3 +1,9 @@
+<%= if assigns[:import_viewer_scripts] do %>
+  <script src="https://unpkg.com/pako@2.1.0/dist/pako.min.js" integrity="sha384-rNlaE5fs9dGIjmxWDALQh/RBAaGRYT5ChrzHo6tRfgrZ36iRFAiquP5g41Jsv+0j" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/upng-js@2.1.0/UPNG.js" integrity="sha384-5zRBkJ6IHy9ezWHX/cBuwC0SnrK23Cfx6G6kIjwR5no9khaSv2md2ZHMXphI3UCB" crossorigin="anonymous"></script>
+  <script>console.log('Imported viewer scripts');</script>
+<% end %>
+
 <%= unless assigns[:disable_primary_nav] do %>
   <%= render "_primary_nav.html", assigns %>
 <% end %>

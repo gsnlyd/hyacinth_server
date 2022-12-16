@@ -26,6 +26,8 @@ defmodule HyacinthWeb.ViewerLive.Show do
     socket = assign(socket, %{
       object: object,
       viewer_select_changeset: ViewerSelectForm.changeset(%ViewerSelectForm{}, %{}),
+
+      import_viewer_scripts: true,
     })
     {:ok, socket}
   end
