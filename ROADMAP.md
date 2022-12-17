@@ -14,7 +14,9 @@
 - [ ] Add runnning pipelines to home page
 - [ ] Add LabelJob.Index page to show all jobs
 - [x] Add viewer abstraction
-- [ ] Add advanced PNG viewer
+- [x] Add advanced PNG viewer
+- [ ] Update slicer and advanced PNG viewer to support 16-bit grayscale
+- [ ] Add viewer selection to labeling page
 - [ ] Add release action to CI
 
 ## 1.1

@@ -9,7 +9,7 @@ defmodule HyacinthWeb.ViewerLive.Show do
 
     @primary_key false
     embedded_schema do
-      field :viewer, Ecto.Enum, values: [:web_image, :advanced_png], default: :web_image
+      field :viewer, Ecto.Enum, values: [:web_image, :advanced_png], default: :advanced_png
     end
 
     @doc false
