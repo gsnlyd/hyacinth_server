@@ -1,23 +1,71 @@
-function computeStats(image) {
-    var min = image.data[0];
-    var max = image.data[0];
+function decode(buffer) {
+    const image = UPNG.decode(buffer);
 
-    for (const val of image.data) {
-        if (val < min) min = val;
-        if (val > max) max = val;
+    image.numPixels = image.width * image.height;
+
+    let typedData;
+    switch (image.depth) {
+        case 8:
+            typedData = image.data;
+            break;
+        case 16:
+            typedData = new Uint16Array(image.numPixels);
+            for (let i = 0; i < image.numPixels; i++) {
+                const byteIndex = i * 2;
+                typedData[i] = (image.data[byteIndex] << 8) | image.data[byteIndex + 1];
+            }
+            break;
+        default:
+            throw new Error(`Unsupported depth: ${image.depth}`);
+    }
+    image.typedData = typedData;
+
+    let minValue = image.typedData[0];
+    let maxValue = image.typedData[0];
+
+    for (const val of image.typedData) {
+        if (val < minValue) minValue = val;
+        if (val > maxValue) maxValue = val;
     }
 
-    return {min, max};
+    image.minValue = minValue;
+    image.maxValue = maxValue;
+
+    return image;
+}
+
+function drawGrayscale(imageData, image, maxThreshold) {
+    for (let i = 0; i < image.numPixels; i++) {
+        const value = (Math.min(image.typedData[i], maxThreshold) / maxThreshold) * 255;
+        const canvasIndex = i * 4;
+        imageData.data[canvasIndex + 0] = value; // R
+        imageData.data[canvasIndex + 1] = value; // G
+        imageData.data[canvasIndex + 2] = value; // B
+        imageData.data[canvasIndex + 3] = 255;   // A
+    }
+}
+
+function drawRGBA(imageData, image, maxThreshold) {
+    for (let i = 0; i < image.data.length; i++) {
+        const clamped = Math.min(image.data[i], maxThreshold);
+        const mapped = (clamped / maxThreshold) * 255;
+        imageData.data[i] = mapped;
+    }
 }
 
 function render(canvas, image, maxThreshold) {
     const context = canvas.getContext('2d');
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-    for (let i = 0; i < image.data.length; i++) {
-        const clamped = Math.min(image.data[i], maxThreshold);
-        const mapped = (clamped / maxThreshold) * 255;
-        imageData.data[i] = mapped;
+    switch (image.ctype) {
+        case 0:
+            drawGrayscale(imageData, image, maxThreshold);
+            break;
+        case 6:
+            drawRGBA(imageData, image, maxThreshold);
+            break;
+        default:
+            throw new Error(`Unsupported png color type: ${image.ctype}`)
     }
 
     context.putImageData(imageData, 0, 0);
@@ -27,27 +75,23 @@ export function createHook() {
     return {
         mounted() {
             this.image = null;
-            this.imageStats = null;
-            this.maxThreshold = 255;
+            this.maxThreshold = 1000;
 
             const url = '/object-image/' + this.el.dataset.objectId;
             fetch(url)
                 .then(res => res.blob())
                 .then(blob => blob.arrayBuffer())
                 .then(buf => {
-                    this.image = UPNG.decode(buf)
-                    this.imageStats = computeStats(this.image);
+                    this.image = decode(buf);
 
                     this.el.width = this.image.width;
                     this.el.height = this.image.height;
                 })
-                .then(() => render(this.el, this.image, this.maxThreshold))
+                .then(() => render(this.el, this.image, (this.maxThreshold / 1000) * this.image.maxValue))
 
             document.getElementById('advanced-png-viewer-max-slider').addEventListener('input', ev => {
                 this.maxThreshold = ev.currentTarget.value;
-                if (this.image) {
-                    render(this.el, this.image, this.maxThreshold);
-                }
+                if (this.image) render(this.el, this.image, (this.maxThreshold / 1000) * this.image.maxValue);
             });
         }
     }
