@@ -15,7 +15,8 @@
 - [ ] Add LabelJob.Index page to show all jobs
 - [x] Add viewer abstraction
 - [x] Add advanced PNG viewer
-- [ ] Update slicer and advanced PNG viewer to support 16-bit grayscale
+- [x] Update slicer to use grayscale with 16-bit support and tone mapping
+- [ ] Update advanced PNG viewer to support 16-bit and grayscale
 - [ ] Add viewer selection to labeling page
 - [ ] Add release action to CI
 
