@@ -156,7 +156,7 @@ h3 {
 
 /* Forms */
 
-.form-content {
+.form-content:not(.form-content-style-only) {
     @apply flex flex-col items-start space-y-4;
 }
 
