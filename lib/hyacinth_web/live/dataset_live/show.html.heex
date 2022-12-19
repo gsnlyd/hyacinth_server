@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <%= link to: Routes.live_path(@socket, HyacinthWeb.LabelJobLive.New, dataset: @dataset), class: "btn btn-blue btn-icon" do %>
+    <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelJobLive.New, dataset: @dataset), class: "link-btn btn-icon btn-blue" do %>
       <Icons.plus_small_solid />
       <span>New Job</span>
     <% end %>

@@ -42,6 +42,32 @@ defmodule Hyacinth.LabelingTest do
     end
   end
 
+  describe "list_label_jobs_preloaded/0" do
+    test "returns all jobs for the given dataset with preloads" do
+      job1 = label_job_fixture()
+      job2 = label_job_fixture()
+      job3 = label_job_fixture()
+
+      [j1, j2, j3] = Labeling.list_label_jobs_preloaded()
+
+      assert %LabelJob{} = j1
+      assert j1.id == job1.id
+      assert Ecto.assoc_loaded?(j1.dataset)
+
+      assert %LabelJob{} = j2
+      assert j2.id == job2.id
+      assert Ecto.assoc_loaded?(j2.dataset)
+
+      assert %LabelJob{} = j3
+      assert j3.id == job3.id
+      assert Ecto.assoc_loaded?(j3.dataset)
+    end
+
+    test "returns empty list if there are no jobs" do
+      assert Labeling.list_label_jobs_preloaded() == []
+    end
+  end
+
   describe "get_label_job!/1" do
     test "returns the label_job with given id" do
       label_job = label_job_fixture()

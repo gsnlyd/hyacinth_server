@@ -18,7 +18,7 @@
           class: "px-2 py-0.5 text-gray-400 hover:text-black hover:bg-blue-200 active:bg-blue-300 rounded"
         %>
         <%= live_redirect "Labeling Jobs",
-          to: Routes.live_path(assigns[:conn] || assigns[:socket], HyacinthWeb.DatasetLive.Index),
+          to: Routes.live_path(assigns[:conn] || assigns[:socket], HyacinthWeb.LabelJobLive.Index),
           class: "px-2 py-0.5 text-gray-400 hover:text-black hover:bg-blue-200 active:bg-blue-300 rounded"
         %>
       </div>

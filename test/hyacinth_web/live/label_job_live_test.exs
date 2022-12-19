@@ -8,6 +8,31 @@ defmodule HyacinthWeb.LabelJobLiveTest do
 
   setup :register_and_log_in_user
 
+  describe "LabelJobLive.Index" do
+    test "renders jobs", %{conn: conn} do
+      label_job_fixture(%{name: "My First Job"})
+      label_job_fixture(%{name: "My Second Job"})
+      label_job_fixture(%{name: "My Third Job"})
+
+      {:ok, _view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelJobLive.Index))
+      assert html =~ "<h1>Labeling Jobs</h1>"
+      assert html =~ "My First Job"
+      assert html =~ "My Second Job"
+      assert html =~ "My Third Job"
+    end
+
+    test "renders with no jobs", %{conn: conn} do
+      {:ok, _view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelJobLive.Index))
+      assert html =~ "<h1>Labeling Jobs</h1>"
+    end
+
+    @tag :disable_login
+    test "fails if user is not logged in", %{conn: conn} do
+      {:error, {:redirect, redirect_params}} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelJobLive.Index))
+      assert %{flash: %{"error" => "You must log in to access this page."}} = redirect_params
+    end
+  end
+
   describe "LabelJobLive.New" do
     test "renders page", %{conn: conn} do
       {:ok, _view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelJobLive.New))

@@ -47,6 +47,22 @@ defmodule Hyacinth.Labeling do
   end
 
   @doc """
+  Returns a list of all LabelJobs with preloads.
+
+  The following fields are preloaded:
+    * `dataset`
+
+  """
+  @spec list_label_jobs_preloaded() :: [%LabelJob{}]
+  def list_label_jobs_preloaded() do
+    Repo.all(
+      from lj in LabelJob,
+      select: lj,
+      preload: [:dataset]
+    )
+  end
+
+  @doc """
   Gets a single LabelJob.
 
   Raises `Ecto.NoResultsError` if the LabelJob does not exist.

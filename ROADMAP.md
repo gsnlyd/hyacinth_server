@@ -12,7 +12,7 @@
 - [ ] Clean up pipeline debug logging
 - [ ] Update design for PipelineLive.Show steps tab
 - [ ] Add runnning pipelines to home page
-- [ ] Add LabelJob.Index page to show all jobs
+- [x] Add LabelJobLive.Index page to show all jobs
 - [x] Add viewer abstraction
 - [x] Add advanced PNG viewer
 - [x] Update slicer to use grayscale with 16-bit support and tone mapping

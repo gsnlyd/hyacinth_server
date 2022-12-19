@@ -234,7 +234,7 @@ h3 {
 }
 
 .filter-form-content select {
-    @apply pl-1 pr-8 py-1 text-sm;
+    @apply pl-2 pr-8 py-1 text-sm;
     @apply text-gray-400;
     @apply bg-transparent rounded;
     @apply border-gray-600 hover:border-white focus:border-blue-500 focus:ring-blue-500;
