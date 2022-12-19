@@ -123,26 +123,27 @@
 
   <% :steps -> %>
     <div class="space-y-4">
-      <%= for {transform, i} <- Enum.with_index(@transforms) do %>
-        <div class="p-2 text-sm bg-gray-800 rounded border border-gray-700">
-          <h2 class="text-xl text-gray-300">Transform #<%= i + 1 %></h2>
-          <ul class="mt-2">
-            <li>
-              <span class="text-gray-400">Driver:</span>
-              <span><%= transform.driver %></span>
-            </li>
-          </ul>
-          <div class="mt-4">
-            <h3 class="text-base text-gray-400">Driver Options</h3>
-            <ul>
-              <%= for {key, value} <- transform.options do %>
-                <li>
-                  <span class="text-gray-400"><%= key %>:</span>
-                  <span><%= value %></span>
-                </li>
-              <% end %>
-            </ul>
+      <%= for transform <- @transforms do %>
+        <div>
+          <div class="flex items-center space-x-3">
+            <h3>Step <%= transform.order_index + 1 %></h3>
+            <.driver_format_tags driver={transform.driver} options={transform.options} />
           </div>
+
+          <div class="mt-1 card">
+            <div>
+              <div class="text-sm text-gray-400">Driver</div>
+              <div class="text-lg text-gray-300"><%= transform.driver %></div>
+            </div>
+
+            <div class="mt-4">
+              <div class="text-sm text-gray-400">Options</div>
+              <div class="mt-1">
+                <.options_table options={transform.options} />
+              </div>
+            </div>
+          </div>
+
         </div>
       <% end %>
     </div>

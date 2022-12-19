@@ -80,19 +80,9 @@
               </button>
             </div>
 
-            <div class="mt-1 px-4 py-2 bg-gray-900 rounded">
-              <table>
-                <tbody class="text-gray-200">
-                  <%= for {k, v} <- Ecto.Changeset.get_field(@changeset, :options) do %>
-                    <tr>
-                      <td class="pr-4 text-gray-500"><%= humanize(k) %></td>
-                      <td><%= v %></td>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
+            <div class="mt-1">
+              <.options_table options={Ecto.Changeset.get_field(@changeset, :options)} />
             </div>
-
           </div>
         </div>
 

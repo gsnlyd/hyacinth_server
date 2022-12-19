@@ -10,7 +10,7 @@
 - [ ] Increment labeling clock
 - [ ] Fix pipeline run pubsub broadcast running before transaction commit
 - [ ] Clean up pipeline debug logging
-- [ ] Update design for PipelineLive.Show steps tab
+- [x] Update design for PipelineLive.Show steps tab
 - [ ] Add runnning pipelines to home page
 - [x] Add LabelJobLive.Index page to show all jobs
 - [x] Add viewer abstraction

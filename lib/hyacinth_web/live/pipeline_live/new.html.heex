@@ -73,16 +73,7 @@
                 </div>
 
                 <div class="mt-1">
-                  <table class="text-sm">
-                    <tbody>
-                      <%= for {k, v} <- Ecto.Changeset.get_field(ft.source, :options) do %>
-                        <tr>
-                          <td class="pr-1 text-gray-400"><%= humanize(k) %></td>
-                          <td><%= v %></td>
-                        </tr>
-                      <% end %>
-                    </tbody>
-                  </table>
+                  <.options_table options={Ecto.Changeset.get_field(ft.source, :options)} />
                 </div>
               </div>
 

@@ -1,6 +1,9 @@
 defmodule HyacinthWeb.Components.BasicComponents do
   use Phoenix.Component
+  import Phoenix.HTML.Form
+
   alias HyacinthWeb.Components.Icons
+  alias Hyacinth.Assembly.Driver
 
   def modal(assigns) do
     assigns = assign_new(assigns, :close_event, fn -> "close_modal" end)
@@ -91,6 +94,47 @@ defmodule HyacinthWeb.Components.BasicComponents do
 
       <div class="mt-2 text-xs text-gray-500"><%= render_slot(@footer) %></div>
     <% end %>
+    """
+  end
+
+  def driver_format_tags(assigns) do
+    assigns = assign_new(assigns, :light, fn -> false end)
+    assigns =
+      if Driver.pure?(assigns.driver) do
+        assign(assigns, %{
+          input_format: :any,
+          output_format: :any,
+        })
+      else
+        assign(assigns, %{
+          input_format: Driver.input_format(assigns.driver, assigns.options),
+          output_format: Driver.output_format(assigns.driver, assigns.options),
+        })
+      end
+
+    ~H"""
+    <div class="flex items-center space-x-1">
+      <span class={["tag", @light && "tag-light"]}><%= @input_format %></span>
+      <span class="text-xs text-gray-400">&rarr;</span>
+      <span class={["tag", @light && "tag-light"]}><%= @output_format %></span>
+    </div>
+    """
+  end
+
+  def options_table(assigns) do
+    ~H"""
+    <div class="px-3 py-2 bg-black bg-gray-900 rounded">
+      <table>
+        <tbody class="text-sm text-gray-200">
+          <%= for {k, v} <- @options do %>
+            <tr>
+              <td class="pr-4 text-gray-500"><%= humanize(k) %></td>
+              <td><%= v %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
     """
   end
 end
