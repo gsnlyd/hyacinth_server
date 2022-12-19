@@ -5,8 +5,8 @@
 - [x] Finish LabelJobLive.New form
 - [ ] Add additional options to job types
 - [ ] Allow labeling of comparisons by clicking image
-- [ ] Fix icons on labeling page
-- [ ] Add prompt to labeling page
+- [x] Fix icons on labeling page
+- [x] Add prompt to labeling page
 - [ ] Increment labeling clock
 - [ ] Fix pipeline run pubsub broadcast running before transaction commit
 - [ ] Clean up pipeline debug logging

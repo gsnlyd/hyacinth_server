@@ -98,7 +98,7 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       assert {:error, {:live_redirect, %{kind: :push, to: "/sessions/2/label/2"}}} = render_click(view, :next_element, %{})
     end
 
-    test "open_modal_label_history event opens label history modal", %{conn: conn} do
+    test "open_modal_label_history event opens label history modal with empty history", %{conn: conn} do
       job = label_job_fixture(%{label_options_string: "First Option, Second Option, Third Option"})
       %LabelSession{} = label_session = label_session_fixture(job)
 
@@ -107,6 +107,25 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
 
       html = render_click(view, :open_modal_label_history, %{})
       assert html =~ "<h1>Label History</h1>"
+      assert html =~ "No label history yet."
+    end
+
+    test "open_modal_label_history event opens label history modal with history", %{conn: conn, user: user} do
+      job = label_job_fixture(%{label_options_string: "First Option, Second Option, Third Option"})
+      %LabelSession{} = label_session = label_session_fixture(job, user)
+
+      {:ok, view, _html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 1))
+      render_click(view, :set_label, %{"label" => "First Option"})
+      render_click(view, :set_label, %{"label" => "Second Option"})
+      html = render_click(view, :set_label, %{"label" => "First Option"})
+
+      refute html =~ "<h1>Label History</h1>"
+
+      html = render_click(view, :open_modal_label_history, %{})
+      assert html =~ "<h1>Label History</h1>"
+      assert html =~ "First Option</td>"
+      assert html =~ "Second Option</td>"
+      refute html =~ "Third Option</td>"
     end
 
     test "open_modal_notes event opens notes modal", %{conn: conn} do

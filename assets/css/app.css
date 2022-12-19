@@ -60,7 +60,7 @@ h3 {
 }
 
 .btn-gray {
-    @apply text-black font-medium;
+    @apply text-gray-800 font-medium;
     @apply bg-gray-400 hover:bg-gray-500;
     @apply focus:ring-gray-200 focus:hover:ring-gray-400;
     @apply focus:outline-none;

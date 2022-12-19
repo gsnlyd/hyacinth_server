@@ -10,7 +10,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
     @primary_key false
     embedded_schema do
-      field :viewer, Ecto.Enum, values: [:web_image, :advanced_png], default: :advanced_png
+      field :viewer, Ecto.Enum, values: [:basic, :advanced], default: :advanced
     end
 
     @doc false
