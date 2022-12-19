@@ -4,6 +4,23 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
   alias Hyacinth.Labeling
   alias Hyacinth.Labeling.Note
 
+  defmodule ViewerSelectForm do
+    use Ecto.Schema
+    import Ecto.Changeset
+
+    @primary_key false
+    embedded_schema do
+      field :viewer, Ecto.Enum, values: [:web_image, :advanced_png], default: :advanced_png
+    end
+
+    @doc false
+    def changeset(viewer_select_form, attrs) do
+      viewer_select_form
+      |> cast(attrs, [:viewer])
+      |> validate_required([:viewer])
+    end
+  end
+
   def mount(params, _session, socket) do
     label_session = Labeling.get_label_session_with_elements!(params["label_session_id"])
     element = Labeling.get_label_element!(label_session, params["element_index"])
@@ -16,10 +33,13 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
       current_value: if(length(labels) == 0, do: nil, else: hd(labels).value.option),
 
+      viewer_select_changeset: ViewerSelectForm.changeset(%ViewerSelectForm{}, %{}),
+
       modal: nil,
 
       disable_primary_nav: true,
       use_wide_layout: true,
+      import_viewer_scripts: true,
     })
 
     {:ok, socket}
@@ -94,6 +114,11 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
             {:noreply, assign(socket, :modal, {:notes, changeset})}
         end
     end
+  end
+
+  def handle_event("viewer_change", %{"viewer_select_form" => params}, socket) do
+    changeset = ViewerSelectForm.changeset(%ViewerSelectForm{}, params)
+    {:noreply, assign(socket, :viewer_select_changeset, changeset)}
   end
 
   def handle_event("prev_element", _value, socket) do

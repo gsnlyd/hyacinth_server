@@ -212,12 +212,13 @@ export function createHook() {
             this.maxThreshold = 100;
             this.dragOrigin = null;
 
-            this.dragBoxEl = document.getElementById('advanced-png-viewer-drag-box');
+            const uniqueId = this.el.dataset.uniqueId;
+            this.dragBoxEl = document.getElementById('advanced-png-viewer-drag-box-' + uniqueId);
 
-            this.minSliderEl = document.getElementById('advanced-png-viewer-min-slider');
-            this.minInputEl = document.getElementById('advanced-png-viewer-min-input');
-            this.maxSliderEl = document.getElementById('advanced-png-viewer-max-slider');
-            this.maxInputEl = document.getElementById('advanced-png-viewer-max-input');
+            this.minSliderEl = document.getElementById('advanced-png-viewer-min-slider-' + uniqueId);
+            this.minInputEl = document.getElementById('advanced-png-viewer-min-input-' + uniqueId);
+            this.maxSliderEl = document.getElementById('advanced-png-viewer-max-slider-' + uniqueId);
+            this.maxInputEl = document.getElementById('advanced-png-viewer-max-input-' + uniqueId);
 
             const url = '/object-image/' + this.el.dataset.objectId;
             fetch(url)
@@ -251,7 +252,7 @@ export function createHook() {
                     render(this.el, this.image, this.minThreshold, this.maxThreshold);
                 });
 
-            updateMinThreshold = (minThreshold) => {
+            const updateMinThreshold = (minThreshold) => {
                 minThreshold = parseInt(minThreshold);
                 if (minThreshold >= this.maxThreshold) minThreshold = this.maxThreshold - 1;
                 this.minThreshold = minThreshold;
@@ -263,7 +264,7 @@ export function createHook() {
             this.minSliderEl.addEventListener('input', ev => updateMinThreshold(ev.currentTarget.value));
             this.minInputEl.addEventListener('change', ev => updateMinThreshold(ev.currentTarget.value));
 
-            updateMaxThreshold = (maxThreshold) => {
+            const updateMaxThreshold = (maxThreshold) => {
                 maxThreshold = parseInt(maxThreshold);
                 if (maxThreshold <= this.minThreshold) maxThreshold = this.minThreshold + 1;
                 this.maxThreshold = maxThreshold;
@@ -275,7 +276,7 @@ export function createHook() {
             this.maxSliderEl.addEventListener('input', ev => updateMaxThreshold(ev.currentTarget.value));
             this.maxInputEl.addEventListener('change', ev => updateMaxThreshold(ev.currentTarget.value));
 
-            renderDrag = (mouseCoords) => {
+            const renderDrag = (mouseCoords) => {
                 if (this.dragOrigin) {
                     const rect = computeRect(this.dragOrigin.pageX, this.dragOrigin.pageY, mouseCoords.pageX, mouseCoords.pageY);
 
@@ -286,7 +287,7 @@ export function createHook() {
                 }
             };
 
-            updateStatsForRegion = (mouseCoords) => {
+            const updateStatsForRegion = (mouseCoords) => {
                 if (this.dragOrigin) {
                     const rect = computeRect(this.dragOrigin.pageX, this.dragOrigin.pageY, mouseCoords.pageX, mouseCoords.pageY);
                     const regionStats = getRegionStats(this.el, this.image, rect);

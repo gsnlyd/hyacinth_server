@@ -43,35 +43,56 @@
   </div>
 </header>
 
-<main class="mt-8">
+<main class="mt-4">
   <div class="flex justify-center items-start space-x-12">
     <div class="flex space-x-6">
-      <%= for object <- @element.objects do %>
-        <div>
-          <img
-            class="w-full aspect-square object-contain bg-black rounded"
-            src={Routes.image_path(@socket, :show, object.id)}
-            style="height: calc(100vh - 16rem);"
-          />
-          <div class="mt-6 p-2 text-lg text-gray-300 font-medium text-center bg-gray-800 rounded border border-gray-700">
+      <%= for {object, i} <- Enum.with_index(@element.objects) do %>
+        <div class="w-full">
+          <div class="p-1 text-gray-400 text-center bg-gray-800 rounded">
             <span><%= object.name %></span>
+          </div>
+
+          <div class="mt-2">
+            <%= case Ecto.Changeset.get_field(@viewer_select_changeset, :viewer) do %>
+            <% :web_image -> %>
+              <img
+                class="w-full aspect-square object-contain bg-black rounded"
+                src={Routes.image_path(@socket, :show, object.id)}
+                style="height: calc(100vh - 16rem);"
+              />
+            <% :advanced_png -> %>
+              <%= live_render(@socket, HyacinthWeb.ViewerLive.Viewers.AdvancedPNG, session: %{"object_id" => object.id, "unique_id" => i}, id: "viewer-advanced-png-#{object.id}")  %>
+            <% end %>
           </div>
         </div>
       <% end %>
     </div>
 
     <div class="w-64">
-      <div class="text-sm text-gray-400 font-medium">Label Options</div>
-      <div class="mt-1 space-y-2 flex flex-col">
-        <%= for label_val <- @label_session.job.label_options do %>
-          <button
-            class={["btn btn-lg", if(@current_value == label_val, do: "btn-dark-blue", else: "btn-blue")]}
-            phx-click="set_label"
-            phx-value-label={label_val}
-          >
-            <span><%= label_val %></span>
-          </button>
-        <% end %>
+      <div>
+        <.form let={f} for={@viewer_select_changeset} phx-change="viewer_change">
+          <div class="form-content">
+            <p class="w-full">
+              <%= label f, :viewer %>
+              <%= select f, :viewer, humanize_enum(ViewerSelectForm, :viewer), class: "!w-full" %>
+            </p>
+          </div>
+        </.form>
+      </div>
+
+      <div class="mt-8">
+        <div class="text-sm text-gray-400 font-medium">Label Options</div>
+        <div class="mt-1 space-y-2 flex flex-col">
+          <%= for label_val <- @label_session.job.label_options do %>
+            <button
+              class={["btn btn-lg", if(@current_value == label_val, do: "btn-dark-blue", else: "btn-blue")]}
+              phx-click="set_label"
+              phx-value-label={label_val}
+            >
+              <span><%= label_val %></span>
+            </button>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
