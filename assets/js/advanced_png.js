@@ -47,8 +47,11 @@ function drawGrayscale(imageData, image, minThreshold, maxThreshold) {
 }
 
 function drawRGBA(imageData, image, minThreshold, maxThreshold) {
-    for (let i = 0; i < image.data.length; i++) {
-        const clamped = Math.max(Math.min(image.data[i], maxThreshold), minThreshold);
+    // TODO: this actually tone-maps the alpha values, which is clearly
+    // wrong but doesn't matter because they're usually all set to 255
+    // Still, this should probably be fixed
+    for (let i = 0; i < image.typedData.length; i++) {
+        const clamped = Math.max(Math.min(image.typedData[i], maxThreshold), minThreshold);
         const value = ((clamped - minThreshold) / (maxThreshold - minThreshold)) * 255;
         imageData.data[i] = value;
     }
@@ -72,12 +75,144 @@ function render(canvas, image, minThreshold, maxThreshold) {
     context.putImageData(imageData, 0, 0);
 }
 
+function getRegionStatsGrayscale(image, x1, x2, y1, y2) {
+    const width = image.width;
+
+    let min = image.typedData[x1 + y1 * width];
+    let max = image.typedData[x1 + y1 * width];
+
+    for (let x = x1; x < x2; x++) {
+        for (let y = y1; y < y2; y++) {
+            const value = image.typedData[x + y * width];
+            if (value < min) min = value;
+            if (value > max) max = value;
+        }
+    }
+
+    return {
+        minValue: min,
+        maxValue: max,
+    };
+}
+
+function getRegionStatsRGBA(image, x1, x2, y1, y2) {
+    const width = image.width;
+
+    let min = image.typedData[(x1 + y1 * width) * 4];
+    let max = min;
+
+    for (let x = x1; x < x2; x++) {
+        for (let y = y1; y < y2; y++) {
+            for (let c = 0; c < 3; c++) {
+                const value = image.typedData[((x + y * width) * 4) + c];
+                if (value < min) min = value;
+                if (value > max) max = value;
+            }
+        }
+    }
+
+    return {
+        minValue: min,
+        maxValue: max,
+    };
+}
+
+function getRegionStats(canvas, image, rectPageCoords) {
+    const {x: x1, y: y1} = getCanvasCoordinates(canvas, rectPageCoords.x1, rectPageCoords.y1);
+    const {x: x2, y: y2} = getCanvasCoordinates(canvas, rectPageCoords.x2, rectPageCoords.y2);
+
+    switch (image.ctype) {
+        case 0: return getRegionStatsGrayscale(image, x1, x2, y1, y2);
+        case 6: return getRegionStatsRGBA(image, x1, x2, y1, y2);
+        default: throw new Error(`Unsupported png color type: ${image.ctype}`);
+    }
+}
+
+function getTrueCanvasRect(canvas) {
+    // This function returns the canvas's true
+    // width/height/x/y relative to the canvas element
+    // after accounting for the CSS "object-fit: contain;"
+    // property
+    const containWidth = canvas.scrollWidth;
+    const containHeight = canvas.scrollHeight;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
+    const containRatio = containWidth / containHeight;
+    const canvasRatio = canvasWidth / canvasHeight;
+
+    let width;
+    let height;
+    if (canvasRatio > containRatio) {
+        width = containWidth;
+        height = width / canvasRatio;
+    }
+    else {
+        height = containHeight;
+        width = height * canvasRatio;
+    }
+
+    const x = Math.floor((containWidth - width) / 2);
+    const y = Math.floor((containHeight - height) / 2);
+
+    return {width, height, x, y};
+}
+
+function getCanvasCoordinates(canvas, pageX, pageY) {
+    // Canvas element full bounding rect
+    const rect = canvas.getBoundingClientRect();
+    // Canvas bounding rect relative to above rect
+    // after taking "object-fit: contain" into account
+    const trueRect = getTrueCanvasRect(canvas);
+
+    // True canvas x/y in page coordinates
+    const trueCanvasPageX = rect.x + trueRect.x;
+    const trueCanvasPageY = rect.y + trueRect.y;
+
+    // Input coords (pageX/pageY) relative to true canvas
+    // but still in page pixel units
+    const xPagePixels = pageX - trueCanvasPageX;
+    const yPagePixels = pageY - trueCanvasPageY;
+
+    // Input coords relative to true canvas in canvas coordinates
+    const xCanvasPixels = Math.floor((xPagePixels / trueRect.width) * canvas.width);
+    const yCanvasPixels = Math.floor((yPagePixels / trueRect.height) * canvas.height);
+
+    return {
+        x: xCanvasPixels,
+        y: yCanvasPixels,
+    };
+}
+
+function computeRect(x1, y1, x2, y2) {
+    // Computes bounding rect, re-ordering
+    // values to avoid a negative width/height
+    const newX1 = Math.min(x1, x2);
+    const newX2 = Math.max(x1, x2);
+    const newY1 = Math.min(y1, y2);
+    const newY2 = Math.max(y1, y2);
+
+    return {
+        x: newX1,
+        y: newY1,
+        x1: newX1,
+        y1: newY1,
+        x2: newX2,
+        y2: newY2,
+        width: newX2 - newX1,
+        height: newY2 - newY1,
+    };
+}
+
 export function createHook() {
     return {
         mounted() {
             this.image = null;
             this.minThreshold = 0;
             this.maxThreshold = 100;
+            this.dragOrigin = null;
+
+            this.dragBoxEl = document.getElementById('advanced-png-viewer-drag-box');
 
             this.minSliderEl = document.getElementById('advanced-png-viewer-min-slider');
             this.minInputEl = document.getElementById('advanced-png-viewer-min-input');
@@ -139,6 +274,42 @@ export function createHook() {
 
             this.maxSliderEl.addEventListener('input', ev => updateMaxThreshold(ev.currentTarget.value));
             this.maxInputEl.addEventListener('change', ev => updateMaxThreshold(ev.currentTarget.value));
+
+            renderDrag = (mouseCoords) => {
+                if (this.dragOrigin) {
+                    const rect = computeRect(this.dragOrigin.pageX, this.dragOrigin.pageY, mouseCoords.pageX, mouseCoords.pageY);
+
+                    this.dragBoxEl.style.left = rect.x + 'px';
+                    this.dragBoxEl.style.top = rect.y + 'px';
+                    this.dragBoxEl.style.width = rect.width + 'px';
+                    this.dragBoxEl.style.height = rect.height + 'px';
+                }
+            };
+
+            updateStatsForRegion = (mouseCoords) => {
+                if (this.dragOrigin) {
+                    const rect = computeRect(this.dragOrigin.pageX, this.dragOrigin.pageY, mouseCoords.pageX, mouseCoords.pageY);
+                    const regionStats = getRegionStats(this.el, this.image, rect);
+                    updateMinThreshold(regionStats.minValue);
+                    updateMaxThreshold(regionStats.maxValue);
+                }
+            }
+
+            this.el.addEventListener('mousedown', ev => {
+                this.dragOrigin = {pageX: ev.pageX, pageY: ev.pageY};
+                renderDrag(this.dragOrigin);
+                this.dragBoxEl.classList.remove('hidden');
+            });
+
+            this.el.addEventListener('mouseup', ev => {
+                updateStatsForRegion({pageX: ev.pageX, pageY: ev.pageY});
+                this.dragBoxEl.classList.add('hidden');
+                this.dragOrigin = null;
+            });
+
+            this.el.addEventListener('mousemove', ev => {
+                renderDrag({pageX: ev.pageX, pageY: ev.pageY});
+            });
         }
     }
 }

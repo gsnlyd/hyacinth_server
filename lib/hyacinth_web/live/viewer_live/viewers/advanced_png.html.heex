@@ -6,14 +6,18 @@
     data-object-id={@object.id}
   ></canvas>
 
-  <div class="form-content form-content-style-only mt-4 space-y-2">
-    <div class="pl-4 p-2 w-full bg-gray-800 rounded flex items-center space-x-4">
-      <input class="flex-1" type="range" min="0" max="100" value="0" id="advanced-png-viewer-min-slider" />
-      <input type="number" min="0" max="100" value="0" id="advanced-png-viewer-min-input" />
+  <div phx-update="ignore" id="advanced-png-viewer-controls">
+    <div class="form-content form-content-style-only mt-4 space-y-2">
+      <div class="pl-4 p-2 w-full bg-gray-800 rounded flex items-center space-x-4">
+        <input class="flex-1" type="range" min="0" max="100" value="0" id="advanced-png-viewer-min-slider" />
+        <input type="number" min="0" max="100" value="0" id="advanced-png-viewer-min-input" />
+      </div>
+      <div class="pl-4 p-2 w-full bg-gray-800 rounded flex items-center space-x-4">
+        <input class="flex-1" type="range" min="0" max="100" value="100" id="advanced-png-viewer-max-slider" />
+        <input type="number" min="0" max="100" value="100" id="advanced-png-viewer-max-input" />
+      </div>
     </div>
-    <div class="pl-4 p-2 w-full bg-gray-800 rounded flex items-center space-x-4">
-      <input class="flex-1" type="range" min="0" max="100" value="100" id="advanced-png-viewer-max-slider" />
-      <input type="number" min="0" max="100" value="100" id="advanced-png-viewer-max-input" />
-    </div>
+
+    <div class="hidden fixed pointer-events-none border-2 border-green-400 box-border" id="advanced-png-viewer-drag-box" />
   </div>
 </div>
