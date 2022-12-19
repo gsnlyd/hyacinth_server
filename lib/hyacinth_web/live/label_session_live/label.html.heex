@@ -35,8 +35,15 @@
     </div>
 
     <div class="bg-gray-700 border border-gray-500 divide-x divide-gray-500 rounded flex">
-      <div class="px-4 text-gray-300 font-mono flex items-center">0:00</div>
-      <button class="p-2 text-gray-300 hover:bg-gray-800 rounded-r transition focus:ring-4 focus:ring-gray-500 focus:outline-none">
+      <div class="px-4 text-gray-300 font-mono flex items-center">
+        <span phx-hook="Timer" id="label-timer" data-timestamp={DateTime.to_unix(@started_at)}>
+          <span phx-update="ignore" id="label-timer-display">0:00</span>
+        </span>
+      </div>
+      <button
+        class="p-2 text-gray-300 hover:bg-gray-800 rounded-r transition focus:ring-4 focus:ring-gray-500 focus:outline-none"
+        phx-click="reset_timer"
+      >
         <Icons.refresh_mini />
       </button>
     </div>

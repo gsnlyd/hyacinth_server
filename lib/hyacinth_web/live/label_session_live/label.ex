@@ -31,6 +31,8 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
       element: element,
       labels: labels,
 
+      started_at: DateTime.utc_now(),
+
       current_value: if(length(labels) == 0, do: nil, else: hd(labels).value.option),
 
       viewer_select_changeset: ViewerSelectForm.changeset(%ViewerSelectForm{}, %{}),
@@ -114,6 +116,10 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
             {:noreply, assign(socket, :modal, {:notes, changeset})}
         end
     end
+  end
+
+  def handle_event("reset_timer", _params, socket) do
+    {:noreply, assign(socket, :started_at, DateTime.utc_now())}
   end
 
   def handle_event("viewer_change", %{"viewer_select_form" => params}, socket) do

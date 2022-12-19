@@ -7,7 +7,7 @@
 - [ ] Allow labeling of comparisons by clicking image
 - [x] Fix icons on labeling page
 - [x] Add prompt to labeling page
-- [ ] Increment labeling clock
+- [x] Add hook to increment labeling timer
 - [ ] Fix pipeline run pubsub broadcast running before transaction commit
 - [ ] Clean up pipeline debug logging
 - [x] Update design for PipelineLive.Show steps tab
