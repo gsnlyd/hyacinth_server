@@ -79,14 +79,14 @@ defmodule Hyacinth.Warehouse.Store do
     objects_dir = get_objects_dir()
     if not File.exists?(objects_dir) do
       File.mkdir!(objects_dir)
-      Logger.info "Created objects directory: #{objects_dir}"
+      Logger.debug "Created objects directory: #{objects_dir}"
     end
 
     {hash_algo, _hash_value} = split_hash(hash)
     hash_dir = get_hash_algo_dir(hash_algo)
     if not File.exists?(hash_dir) do
       File.mkdir!(hash_dir)
-      Logger.info "Created hash (#{hash_algo}) subdirectory: #{hash_dir}"
+      Logger.debug "Created hash (#{hash_algo}) subdirectory: #{hash_dir}"
     end
 
     :ok
@@ -105,7 +105,7 @@ defmodule Hyacinth.Warehouse.Store do
 
     dest_path = get_object_path_from_hash(hash)
     bytes_copied = File.copy!(path, dest_path)
-    Logger.info "Successfully copied #{bytes_copied} bytes from #{path} to #{dest_path}"
+    Logger.debug "Successfully copied #{bytes_copied} bytes from #{path} to #{dest_path}"
 
     hash
   end

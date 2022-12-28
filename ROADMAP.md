@@ -9,7 +9,7 @@
 - [x] Add prompt to labeling page
 - [x] Add hook to increment labeling timer
 - [ ] Fix pipeline run pubsub broadcast running before transaction commit
-- [ ] Clean up pipeline debug logging
+- [x] Clean up pipeline debug logging
 - [x] Update design for PipelineLive.Show steps tab
 - [ ] Add runnning pipelines to home page
 - [x] Add LabelJobLive.Index page to show all jobs
