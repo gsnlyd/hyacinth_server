@@ -100,12 +100,8 @@ defmodule HyacinthWeb.Components.Cards do
     ~H"""
     <.link_card to={Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @progress.session)}>
       <:header>
-        <%= if @use_job_for_header do %>
-          <div><%= @progress.session.job.name %></div>
-          <div class="text-xs text-gray-500 font-normal"><%= @progress.session.user.email %></div>
-        <% else %>
-          <%= @progress.session.user.email %>
-        <% end %>
+        <div><%= @progress.session.user.name %>'s Session</div>
+        <div class="text-xs text-gray-500 font-normal"><%= @progress.session.job.name %></div>
       </:header>
 
       <:tag>

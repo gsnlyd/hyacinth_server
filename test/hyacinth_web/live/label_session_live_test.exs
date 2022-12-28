@@ -12,7 +12,7 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
     test "renders label session", %{conn: conn} do
       dataset = root_dataset_fixture("My Dataset", 3, "My Object No")
       job = label_job_fixture(%{name: "My Job", labeling_options_string: "option 1, option 2, option 3"}, dataset)
-      user = user_fixture(%{email: "someuser@example.com"})
+      user = user_fixture(%{name: "Some User", email: "someuser@example.com"})
       %LabelSession{} = label_session = label_session_fixture(job, user)
 
       [e1, e2, _e3] = Labeling.get_label_session_with_elements!(label_session.id).elements
@@ -23,7 +23,7 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       {:ok, _view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Show, label_session))
       assert html =~ "My Job"
       assert html =~ "My Dataset"
-      assert html =~ "someuser@example.com"
+      assert html =~ "Some User"
 
       assert html =~ "My Object No1"
       assert html =~ "My Object No2"

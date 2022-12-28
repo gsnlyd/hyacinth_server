@@ -100,16 +100,16 @@ defmodule HyacinthWeb.LabelJobLiveTest do
   describe "LabelJobLive.Show" do
     test "renders job with sessions", %{conn: conn} do
       %LabelJob{} = job = label_job_fixture(%{name: "My Job"})
-      label_session_fixture(job, user_fixture(%{email: "firstuser@example.com"}))
-      label_session_fixture(job, user_fixture(%{email: "seconduser@example.com"}))
-      label_session_fixture(job, user_fixture(%{email: "thirduser@example.com"}))
+      label_session_fixture(job, user_fixture(%{name: "First User"}))
+      label_session_fixture(job, user_fixture(%{name: "Second User"}))
+      label_session_fixture(job, user_fixture(%{name: "Third User"}))
 
       {:ok, _view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelJobLive.Show, job))
       assert html =~ "<h1>My Job</h1>"
 
-      assert html =~ "firstuser@example.com"
-      assert html =~ "seconduser@example.com"
-      assert html =~ "thirduser@example.com"
+      assert html =~ "First User"
+      assert html =~ "Second User"
+      assert html =~ "Third User"
     end
 
     test "renders job with no sessions", %{conn: conn} do
