@@ -3,6 +3,7 @@ defmodule Hyacinth.Repo.Migrations.CreateUsersAuthTables do
 
   def change do
     create table(:users) do
+      add :name, :string, null: false
       add :email, :string, null: false, collate: :nocase
       add :hashed_password, :string, null: false
       add :confirmed_at, :naive_datetime

@@ -12,6 +12,12 @@
 
     <div class="form-content">
       <p>
+        <%= label f, :name %>
+        <%= text_input f, :name, placeholder: "Name" %>
+        <%= error_tag f, :name %>
+      </p>
+
+      <p>
         <%= label f, :email %>
         <%= text_input f, :email, placeholder: "Email address" %>
         <%= error_tag f, :email %>

@@ -49,10 +49,11 @@ defmodule Hyacinth.AccountsTest do
   end
 
   describe "register_user/1" do
-    test "requires email and password to be set" do
+    test "requires name, email, and password to be set" do
       {:error, changeset} = Accounts.register_user(%{})
 
       assert %{
+               name: ["can't be blank"],
                password: ["can't be blank"],
                email: ["can't be blank"]
              } = errors_on(changeset)
@@ -65,6 +66,12 @@ defmodule Hyacinth.AccountsTest do
                email: ["must have the @ sign and no spaces"],
                password: ["should be at least 12 character(s)"]
              } = errors_on(changeset)
+    end
+
+    test "validates maximum value for name" do
+      too_long = String.duplicate("db", 100)
+      {:error, changeset} = Accounts.register_user(valid_user_attributes(name: too_long))
+      assert %{name: ["should be at most 100 character(s)"]} == errors_on(changeset)
     end
 
     test "validates maximum values for email and password for security" do
@@ -85,8 +92,10 @@ defmodule Hyacinth.AccountsTest do
     end
 
     test "registers users with a hashed password" do
+      name = valid_user_name()
       email = unique_user_email()
-      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
+      {:ok, user} = Accounts.register_user(valid_user_attributes(name: name, email: email))
+      assert user.name == name
       assert user.email == email
       assert is_binary(user.hashed_password)
       assert is_nil(user.confirmed_at)
@@ -97,20 +106,22 @@ defmodule Hyacinth.AccountsTest do
   describe "change_user_registration/2" do
     test "returns a changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_registration(%User{})
-      assert changeset.required == [:password, :email]
+      assert changeset.required == [:password, :email, :name]
     end
 
     test "allows fields to be set" do
+      name = valid_user_name()
       email = unique_user_email()
       password = valid_user_password()
 
       changeset =
         Accounts.change_user_registration(
           %User{},
-          valid_user_attributes(email: email, password: password)
+          valid_user_attributes(name: name, email: email, password: password)
         )
 
       assert changeset.valid?
+      assert get_change(changeset, :name) == name
       assert get_change(changeset, :email) == email
       assert get_change(changeset, :password) == password
       assert is_nil(get_change(changeset, :hashed_password))

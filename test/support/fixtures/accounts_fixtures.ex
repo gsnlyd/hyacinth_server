@@ -4,11 +4,13 @@ defmodule Hyacinth.AccountsFixtures do
   entities via the `Hyacinth.Accounts` context.
   """
 
+  def valid_user_name, do: "Jane Doe"
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
   def valid_user_password, do: "hello world!"
 
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
+      name: valid_user_name(),
       email: unique_user_email(),
       password: valid_user_password()
     })

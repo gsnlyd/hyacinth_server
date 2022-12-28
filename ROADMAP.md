@@ -1,7 +1,7 @@
 # Roadmap
 
 ## 1.0
-- [ ] Add names to users
+- [x] Add names to users
 - [x] Finish LabelJobLive.New form
 - [ ] Add additional options to job types
 - [ ] Allow labeling of comparisons by clicking image

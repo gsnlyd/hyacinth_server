@@ -3,6 +3,7 @@ defmodule Hyacinth.Accounts.User do
   import Ecto.Changeset
 
   schema "users" do
+    field :name, :string
     field :email, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
@@ -30,9 +31,16 @@ defmodule Hyacinth.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:name, :email, :password])
+    |> validate_name()
     |> validate_email()
     |> validate_password(opts)
+  end
+
+  defp validate_name(changeset) do
+    changeset
+    |> validate_required([:name])
+    |> validate_length(:name, max: 100)
   end
 
   defp validate_email(changeset) do
