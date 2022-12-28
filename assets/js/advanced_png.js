@@ -1,3 +1,5 @@
+import UPNG from '../vendor/upng/UPNG.js';
+
 function decode(buffer) {
     const image = UPNG.decode(buffer);
 

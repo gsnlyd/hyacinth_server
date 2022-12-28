@@ -1,5 +1,6 @@
 
 var UPNG = {};
+export default UPNG; // Fixes ES import - make sure to keep if vendored package is ever updated!
 
 	
 
