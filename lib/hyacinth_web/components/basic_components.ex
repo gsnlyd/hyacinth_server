@@ -142,7 +142,7 @@ defmodule HyacinthWeb.Components.BasicComponents do
           <%= for {k, v} <- @options do %>
             <tr>
               <td class="pr-4 text-gray-500"><%= humanize(k) %></td>
-              <td><%= v %></td>
+              <td class="whitespace-pre"><%= if(is_list(v), do: Enum.join(v, ", "), else: v) %></td>
             </tr>
           <% end %>
         </tbody>

@@ -1,6 +1,7 @@
 defmodule Hyacinth.Labeling.LabelJob do
   use Hyacinth.Schema
   import Ecto.Changeset
+  import Hyacinth.Validators
 
   alias Hyacinth.Accounts.User
   alias Hyacinth.Warehouse.Dataset
@@ -32,25 +33,8 @@ defmodule Hyacinth.Labeling.LabelJob do
     |> cast(attrs, [:name, :description, :prompt, :label_options_string, :type, :options, :dataset_id])
     |> validate_required([:name, :label_options_string, :type, :options, :dataset_id])
     |> validate_length(:label_options_string, min: 1)
-    |> parse_label_options_string()
+    |> parse_comma_separated_string(:label_options_string, :label_options)
     |> validate_job_type_options()
-  end
-
-  def parse_label_options_string(%Ecto.Changeset{} = changeset) do
-    if changeset.valid? do
-      label_options_string = get_change(changeset, :label_options_string)
-
-      split_options =
-        label_options_string
-        |> String.split(",", trim: true)
-        |> Enum.map(&String.trim/1)
-
-      changeset
-      |> put_change(:label_options, split_options)
-      |> delete_change(:label_options_string)
-    else
-      changeset
-    end
   end
 
   defp validate_job_type_options(%Ecto.Changeset{} = changeset) do

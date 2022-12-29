@@ -58,4 +58,7 @@ defmodule Hyacinth.Labeling.LabelJobType.Classification do
       [o]
     end)
   end
+
+  @impl LabelJobType
+  def list_object_label_options(_options), do: nil
 end

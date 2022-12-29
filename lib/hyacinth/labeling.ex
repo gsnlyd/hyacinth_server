@@ -440,7 +440,8 @@ defmodule Hyacinth.Labeling do
         end
       end)
       |> Multi.run(:validate_label_value, fn _repo, %{label_job: %LabelJob{} = label_job} ->
-        if label_value in label_job.label_options do
+        object_label_options = LabelJobType.list_object_label_options(label_job.type, label_job.options)
+        if label_value in label_job.label_options or (object_label_options != nil && label_value in object_label_options) do
           {:ok, true}
         else
           {:error, :invalid_label_value}

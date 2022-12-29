@@ -2,7 +2,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
   use HyacinthWeb, :live_view
 
   alias Hyacinth.Labeling
-  alias Hyacinth.Labeling.Note
+  alias Hyacinth.Labeling.{Note, LabelJobType}
 
   defmodule ViewerSelectForm do
     use Ecto.Schema
@@ -26,10 +26,18 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
     element = Labeling.get_label_element!(label_session, params["element_index"])
     labels = Labeling.list_element_labels(element)
 
+    object_label_options =
+      case LabelJobType.list_object_label_options(label_session.job.type, label_session.job.options) do
+        options when is_list(options) -> options
+        nil -> Enum.map(1..(length(element.objects) - 1), fn _i -> nil end)
+      end
+
     socket = assign(socket, %{
       label_session: label_session,
       element: element,
       labels: labels,
+
+      object_label_options: object_label_options,
 
       started_at: DateTime.utc_now(),
 

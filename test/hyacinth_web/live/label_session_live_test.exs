@@ -60,11 +60,9 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       job = label_job_fixture(%{label_options_string: "First Option, Second Option, Third Option"})
       %LabelSession{} = label_session = label_session_fixture(job, user)
 
-      {:ok, view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 0))
-      refute html =~ "btn-dark-blue"
+      {:ok, view, _html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 0))
 
-      html = render_click(view, :set_label, %{"label" => "First Option"})
-      assert html =~ "btn-dark-blue"
+      _html = render_click(view, :set_label, %{"label" => "First Option"})
 
       %LabelElement{} = element = Labeling.get_label_element!(label_session, 0)
       assert [%LabelEntry{value: %LabelEntry.Value{option: "First Option"}}] = Labeling.list_element_labels(element)
@@ -74,11 +72,9 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       job = label_job_fixture(%{label_options_string: "First Option, Second Option, Third Option"})
       %LabelSession{} = label_session = label_session_fixture(job, user)
 
-      {:ok, view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 0))
-      refute html =~ "btn-dark-blue"
+      {:ok, view, _html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 0))
 
-      html = render_keydown(view, :set_label_key, %{"key" => "1"})
-      assert html =~ "btn-dark-blue"
+      _html = render_keydown(view, :set_label_key, %{"key" => "1"})
 
       %LabelElement{} = element = Labeling.get_label_element!(label_session, 0)
       assert [%LabelEntry{value: %LabelEntry.Value{option: "First Option"}}] = Labeling.list_element_labels(element)

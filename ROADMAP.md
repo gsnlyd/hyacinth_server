@@ -3,8 +3,8 @@
 ## 1.0
 - [x] Add names to users
 - [x] Finish LabelJobLive.New form
-- [ ] Add additional options to job types
-- [ ] Allow labeling of comparisons by clicking image
+- [x] Add additional options to job types
+- [x] Allow labeling of comparisons
 - [x] Fix icons on labeling page
 - [x] Add prompt to labeling page
 - [x] Add hook to increment labeling timer

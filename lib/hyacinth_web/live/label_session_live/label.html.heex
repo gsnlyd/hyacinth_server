@@ -53,10 +53,30 @@
 <main class="mt-4">
   <div class="flex justify-center items-start space-x-12">
     <div class="flex space-x-6">
-      <%= for {object, i} <- Enum.with_index(@element.objects) do %>
+      <%= for {{object, label_val}, i} <- @element.objects |> Enum.zip(@object_label_options) |> Enum.with_index() do %>
         <div class="w-full">
-          <div class="p-1 text-gray-400 text-center bg-gray-800 rounded">
-            <span><%= object.name %></span>
+          <div class="flex items-center space-x-2">
+            <div class="flex-1 px-2 py-1.5 text-gray-400 bg-gray-800 rounded border border-gray-700">
+              <div class="flex items-center">
+                <Icons.photo_solid />
+                <span class="ml-2"><%= object.name %></span>
+              </div>
+            </div>
+
+            <%= if label_val do %>
+              <button
+                class="btn btn-blue flex items-center"
+                phx-click="set_label"
+                phx-value-label={label_val}
+              >
+                <span class={["rounded-full bg-black bg-opacity-10 border-2 border-black", label_val != @current_value && "border-opacity-30"]}>
+                  <span class={label_val == @current_value || "opacity-0"}>
+                    <Icons.check_circle_mini />
+                  </span>
+                </span>
+                <span class="ml-2"><%= label_val %></span>
+              </button>
+            <% end %>
           </div>
 
           <div class="mt-2">
@@ -97,13 +117,18 @@
       <div class="mt-4">
         <div class="text-sm text-gray-400 font-medium">Label Options</div>
         <div class="mt-1 space-y-2 flex flex-col">
-          <%= for label_val <- @label_session.job.label_options do %>
+          <%= for {label_val, selected} <- Enum.map(@label_session.job.label_options, fn lv -> {lv, lv == @current_value} end) do %>
             <button
-              class={["btn btn-lg", if(@current_value == label_val, do: "btn-dark-blue", else: "btn-blue")]}
+              class="btn btn-lg btn-blue !px-2 flex items-center"
               phx-click="set_label"
               phx-value-label={label_val}
             >
-              <span><%= label_val %></span>
+              <span class={["rounded-full bg-black bg-opacity-10 border-2 border-black", !selected && "border-opacity-30"]}>
+                <span class={selected || "opacity-0"}>
+                  <Icons.check_circle_mini />
+                </span>
+              </span>
+              <span class="ml-2"><%= label_val %></span>
             </button>
           <% end %>
         </div>

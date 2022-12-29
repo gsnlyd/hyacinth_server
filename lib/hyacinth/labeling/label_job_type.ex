@@ -103,6 +103,35 @@ defmodule Hyacinth.Labeling.LabelJobType do
   @spec group_objects(atom, [%Object{}]) :: [[%Object{}]]
   def group_objects(job_type, objects), do: module_for(job_type).group_objects(objects)
 
+  @doc """
+  Callback that lists object label options for this job type.
+
+  See `list_object_label_options/2` for details.
+  """
+  @callback list_object_label_options(options :: map) :: [String.t] | nil
+
+  @doc """
+  Lists object label options for the given job type.
+
+  Object label options are the label option values which
+  are set when a user chooses a particular object in
+  a comparison.
+
+  This functionality is not implemented for all job types.
+  In this case, the return value will be nil.
+
+  ## Examples
+
+      iex> list_object_label_options(:comparison_exhaustive, some_options)
+      ["First Image", "Second Image"]
+
+      iex> list_object_label_options(:classification, some_options)
+      nil
+
+  """
+  @spec list_object_label_options(atom, map) :: [String.t] | nil
+  def list_object_label_options(job_type, options), do: module_for(job_type).list_object_label_options(options)
+
   defp module_for(:classification), do: LabelJobType.Classification
   defp module_for(:comparison_exhaustive), do: LabelJobType.ComparisonExhaustive
 end
