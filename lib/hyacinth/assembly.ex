@@ -173,6 +173,32 @@ defmodule Hyacinth.Assembly do
   end
 
   @doc """
+  Lists all pipeline runs which are currently
+  running with preloads.
+
+  The following fields are preloaded:
+    * `ran_by`
+    * `pipeline`
+    * `transform_runs`
+    * `TransformRun.input`
+    * `TransformRun.output`
+
+  ## Examples
+
+      iex> list_running_pipeline_runs_preloaded()
+      [%PipelineRun{}, %PipelineRun{}, ...]
+
+  """
+  def list_running_pipeline_runs_preloaded do
+    Repo.all(
+      from pr in PipelineRun,
+      where: pr.status == :running,
+      select: pr,
+      preload: [:ran_by, :pipeline, transform_runs: [:input, :output]]
+    )
+  end
+
+  @doc """
   Gets a single PipelineRun.
 
   The following attributes are preloaded:
@@ -300,7 +326,7 @@ defmodule Hyacinth.Assembly do
   end
 
   @doc """
-  Subscribes to updates for a PipelineRun.
+  Subscribes to updates for a Pipeline or PipelineRun.
 
   If a `Hyacinth.Assembly.Pipeline` is passed, updates
   are sent for all runs associated with that Pipeline.
@@ -338,10 +364,27 @@ defmodule Hyacinth.Assembly do
     :ok = PubSub.subscribe(Hyacinth.PubSub, "pipeline_run_updates:pipeline_run_id:#{pipeline_run_id}")
   end
 
+  @doc """
+  Subscribes to all PipelineRun updates.
+
+  See `subscribe_pipeline_run_updates/1` for
+  details on the message format.
+
+  ## Examples
+
+      iex> subscribe_all_pipeline_run_updates()
+      :ok
+
+  """
+  def subscribe_all_pipeline_run_updates do
+    :ok = PubSub.subscribe(Hyacinth.PubSub, "pipeline_run_updates")
+  end
+
   @doc false
   @spec broadcast_pipeline_run_update(%PipelineRun{}) :: :ok
   def broadcast_pipeline_run_update(%PipelineRun{id: pipeline_run_id, pipeline_id: pipeline_id}) do
     message = {:pipeline_run_updated, {pipeline_run_id, get_pipeline_run_status!(pipeline_run_id)}}
+    PubSub.broadcast!(Hyacinth.PubSub, "pipeline_run_updates", message)
     PubSub.broadcast!(Hyacinth.PubSub, "pipeline_run_updates:pipeline_id:#{pipeline_id}", message)
     PubSub.broadcast!(Hyacinth.PubSub, "pipeline_run_updates:pipeline_run_id:#{pipeline_run_id}", message)
     :ok

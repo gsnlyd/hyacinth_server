@@ -12,7 +12,7 @@
 - [x] Fix pipeline run pubsub broadcast running before transaction commit
 - [x] Clean up pipeline debug logging
 - [x] Update design for PipelineLive.Show steps tab
-- [ ] Add runnning pipelines to home page
+- [x] Add runnning pipelines to home page
 - [x] Add LabelJobLive.Index page to show all jobs
 - [x] Add viewer abstraction
 - [x] Add advanced PNG viewer

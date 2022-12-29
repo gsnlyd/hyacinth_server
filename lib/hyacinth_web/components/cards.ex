@@ -3,6 +3,9 @@ defmodule HyacinthWeb.Components.Cards do
   alias HyacinthWeb.Router.Helpers, as: Routes
 
   import HyacinthWeb.Components.BasicComponents
+  import HyacinthWeb.LiveUtils
+
+  alias HyacinthWeb.Components.Icons
 
   alias Hyacinth.Warehouse.DatasetStats
 
@@ -67,6 +70,72 @@ defmodule HyacinthWeb.Components.Cards do
       </:body>
 
       <:footer>Created <%= Calendar.strftime(@pipeline.inserted_at, "%c") %></:footer>
+    </.link_card>
+    """
+  end
+
+  def pipeline_run_card(assigns) do
+    ~H"""
+    <.link_card to={Routes.live_path(@socket, HyacinthWeb.PipelineRunLive.Show, @pipeline_run)}>
+      <:header>
+        <span class="px-1 py-0.5 text-xs text-gray-400 bg-gray-700 rounded">Input</span>
+        <span class="text-sm text-gray-300 font-medium"><%= hd(@pipeline_run.transform_runs).input.name %></span>
+      </:header>
+
+      <:tag>
+        <%= case @pipeline_run.status do %>
+        <% :running -> %>
+          <div class="pill pill-yellow">Running</div>
+        <% :complete -> %>
+          <div class="pill pill-green">Complete</div>
+        <% end %>
+      </:tag>
+
+      <:body>
+        <div class="mt-1 text-sm text-gray-400 flex items-center">
+          <div class="text-sm">
+            <span class="text-gray-500">Ran by</span>
+            <span><%= @pipeline_run.ran_by.email %></span>
+          </div>
+          <%= if @pipeline_run.completed_at do %>
+            <div class="mx-1">&bull;</div>
+            <div><%= format_time(DateTime.diff(@pipeline_run.completed_at, @pipeline_run.inserted_at)) %></div>
+          <% end %>
+        </div>
+
+
+        <div class="mt-2 text-sm text-gray-400">
+          <%= for tr <- @pipeline_run.transform_runs do %>
+            <div class="flex items-center space-x-1">
+              <div>
+                <%= case tr.status do %>
+                <% :waiting -> %>
+                  <div class="text-gray-500 opacity-60">
+                    <Icons.minus_circle_mini />
+                  </div>
+                <% :running -> %>
+                  <div class="text-yellow-400 animate-spin">
+                    <Icons.refresh_mini />
+                  </div>
+                <% :complete -> %>
+                  <div class="text-green-400 opacity-60">
+                    <Icons.check_circle_mini />
+                  </div>
+                <% end %>
+              </div>
+              <div>Step <%= tr.order_index + 1 %></div>
+            </div>
+          <% end %>
+        </div>
+      </:body>
+
+      <:footer>
+        <%= if @pipeline_run.status == :complete do %>
+          <div class="text-gray-500 text-xs">Completed <%= Calendar.strftime(@pipeline_run.completed_at, "%c") %></div>
+        <% else %>
+          <div class="text-gray-500 text-xs">Started <%= Calendar.strftime(@pipeline_run.inserted_at, "%c") %></div>
+        <% end %>
+      </:footer>
     </.link_card>
     """
   end

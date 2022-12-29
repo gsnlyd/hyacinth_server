@@ -339,6 +339,37 @@ defmodule Hyacinth.AssemblyTest do
     end
   end
 
+  describe "list_running_pipeline_runs_preloaded" do
+    test "lists running pipeline runs" do
+      run1 = pipeline_run_fixture()
+      run2 = pipeline_run_fixture()
+      _run3 = completed_pipeline_run_fixture()
+
+      [r1, r2] = Assembly.list_running_pipeline_runs_preloaded()
+      
+      assert %PipelineRun{} = r1
+      assert r1.id == run1.id
+      assert Ecto.assoc_loaded?(r1.ran_by)
+      assert Ecto.assoc_loaded?(r1.pipeline)
+      assert Ecto.assoc_loaded?(r1.transform_runs)
+      assert Ecto.assoc_loaded?(hd(r1.transform_runs).input)
+      assert Ecto.assoc_loaded?(hd(r1.transform_runs).output)
+
+      assert %PipelineRun{} = r2
+      assert r2.id == run2.id
+      assert Ecto.assoc_loaded?(r2.ran_by)
+      assert Ecto.assoc_loaded?(r2.pipeline)
+      assert Ecto.assoc_loaded?(r2.transform_runs)
+      assert Ecto.assoc_loaded?(hd(r2.transform_runs).input)
+      assert Ecto.assoc_loaded?(hd(r2.transform_runs).output)
+    end
+
+    test "returns empty list if there are no running pipelines" do
+      completed_pipeline_run_fixture()
+      assert Assembly.list_running_pipeline_runs_preloaded() == []
+    end
+  end
+  
   describe "get_pipeline_run!/1" do
     test "gets a single pipeline run with preloads" do
       original_pr = pipeline_run_fixture()
@@ -590,6 +621,23 @@ defmodule Hyacinth.AssemblyTest do
 
       pipeline_run_id = pipeline_run.id
       assert_received {:pipeline_run_updated, {^pipeline_run_id, :running}}
+    end
+  end
+
+  describe "subscribe_all_pipeline_run_updates" do
+    test "correctly subscribes to all pipelines" do
+      %PipelineRun{} = run1 = pipeline_run_fixture()
+      %PipelineRun{} = run2 = pipeline_run_fixture()
+
+      :ok = Assembly.subscribe_all_pipeline_run_updates()
+
+      :ok = Assembly.broadcast_pipeline_run_update(run1)
+      run1_id = run1.id
+      assert_received {:pipeline_run_updated, {^run1_id, :running}}
+
+      :ok = Assembly.broadcast_pipeline_run_update(run2)
+      run2_id = run2.id
+      assert_received {:pipeline_run_updated, {^run2_id, :running}}
     end
   end
 

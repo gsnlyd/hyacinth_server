@@ -1,15 +1,31 @@
 <main>
-  <div>
+  <%= if length(@user_sessions) > 0 do %>
     <div>
-      <h3>Your Labeling Sessions</h3>
-    </div>
+      <div>
+        <h3>Your Labeling Sessions</h3>
+      </div>
 
-    <div class="mt-2 grid grid-cols-3 gap-4">
-      <%= for prog <- @user_sessions do %>
-        <Cards.label_session_progress_card progress={prog} use_job_for_header={true} socket={@socket} />
-      <% end %>
+      <div class="mt-2 grid grid-cols-3 gap-4">
+        <%= for prog <- @user_sessions do %>
+          <Cards.label_session_progress_card progress={prog} use_job_for_header={true} socket={@socket} />
+        <% end %>
+      </div>
     </div>
-  </div>
+  <% end %>
+
+  <%= if length(@running_pipeline_runs) > 0 do %>
+    <div class="mt-8">
+      <div>
+        <h3>Running Pipelines</h3>
+      </div>
+
+      <div class="mt-2 grid grid-cols-3 gap-4">
+        <%= for run <- @running_pipeline_runs do %>
+          <Cards.pipeline_run_card pipeline_run={run} socket={@socket} />
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 
   <div class="mt-8 flex space-x-6">
 
@@ -24,7 +40,7 @@
       </div>
 
       <div class="mt-2 flex flex-col space-y-4">
-        <%= for dataset_stats <- @datasets do %>
+        <%= for dataset_stats <- Enum.take(@datasets, 5) do %>
           <Cards.dataset_card dataset_stats={dataset_stats} socket={@socket} />
         <% end %>
       </div>
@@ -41,7 +57,7 @@
       </div>
 
       <div class="mt-2 flex flex-col space-y-4">
-        <%= for pipeline <- @pipelines do %>
+        <%= for pipeline <- Enum.take(@pipelines, 5) do %>
           <Cards.pipeline_card pipeline={pipeline} socket={@socket} />
         <% end %>
       </div>
@@ -58,7 +74,7 @@
       </div>
 
       <div class="mt-2 flex flex-col space-y-4">
-        <%= for job <- @jobs do %>
+        <%= for job <- Enum.take(@jobs, 5) do %>
           <Cards.label_job_card job={job} socket={@socket} />
         <% end %>
       </div>

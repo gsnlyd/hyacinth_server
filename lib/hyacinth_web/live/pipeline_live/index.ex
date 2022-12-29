@@ -26,6 +26,8 @@ defmodule HyacinthWeb.PipelineLive.Index do
 
 
   def mount(_params, _session, socket) do
+    if connected?(socket), do: Assembly.subscribe_all_pipeline_run_updates()
+
     socket = assign(socket, %{
       pipelines: Assembly.list_pipelines_preloaded(),
 
@@ -56,5 +58,12 @@ defmodule HyacinthWeb.PipelineLive.Index do
   def handle_event("pipeline_filter_updated", %{"pipeline_filter_form" => params}, socket) do
     changeset = PipelineFilterForm.changeset(%PipelineFilterForm{}, params)
     {:noreply, assign(socket, :pipeline_filter_changeset, changeset)}
+  end
+
+  def handle_info({:pipeline_run_updated, {_id, _status}}, socket) do
+    socket = assign(socket, %{
+      pipelines: Assembly.list_pipelines_preloaded(),
+    })
+    {:noreply, socket}
   end
 end

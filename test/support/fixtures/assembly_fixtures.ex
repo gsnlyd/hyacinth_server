@@ -54,4 +54,15 @@ defmodule Hyacinth.AssemblyFixtures do
     %PipelineRun{} = pipeline_run = Assembly.create_pipeline_run!(pipeline, dataset, user)
     Assembly.get_pipeline_run!(pipeline_run.id)
   end
+
+  def completed_pipeline_run_fixture(pipeline \\ nil, dataset \\ nil, user \\ nil) do
+    %PipelineRun{} = pipeline_run = pipeline_run_fixture(pipeline, dataset, user)
+    [tr1, tr2] = pipeline_run.transform_runs
+    {:ok, _} = Assembly.start_transform_run(tr1)
+    {:ok, _} = Assembly.complete_transform_run(tr1, many_object_params_fixtures())
+    {:ok, _} = Assembly.start_transform_run(tr2)
+    {:ok, _} = Assembly.complete_transform_run(tr2, many_object_params_fixtures())
+
+    Assembly.get_pipeline_run!(pipeline_run.id)
+  end
 end
