@@ -69,8 +69,14 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonExhaustive do
   end
 
   @impl LabelJobType
-  def group_objects(objects) do
-    combinations(objects)
+  def group_objects(options, objects) do
+    options = ComparisonExhaustiveOptions.parse(options)
+    grouped = combinations(objects)
+    if options.randomize do
+      Hyacinth.RandomUtils.shuffle_seeded(options.random_seed, grouped)
+    else
+      grouped
+    end
   end
 
   # TODO: move this function somewhere else

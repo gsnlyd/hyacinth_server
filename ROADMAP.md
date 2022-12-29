@@ -4,6 +4,7 @@
 - [x] Add names to users
 - [x] Finish LabelJobLive.New form
 - [x] Add additional options to job types
+- [x] Implement randomization for drivers/job types
 - [x] Allow labeling of comparisons
 - [x] Fix icons on labeling page
 - [x] Add prompt to labeling page

@@ -83,7 +83,7 @@ defmodule Hyacinth.Labeling.LabelJobType do
 
   See `group_objects/2` for details.
   """
-  @callback group_objects([%Object{}]) :: [[%Object{}]]
+  @callback group_objects(options :: map, objects :: [%Object{}]) :: [[%Object{}]]
 
   @doc """
   Groups objects according to the given job type's behavior.
@@ -100,8 +100,8 @@ defmodule Hyacinth.Labeling.LabelJobType do
       [[...], [...], [...]]
 
   """
-  @spec group_objects(atom, [%Object{}]) :: [[%Object{}]]
-  def group_objects(job_type, objects), do: module_for(job_type).group_objects(objects)
+  @spec group_objects(atom, map, [%Object{}]) :: [[%Object{}]]
+  def group_objects(job_type, options, objects), do: module_for(job_type).group_objects(options, objects)
 
   @doc """
   Callback that lists object label options for this job type.

@@ -18,6 +18,12 @@ defmodule Hyacinth.Assembly.Driver.Sample do
       |> validate_required([:object_count, :random_seed])
       |> validate_number(:object_count, greater_than: 0)
     end
+
+    def parse(params) do
+      %SampleOptions{}
+      |> changeset(params)
+      |> apply_changes()
+    end
   end
 
   @behaviour Driver
@@ -50,8 +56,8 @@ defmodule Hyacinth.Assembly.Driver.Sample do
 
   @impl Driver
   def filter_objects(options, objects) do
-    # TODO: use seed
-    Enum.take_random(objects, options["object_count"])
+    options = SampleOptions.parse(options)
+    Hyacinth.RandomUtils.take_random_seeded(options.random_seed, objects, options.object_count)
   end
 
   @impl Driver

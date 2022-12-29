@@ -19,6 +19,12 @@ defmodule Hyacinth.Labeling.LabelJobType.Classification do
       |> validate_required([:randomize, :random_seed])
       |> validate_number(:random_seed, greater_than: 0)
     end
+
+    def parse(params) do
+      %ClassificationOptions{}
+      |> changeset(params)
+      |> apply_changes()
+    end
   end
 
   @behaviour LabelJobType
@@ -53,10 +59,14 @@ defmodule Hyacinth.Labeling.LabelJobType.Classification do
   end
 
   @impl LabelJobType
-  def group_objects(objects) do
-    Enum.map(objects, fn %Object{} = o ->
-      [o]
-    end)
+  def group_objects(options, objects) do
+    options =  ClassificationOptions.parse(options)
+    grouped = Enum.map(objects, fn %Object{} = o -> [o] end)
+    if options.randomize do
+      Hyacinth.RandomUtils.shuffle_seeded(options.random_seed, grouped)
+    else
+      grouped
+    end
   end
 
   @impl LabelJobType

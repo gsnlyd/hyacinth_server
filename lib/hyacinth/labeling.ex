@@ -123,7 +123,7 @@ defmodule Hyacinth.Labeling do
       end)
       |> Multi.run(:elements, fn _repo, %{label_job: %LabelJob{} = job, blueprint_session: %LabelSession{} = blueprint} ->
         dataset = Warehouse.get_dataset!(job.dataset_id)
-        objects_grouped = LabelJobType.group_objects(job.type, Warehouse.list_objects(dataset))
+        objects_grouped = LabelJobType.group_objects(job.type, job.options, Warehouse.list_objects(dataset))
 
         elements =
           objects_grouped
