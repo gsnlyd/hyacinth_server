@@ -18,14 +18,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create \
-            --title ${{ inputs.tagName }} \
+            --title "${{ inputs.tagName }}" \
             --draft \
-            ${{ inputs.tagName }}
+            --repo $GITHUB_REPOSITORY \
+            "${{ inputs.tagName }}"
 
   build-x64-centos-stream-8:
     uses: ./.github/workflows/build-x64-centos-stream-8.yml
 
   upload-x64-centos-stream-8:
+    needs: [create-release-draft, build-x64-centos-stream-8]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -36,4 +38,8 @@ jobs:
       - name: Upload build to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ inputs.tagName }} hyacinth-x64-centos-stream-8.tar
+        run: |
+          gh release upload \
+            --repo $GITHUB_REPOSITORY \
+            ${{ inputs.tagName }} \
+            hyacinth-x64-centos-stream-8.tar
