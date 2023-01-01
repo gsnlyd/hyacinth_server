@@ -1,0 +1,44 @@
+name: Run integration tests
+
+on: workflow_call
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: 25
+          elixir-version: 1.14
+      - name: Download dcm2niix
+        run: |
+          cd ~
+          curl -fLO https://github.com/rordenlab/dcm2niix/releases/latest/download/dcm2niix_lnx.zip
+          unzip dcm2niix_lnx.zip
+          mkdir dcm2niix_bin
+          mv dcm2niix dcm2niix_bin
+      - name: Set up slicer python
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+        working-directory: ./priv/drivers/python_slicer
+      - name: Generate test data
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          mkdir -p datasets/test_dataset
+          python generate.py 10 datasets/test_dataset
+        working-directory: ./priv/test_data
+      - name: Make storage directories
+        run: |
+          mkdir -p priv/test_storage/warehouse
+          mkdir -p priv/test_storage/transform
+      - run: mix deps.get
+      - run: MIX_ENV=test mix compile
+      - name: Run integration tests
+        run: |
+          export PATH="$PATH:$HOME/dcm2niix_bin"
+          mix test --only integration
