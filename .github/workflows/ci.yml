@@ -2,15 +2,7 @@ on: push
 
 jobs:
   unit-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: erlef/setup-beam@v1
-        with:
-          otp-version: 25
-          elixir-version: 1.14
-      - run: mix deps.get
-      - run: mix test
+    uses: ./.github/workflows/unit-tests.yml
 
   integration-tests:
     runs-on: ubuntu-latest
