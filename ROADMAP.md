@@ -19,7 +19,7 @@
 - [x] Update slicer to use grayscale with 16-bit support and tone mapping
 - [x] Update advanced PNG viewer to support 16-bit and grayscale
 - [x] Add viewer selection to labeling page
-- [ ] Add release action to CI
+- [x] Add release action to CI
 
 ## 1.1
 - [ ] Add collaborative viewing/labeling features
