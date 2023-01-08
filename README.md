@@ -130,7 +130,7 @@ See the [Elixir installation instructions](https://elixir-lang.org/install.html)
 (package managers for the Elixir and Erlang ecosystems, respectively) to build Hyacinth. Both
 can be installed via the `mix` build tool included with Elixir.
 
-If you skip this step, you will be prompted to install both during step 3.
+    If you skip this step, you will be prompted to install both during step 3.
 
     ```console
     $ mix local.hex
