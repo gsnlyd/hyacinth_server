@@ -5,6 +5,10 @@ defmodule Hyacinth.Release do
   """
   @app :hyacinth
 
+  def generate_config() do
+    Hyacinth.GenerateConfig.generate_config()
+  end
+
   def new_dataset(a1, a2, a3) do
     load_app()
 

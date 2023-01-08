@@ -22,5 +22,6 @@
 - [x] Add release action to CI
 
 ## 1.1
+- [x] Add script to generate a default config file
 - [ ] Add collaborative viewing/labeling features
 - [ ] Add viewers for other image types (DICOM, Nifti)
