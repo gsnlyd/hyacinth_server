@@ -81,6 +81,7 @@ defmodule Hyacinth.LabelingTest do
 
       job_with_bp = Labeling.get_job_with_blueprint(label_job.id)
       assert job_with_bp.id == label_job.id
+      assert Ecto.assoc_loaded?(job_with_bp.created_by_user)
       assert Ecto.assoc_loaded?(job_with_bp.dataset)
       assert Ecto.assoc_loaded?(job_with_bp.blueprint)
       assert Ecto.assoc_loaded?(job_with_bp.blueprint.elements)

@@ -35,6 +35,18 @@
     </div>
   </div>
 
+  <div class="mt-2 flex items-center space-x-2">
+    <.header_tag tooltip="Created by">
+      <:icon><Icons.user_circle_mini /></:icon>
+      <:text><%= @pipeline.creator.name %></:text>
+    </.header_tag>
+
+    <.header_tag tooltip="Steps">
+      <:icon><Icons.rectangle_stack_mini /></:icon>
+      <:text><%= length(@pipeline.transforms) %> steps</:text>
+    </.header_tag>
+  </div>
+
   <div class="mt-4 text-xl border-b-2 border-gray-700">
     <div class="-mb-0.5">
       <.tab_button cur_tab={@tab} event="set_tab" tab="runs">Runs</.tab_button>

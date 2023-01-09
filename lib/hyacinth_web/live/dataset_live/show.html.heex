@@ -27,6 +27,18 @@
     <% end %>
   </div>
 
+  <div class="mt-2 flex items-center space-x-2">
+    <.header_tag tooltip="Labeling Jobs">
+      <:icon><Icons.rectangle_stack_mini /></:icon>
+      <:text><%= length(@jobs) %> labeling jobs</:text>
+    </.header_tag>
+
+    <.header_tag tooltip="Images">
+      <:icon><Icons.rectangle_stack_mini /></:icon>
+      <:text><%= length(@objects) %> images</:text>
+    </.header_tag>
+  </div>
+
   <div class="mt-4 text-xl border-b-2 border-gray-700">
     <div class="-mb-0.5">
       <.tab_button cur_tab={@tab} event="set_tab" tab="jobs">Labeling Jobs</.tab_button>
@@ -69,7 +81,6 @@
 
   <% :objects -> %>
     <div>
-      <div class="ml-1 text-lg text-gray-300"><%= length(@objects) %> objects</div>
       <div class="mt-2 border border-gray-700 rounded">
         <table class="mt-1 w-full table">
           <thead>

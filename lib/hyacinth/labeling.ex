@@ -97,7 +97,7 @@ defmodule Hyacinth.Labeling do
       from lj in LabelJob,
       where: lj.id == ^id,
       select: lj,
-      preload: [dataset: [], blueprint: [elements: :objects]]
+      preload: [created_by_user: [], dataset: [], blueprint: [elements: :objects]]
     )
   end
 

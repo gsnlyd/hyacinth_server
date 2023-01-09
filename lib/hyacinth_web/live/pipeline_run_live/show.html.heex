@@ -23,22 +23,25 @@
         <% end %>
       </div>
     </div>
+  </div>
 
-    <div class="mt-1 text-gray-400 flex items-center space-x-2">
-      <div>
-        <span class="tag">Ran by</span>
-        <span><%= @pipeline_run.ran_by.email %></span>
-      </div>
+  <div class="mt-2 flex items-center space-x-2">
+    <.header_tag tooltip="Pipeline">
+      <:icon><Icons.rectangle_stack_mini /></:icon>
+      <:text><%= @pipeline_run.pipeline.name %></:text>
+    </.header_tag>
 
-      <%= if @pipeline_run.completed_at do %>
-        <div class="flex items-center space-x-0.5">
-          <div class="text-gray-500">
-            <Icons.check_circle_mini />
-          </div>
-          <span><%= format_time(DateTime.diff(@pipeline_run.completed_at, @pipeline_run.inserted_at)) %></span>
-        </div>
-      <% end %>
-    </div>
+    <.header_tag tooltip="Ran by">
+      <:icon><Icons.user_circle_mini /></:icon>
+      <:text><%= @pipeline_run.ran_by.name %></:text>
+    </.header_tag>
+
+    <%= if @pipeline_run.completed_at do %>
+      <.header_tag tooltip="Run time">
+        <:icon><Icons.check_circle_mini /></:icon>
+        <:text><%= format_time(DateTime.diff(@pipeline_run.completed_at, @pipeline_run.inserted_at)) %></:text>
+      </.header_tag>
+    <% end %>
   </div>
 </header>
 
