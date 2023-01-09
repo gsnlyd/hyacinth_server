@@ -17,8 +17,8 @@ defmodule HyacinthWeb.PipelineLive.Show do
     end
 
     @doc false
-    def changeset(filter_options, attrs) do
-      filter_options
+    def changeset(data, attrs) do
+      data
       |> cast(attrs, [:dataset_id])
       |> validate_required([:dataset_id])
     end
@@ -53,14 +53,13 @@ defmodule HyacinthWeb.PipelineLive.Show do
     socket = assign(socket, %{
       pipeline: pipeline,
       transforms: Assembly.list_transforms(pipeline),
-
       datasets: Warehouse.list_datasets(),
-
-      run_pipeline_changeset: RunPipelineForm.changeset(%RunPipelineForm{}, %{}),
 
       run_filter_changeset: RunFilterForm.changeset(%RunFilterForm{}, %{}),
 
       tab: :runs,
+
+      modal: nil,
     })
 
     {:ok, socket}
@@ -85,23 +84,6 @@ defmodule HyacinthWeb.PipelineLive.Show do
     |> Enum.sort_by(sort_func, sorter)
   end
 
-  def handle_event("run_pipeline_submit", %{"run_pipeline_form" => params}, socket) do
-    changeset = RunPipelineForm.changeset(%RunPipelineForm{}, params)
-    dataset_id = Ecto.Changeset.apply_changes(changeset).dataset_id
-
-    case dataset_id do
-      dataset_id when is_integer(dataset_id) ->
-        %Dataset{} = dataset = Warehouse.get_dataset!(dataset_id)
-        %PipelineRun{} = pipeline_run = Assembly.create_pipeline_run!(socket.assigns.pipeline, dataset, socket.assigns.current_user)
-        :ok = Runner.run_pipeline(pipeline_run)
-
-        {:noreply, push_redirect(socket, to: Routes.live_path(socket, HyacinthWeb.PipelineRunLive.Show, pipeline_run))}
-
-      nil ->
-        {:noreply, assign(socket, :run_pipeline_changeset, changeset)}
-    end
-  end
-
   def handle_event("set_tab", %{"tab" => tab}, socket) do
     tab = case tab do
       "runs" -> :runs
@@ -113,6 +95,40 @@ defmodule HyacinthWeb.PipelineLive.Show do
   def handle_event("run_filter_updated", %{"run_filter_form" => params}, socket) do
     changeset = RunFilterForm.changeset(%RunFilterForm{}, params)
     {:noreply, assign(socket, :run_filter_changeset, changeset)}
+  end
+
+  def handle_event("run_pipeline_form_change", %{"run_pipeline_form" => params}, socket) do
+    changeset =
+      %RunPipelineForm{}
+      |> RunPipelineForm.changeset(params)
+      |> Map.put(:action, :insert)
+
+    {:noreply, assign(socket, :modal, {:run_pipeline, changeset})}
+  end
+
+  def handle_event("run_pipeline_form_submit", %{"run_pipeline_form" => params}, socket) do
+    changeset = RunPipelineForm.changeset(%RunPipelineForm{}, params)
+
+    case Ecto.Changeset.apply_action(changeset, :insert) do
+      {:ok, %RunPipelineForm{} = schema} ->
+        %Dataset{} = dataset = Warehouse.get_dataset!(schema.dataset_id)
+        %PipelineRun{} = pipeline_run = Assembly.create_pipeline_run!(socket.assigns.pipeline, dataset, socket.assigns.current_user)
+        :ok = Runner.run_pipeline(pipeline_run)
+
+        {:noreply, push_redirect(socket, to: Routes.live_path(socket, HyacinthWeb.PipelineRunLive.Show, pipeline_run))}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, :modal, {:run_pipeline, changeset})}
+    end
+  end
+
+  def handle_event("open_modal_run_pipeline", _params, socket) do
+    changeset = RunPipelineForm.changeset(%RunPipelineForm{}, %{})
+    {:noreply, assign(socket, :modal, {:run_pipeline, changeset})}
+  end
+
+  def handle_event("close_modal", _params, socket) do
+    {:noreply, assign(socket, :modal, nil)}
   end
 
   def handle_info({:pipeline_run_updated, {_id, _status}}, socket) do
