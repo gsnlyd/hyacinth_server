@@ -19,24 +19,31 @@
       <div class="flex items-center space-x-3">
         <h1><%= @label_session.user.name %>'s Session</h1>
         <div>
-          <%= case @label_session.job.type do %>
-            <% :classification -> %>
-              <div class="pill pill-lg pill-green">Classification Session</div>
-            <% :comparison_exhaustive -> %>
-              <div class="pill pill-lg pill-blue">Comparison Session</div>
+          <%= cond do %>
+          <% @num_labeled == 0 -> %>
+            <div class="pill pill-lg pill-gray">Not Started</div>
+          <% @num_labeled < @num_total -> %>
+            <div class="pill pill-lg pill-yellow">In Progress</div>
+          <% true -> %>
+            <div class="pill pill-lg pill-green">Complete</div>
           <% end %>
         </div>
       </div>
 
       <div class="mt-3 flex items-center space-x-2">
-        <.header_tag>
+        <.header_tag tooltip="Labeling Job">
           <:icon><Icons.rectangle_stack_mini /></:icon>
           <:text><%= @label_session.job.name %></:text>
         </.header_tag>
 
-        <.header_tag>
+        <.header_tag tooltip="Session User">
           <:icon><Icons.user_circle_mini /></:icon>
           <:text><%= @label_session.user.name %></:text>
+        </.header_tag>
+
+        <.header_tag tooltip="Labeling Job Type">
+          <:icon><Icons.book_open_mini /></:icon>
+          <:text><%= LabelJobType.name(@label_session.job.type) %></:text>
         </.header_tag>
 
         <.header_tag>
@@ -55,9 +62,24 @@
   </div>
 </header>
 
-<main class="mt-6">
+<main class="mt-4">
   <div>
-    <div class="border border-gray-700 rounded">
+    <div class="flex items-center space-x-2">
+      <div class="px-2 py-0.5 text-sm text-gray-300 font-medium bg-gray-800 rounded">
+        <span><%= @num_labeled %></span>
+        <span>/</span>
+        <span><%= @num_total %></span>
+      </div>
+
+      <div class="flex-1 h-1.5 bg-gray-600 rounded-full">
+        <div
+          class={["h-full rounded-full bg-opacity-70", if(@num_labeled < @num_total, do: "bg-yellow-400", else: "bg-green-400")]}
+          style={"width: #{if(@num_labeled == 0, do: 0, else: (@num_labeled / (@num_total) * 100))}%"}
+        />
+      </div>
+    </div>
+
+    <div class="mt-2 border border-gray-700 rounded">
       <table class="mt-1 w-full table">
         <thead>
           <tr>

@@ -70,8 +70,9 @@ defmodule HyacinthWeb.Components.BasicComponents do
   end
 
   def header_tag(assigns) do
+    assigns = assign_new(assigns, :tooltip, fn -> nil end)
     ~H"""
-    <div class="pl-1 pr-2 py-1 text-sm text-black font-medium bg-gray-300 rounded flex items-center">
+    <div class="pl-1 pr-2 py-1 text-sm text-black font-medium bg-gray-300 rounded flex items-center" title={@tooltip}>
       <span class="opacity-80">
         <%= render_slot(@icon) %>
       </span>
