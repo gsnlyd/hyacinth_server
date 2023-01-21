@@ -150,6 +150,8 @@ defmodule HyacinthWeb.Components.Cards do
           <div class="pill pill-green">Classification</div>
         <% :comparison_exhaustive -> %>
           <div class="pill pill-blue">Comparison</div>
+        <% :comparison_mergesort -> %>
+          <div class="pill pill-blue">Comparison</div>
         <% end %>
       </:tag>
 

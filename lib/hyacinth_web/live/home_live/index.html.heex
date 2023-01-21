@@ -6,7 +6,7 @@
       </div>
 
       <div class="mt-2 grid grid-cols-3 gap-4">
-        <%= for prog <- @user_sessions do %>
+        <%= for prog <- Enum.take(@user_sessions, 6) do %>
           <Cards.label_session_progress_card progress={prog} use_job_for_header={true} socket={@socket} />
         <% end %>
       </div>

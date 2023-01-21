@@ -2,7 +2,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
   use HyacinthWeb, :live_view
 
   alias Hyacinth.Labeling
-  alias Hyacinth.Labeling.{Note, LabelJobType}
+  alias Hyacinth.Labeling.{LabelJob, Note, LabelJobType}
 
   defmodule ViewerSelectForm do
     use Ecto.Schema
@@ -60,6 +60,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
     labels = Labeling.list_element_labels(socket.assigns.element)
     socket = assign(socket, %{
+      label_session: Labeling.get_label_session_with_elements!(socket.assigns.label_session.id),
       labels: labels,
       current_value: hd(labels).value.option,
     })
@@ -68,13 +69,19 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
   def handle_event("set_label_key", %{"key" => key}, socket) when key in ["1", "2", "3", "4", "5", "6", "7", "8", "9"] do
     label_i = String.to_integer(key) - 1
-    label_value = Enum.at(socket.assigns.label_session.job.label_options, label_i)
+
+    %LabelJob{} = job = socket.assigns.label_session.job
+    job_type_options = LabelJobType.list_object_label_options(job.type, job.options)
+    all_label_options = (job_type_options || []) ++ job.label_options
+
+    label_value = Enum.at(all_label_options, label_i)
     case label_value do
       label_value when is_binary(label_value) ->
         Labeling.create_label_entry!(socket.assigns.element, socket.assigns.current_user, label_value)
 
         labels = Labeling.list_element_labels(socket.assigns.element)
         socket = assign(socket, %{
+          label_session: Labeling.get_label_session_with_elements!(socket.assigns.label_session.id),
           labels: labels,
           current_value: hd(labels).value.option,
         })

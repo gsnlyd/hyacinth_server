@@ -14,7 +14,7 @@ defmodule Hyacinth.Labeling.LabelJob do
     field :prompt, :string
     field :label_options, {:array, :string}
 
-    field :type, Ecto.Enum, values: [:classification, :comparison_exhaustive], default: :classification
+    field :type, Ecto.Enum, values: [:classification, :comparison_exhaustive, :comparison_mergesort], default: :classification
     field :options, :map, default: %{}
 
     field :label_options_string, :string, virtual: true

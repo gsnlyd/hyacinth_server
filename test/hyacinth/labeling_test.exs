@@ -5,6 +5,7 @@ defmodule Hyacinth.LabelingTest do
 
   import Hyacinth.{AccountsFixtures, WarehouseFixtures, LabelingFixtures}
 
+  alias Hyacinth.Accounts.User
   alias Hyacinth.Labeling.{LabelJob, LabelSession, LabelElement, LabelEntry, Note}
 
   @invalid_label_job_attrs %{name: nil, type: nil, label_options_string: nil, dataset_id: nil}
@@ -260,7 +261,7 @@ defmodule Hyacinth.LabelingTest do
   end
 
   describe "create_label_session/2" do
-    test "creates a LabelSession" do
+    test "creates a session" do
       job = label_job_fixture()
       user = user_fixture()
 
@@ -272,6 +273,19 @@ defmodule Hyacinth.LabelingTest do
       blueprint = Labeling.get_job_with_blueprint(job.id).blueprint
       elements = Labeling.get_label_session_with_elements!(session.id).elements
       assert length(elements) == length(blueprint.elements)
+    end
+
+    test "creates an active session" do
+      job = label_job_fixture(%{type: :comparison_mergesort})
+      user = user_fixture()
+
+      session = Labeling.create_label_session(job, user)
+      assert %LabelSession{} = session
+      assert session.job_id == job.id
+      assert session.user_id == user.id
+
+      elements = Labeling.get_label_session_with_elements!(session.id).elements
+      assert length(elements) == 1
     end
   end
 
@@ -325,8 +339,12 @@ defmodule Hyacinth.LabelingTest do
     end
   end
 
-  def setup_session(_context) do
-    job = label_job_fixture(%{label_options_string: "valid option, another option, third option"})
+  def setup_session(context) do
+    job_type = context[:job_type] || :classification
+    num_objects = context[:num_objects] || 3
+
+    dataset = root_dataset_fixture(nil, num_objects)
+    job = label_job_fixture(%{type: job_type, label_options_string: "valid option, another option, third option"}, dataset)
     user = user_fixture()
     session = label_session_fixture(job, user)
     session = Labeling.get_label_session_with_elements!(session.id)
@@ -343,10 +361,15 @@ defmodule Hyacinth.LabelingTest do
     }
   end
 
+  def create_label_at_index(%LabelSession{} = session, %User{} = user, i, label_option) do
+    elements = Labeling.get_label_session_with_elements!(session.id).elements
+    Labeling.create_label_entry!(Enum.at(elements, i), user, label_option)
+  end
+
   describe "create_label_entry!/3" do
     setup [:setup_session, :extract_element]
 
-    test "creates LabelEntry", %{user: user, element: element} do
+    test "creates label entry", %{user: user, element: element} do
       label_entry = Labeling.create_label_entry!(element, user, "valid option")
 
       assert %LabelEntry{} = label_entry
@@ -356,6 +379,61 @@ defmodule Hyacinth.LabelingTest do
       element_labels = Labeling.list_element_labels(element)
       assert length(element_labels) == 1
       assert hd(element_labels).id == label_entry.id
+    end
+
+    @tag num_objects: 10
+    test "does not clear following elements for non-active session", %{user: user, session: session} do
+      Labeling.create_label_entry!(Enum.at(session.elements, 0), user, "valid option")
+      Labeling.create_label_entry!(Enum.at(session.elements, 1), user, "valid option")
+      Labeling.create_label_entry!(Enum.at(session.elements, 2), user, "valid option")
+
+      session = Labeling.get_label_session_with_elements!(session.id)
+      assert length(session.elements) == 10
+
+      Labeling.create_label_entry!(Enum.at(session.elements, 0), user, "another option")
+
+      session = Labeling.get_label_session_with_elements!(session.id)
+      assert length(session.elements) == 10
+    end
+
+    @tag job_type: :comparison_mergesort
+    test "correctly adds next element to active session", %{user: user, session: session} do
+      assert length(session.elements) == 1
+
+      Labeling.create_label_entry!(Enum.at(session.elements, 0), user, "First Image")
+
+      session = Labeling.get_label_session_with_elements!(session.id)
+      assert length(session.elements) == 2
+
+      Labeling.create_label_entry!(Enum.at(session.elements, 1), user, "Second Image")
+
+      session = Labeling.get_label_session_with_elements!(session.id)
+      assert length(session.elements) == 3
+    end
+
+    @tag job_type: :comparison_mergesort, num_objects: 4
+    test "does not add more elements once labeling is complete", %{user: user, session: session} do
+      create_label_at_index(session, user, 0, "First Image")
+      create_label_at_index(session, user, 1, "First Image")
+      create_label_at_index(session, user, 2, "First Image")
+
+      session = Labeling.get_label_session_with_elements!(session.id)
+      assert length(session.elements) == 3
+    end
+
+    @tag job_type: :comparison_mergesort, num_objects: 10
+    test "correctly clears following elements for active session", %{user: user, session: session} do
+      create_label_at_index(session, user, 0, "First Image")
+      create_label_at_index(session, user, 1, "Second Image")
+      create_label_at_index(session, user, 2, "First Image")
+
+      session = Labeling.get_label_session_with_elements!(session.id)
+      assert length(session.elements) == 4
+
+      create_label_at_index(session, user, 0, "Second Image")
+
+      session = Labeling.get_label_session_with_elements!(session.id)
+      assert length(session.elements) == 2
     end
 
     test "raises if label_value is invalid", %{user: user, element: element} do

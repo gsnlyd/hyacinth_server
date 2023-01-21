@@ -308,7 +308,7 @@ defmodule Hyacinth.Labeling do
       from ls in LabelSession,
       where: ls.id == ^id,
       select: ls,
-      preload: [job: [:dataset], user: [], elements: [:objects, :labels]]
+      preload: [job: [:dataset], user: [], elements: [:objects, :labels, :note]]
     )
   end
 
@@ -327,20 +327,33 @@ defmodule Hyacinth.Labeling do
       Multi.new()
       |> Multi.insert(:label_session, %LabelSession{blueprint: false, job_id: job.id, user_id: user.id})
       |> Multi.run(:elements, fn _repo, %{label_session: session} ->
-        # Clone elements from job blueprint into new session
         blueprint = get_job_with_blueprint(job.id).blueprint
-        elements =
-          Enum.map(blueprint.elements, fn %LabelElement{} = bp_element ->
-            element = Repo.insert! %LabelElement{element_index: bp_element.element_index, session_id: session.id}
 
-            Enum.map(bp_element.label_element_objects, fn %LabelElementObject{} = bp_el_object ->
-              Repo.insert! %LabelElementObject{object_index: bp_el_object.object_index, label_element_id: element.id, object_id: bp_el_object.object_id}
-            end)
+        if LabelJobType.active?(job.type) do
+          element = Repo.insert! %LabelElement{element_index: 0, session_id: session.id}
 
-            element
+          LabelJobType.next_group(job.type, job.options, blueprint.elements, [])
+          |> Enum.with_index()
+          |> Enum.map(fn {%Object{} = object, i} ->
+            Repo.insert! %LabelElementObject{object_index: i, label_element_id: element.id, object_id: object.id}
           end)
 
-        {:ok, elements}
+          {:ok, [element]}
+        else
+          # Clone elements from job blueprint into new session
+          elements =
+            Enum.map(blueprint.elements, fn %LabelElement{} = bp_element ->
+              element = Repo.insert! %LabelElement{element_index: bp_element.element_index, session_id: session.id}
+
+              Enum.map(bp_element.label_element_objects, fn %LabelElementObject{} = bp_el_object ->
+                Repo.insert! %LabelElementObject{object_index: bp_el_object.object_index, label_element_id: element.id, object_id: bp_el_object.object_id}
+              end)
+
+              element
+            end)
+
+          {:ok, elements}
+        end
       end)
       |> Repo.transaction()
 
@@ -447,6 +460,24 @@ defmodule Hyacinth.Labeling do
           {:error, :invalid_label_value}
         end
       end)
+      |> Multi.run(:delete_following_elements, fn _repo, %{label_job: %LabelJob{} = job} ->
+        if LabelJobType.active?(job.type) do
+          deleted_elements =
+            get_label_session_with_elements!(element.session_id).elements
+            |> Enum.filter(fn %LabelElement{} = el -> el.element_index > element.element_index end)
+            |> Enum.map(fn %LabelElement{} = el ->
+              Enum.each(el.label_element_objects, &Repo.delete!/1)
+              Enum.each(el.labels, &Repo.delete!/1)
+              if el.note, do: Repo.delete!(el.note)
+              Repo.delete! el
+
+              el
+            end)
+          {:ok, deleted_elements}
+        else
+          {:ok, :not_active}
+        end
+      end)
       |> Multi.insert(:label_entry, %LabelEntry{
         value: %LabelEntry.Value{
           option: label_value
@@ -457,6 +488,30 @@ defmodule Hyacinth.Labeling do
         },
         element_id: element.id,
       })
+      |> Multi.run(:next_element, fn _repo, %{label_job: %LabelJob{} = job} ->
+        if LabelJobType.active?(job.type) do
+          blueprint_elements = get_job_with_blueprint(job.id).blueprint.elements
+          session_elements = get_label_session_with_elements!(element.session_id).elements
+
+          case LabelJobType.next_group(job.type, job.options, blueprint_elements, session_elements) do
+            :labeling_complete ->
+              {:ok, :labeling_complete}
+
+            next_group when is_list(next_group) ->
+              next_element = Repo.insert! %LabelElement{element_index: element.element_index + 1, session_id: element.session_id}
+
+              next_group
+              |> Enum.with_index()
+              |> Enum.map(fn {%Object{} = object, i} ->
+                Repo.insert! %LabelElementObject{object_index: i, label_element_id: next_element.id, object_id: object.id}
+              end)
+
+              {:ok, next_element}
+          end
+        else
+          {:ok, :not_active}
+        end
+      end)
       |> Repo.transaction()
 
     {:ok, %{label_entry: %LabelEntry{} = label_entry}} = result

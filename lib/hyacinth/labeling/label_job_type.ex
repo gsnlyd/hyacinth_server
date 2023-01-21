@@ -2,6 +2,7 @@ defmodule Hyacinth.Labeling.LabelJobType do
   alias Hyacinth.Labeling.LabelJobType
 
   alias Hyacinth.Warehouse.Object
+  alias Hyacinth.Labeling.LabelElement
 
   @doc """
   Callback that returns a display name for this job type.
@@ -132,6 +133,62 @@ defmodule Hyacinth.Labeling.LabelJobType do
   @spec list_object_label_options(atom, map) :: [String.t] | nil
   def list_object_label_options(job_type, options), do: module_for(job_type).list_object_label_options(options)
 
+  @doc """
+  Callback that returns true if this is an active job type.
+
+  See `active?/1` for details.
+  """
+  @callback active?() :: boolean
+
+  @doc """
+  Returns true if the given job type is active.
+
+  Active job types create their next element based
+  on previous labels.
+
+  ## Examples
+
+      iex> active?(:classification)
+      false
+
+      iex> active?(:comparison_mergesort)
+      true
+
+  """
+  @spec active?(atom) :: boolean
+  def active?(job_type), do: module_for(job_type).active?()
+
+  @doc """
+  Callback that actively chooses the next group based on
+  previous labels.
+
+  See `next_group/4` for details.
+  """
+  @callback next_group(options :: map, blueprint_elements :: [%LabelElement{}], session_elements :: [%LabelElement{}]) :: [%Object{}] | :labeling_complete
+
+  @doc """
+  Actively chooses the next group based on previous labels.
+
+  Returns a new group, or `:labeling_complete` if labeling
+  is complete.
+
+  This function is only implemented for active job types (see `active?/1`).
+
+  ## Examples
+
+      iex> next_group(:comparison_mergesort, some_options, some_blueprint_elements, some_session_elements)
+      [%Object{...}, %Object{...}]
+
+      iex> next_group(:comparison_mergesort, some_options, some_blueprint_elements, some_session_elements)
+      :labeling_complete
+
+  """
+  @spec next_group(atom, map, [%LabelElement{}], [%LabelElement{}]) :: [%Object{}] | :labeling_complete
+  def next_group(job_type, options, blueprint_elements, session_elements), do: module_for(job_type).next_group(options, blueprint_elements, session_elements)
+
+  @optional_callbacks next_group: 3
+
   defp module_for(:classification), do: LabelJobType.Classification
   defp module_for(:comparison_exhaustive), do: LabelJobType.ComparisonExhaustive
+  defp module_for(:comparison_mergesort), do: LabelJobType.ComparisonMergesort
 end

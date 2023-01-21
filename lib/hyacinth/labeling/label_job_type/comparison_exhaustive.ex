@@ -95,4 +95,7 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonExhaustive do
     options = ComparisonExhaustiveOptions.parse(options)
     options.comparison_label_options
   end
+
+  @impl LabelJobType
+  def active?, do: false
 end
