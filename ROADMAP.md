@@ -25,5 +25,6 @@
 - [x] Add script to generate a default config file
 - [x] Add support for active labeling sessions
 - [x] Add merge sort comparison job type
+- [x] Add label export functionality for labeling sessions
 - [ ] Add collaborative viewing/labeling features
 - [ ] Add viewers for other image types (DICOM, Nifti)

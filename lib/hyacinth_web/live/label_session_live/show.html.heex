@@ -77,6 +77,10 @@
           style={"width: #{if(@num_labeled == 0, do: 0, else: (@num_labeled / (@num_total) * 100))}%"}
         />
       </div>
+
+      <div>
+        <%= link "Export", to: Routes.export_labels_path(@socket, :show, @label_session), class: "btn btn-blue" %>
+      </div>
     </div>
 
     <div class="mt-2 border border-gray-700 rounded">
