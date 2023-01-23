@@ -132,7 +132,7 @@
           <div class="form-content">
             <p>
               <%= label f, :timestamp_columns %>
-              <%= select f, :timestamp_columns, [{"ISO", :iso}, {"UNIX", :unix}, {"ISO and UNIX", :iso_and_unix}] %>
+              <%= select f, :timestamp_columns, [{"Date/Time (ISO)", :iso}, {"UNIX", :unix}, {"Date/Time (ISO) and UNIX", :iso_and_unix}] %>
               <%= error_tag f, :timestamp_columns %>
             </p>
 
