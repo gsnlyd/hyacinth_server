@@ -164,10 +164,10 @@ defmodule Hyacinth.LabelingTest do
 
       sess1 = Labeling.get_label_session_with_elements!(sess1.id)
 
-      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 1")
-      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 2")
-      Labeling.create_label_entry!(Enum.at(sess1.elements, 1), user, "option 1")
-      Labeling.create_label_entry!(Enum.at(sess1.elements, 2), user, "option 1")
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 1", DateTime.utc_now())
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 2", DateTime.utc_now())
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 1), user, "option 1", DateTime.utc_now())
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 2), user, "option 1", DateTime.utc_now())
 
       [prog1, prog2] = Labeling.list_sessions_with_progress(user)
       assert %Labeling.LabelSessionProgress{} = prog1
@@ -207,10 +207,10 @@ defmodule Hyacinth.LabelingTest do
       label_session_fixture(job1, other_user)
 
       sess1 = Labeling.get_label_session_with_elements!(sess1.id)
-      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 1")
-      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 2")
-      Labeling.create_label_entry!(Enum.at(sess1.elements, 1), user, "option 1")
-      Labeling.create_label_entry!(Enum.at(sess1.elements, 2), user, "option 1")
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 1", DateTime.utc_now())
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 0), user, "option 2", DateTime.utc_now())
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 1), user, "option 1", DateTime.utc_now())
+      Labeling.create_label_entry!(Enum.at(sess1.elements, 2), user, "option 1", DateTime.utc_now())
 
       [prog1, prog2] = Labeling.list_sessions_with_progress(user)
       assert %Labeling.LabelSessionProgress{} = prog1
@@ -363,14 +363,14 @@ defmodule Hyacinth.LabelingTest do
 
   def create_label_at_index(%LabelSession{} = session, %User{} = user, i, label_option) do
     elements = Labeling.get_label_session_with_elements!(session.id).elements
-    Labeling.create_label_entry!(Enum.at(elements, i), user, label_option)
+    Labeling.create_label_entry!(Enum.at(elements, i), user, label_option, DateTime.utc_now())
   end
 
   describe "create_label_entry!/3" do
     setup [:setup_session, :extract_element]
 
     test "creates label entry", %{user: user, element: element} do
-      label_entry = Labeling.create_label_entry!(element, user, "valid option")
+      label_entry = Labeling.create_label_entry!(element, user, "valid option", DateTime.utc_now())
 
       assert %LabelEntry{} = label_entry
       assert label_entry.element_id == element.id
@@ -383,14 +383,14 @@ defmodule Hyacinth.LabelingTest do
 
     @tag num_objects: 10
     test "does not clear following elements for non-active session", %{user: user, session: session} do
-      Labeling.create_label_entry!(Enum.at(session.elements, 0), user, "valid option")
-      Labeling.create_label_entry!(Enum.at(session.elements, 1), user, "valid option")
-      Labeling.create_label_entry!(Enum.at(session.elements, 2), user, "valid option")
+      Labeling.create_label_entry!(Enum.at(session.elements, 0), user, "valid option", DateTime.utc_now())
+      Labeling.create_label_entry!(Enum.at(session.elements, 1), user, "valid option", DateTime.utc_now())
+      Labeling.create_label_entry!(Enum.at(session.elements, 2), user, "valid option", DateTime.utc_now())
 
       session = Labeling.get_label_session_with_elements!(session.id)
       assert length(session.elements) == 10
 
-      Labeling.create_label_entry!(Enum.at(session.elements, 0), user, "another option")
+      Labeling.create_label_entry!(Enum.at(session.elements, 0), user, "another option", DateTime.utc_now())
 
       session = Labeling.get_label_session_with_elements!(session.id)
       assert length(session.elements) == 10
@@ -400,12 +400,12 @@ defmodule Hyacinth.LabelingTest do
     test "correctly adds next element to active session", %{user: user, session: session} do
       assert length(session.elements) == 1
 
-      Labeling.create_label_entry!(Enum.at(session.elements, 0), user, "First Image")
+      Labeling.create_label_entry!(Enum.at(session.elements, 0), user, "First Image", DateTime.utc_now())
 
       session = Labeling.get_label_session_with_elements!(session.id)
       assert length(session.elements) == 2
 
-      Labeling.create_label_entry!(Enum.at(session.elements, 1), user, "Second Image")
+      Labeling.create_label_entry!(Enum.at(session.elements, 1), user, "Second Image", DateTime.utc_now())
 
       session = Labeling.get_label_session_with_elements!(session.id)
       assert length(session.elements) == 3
@@ -438,7 +438,7 @@ defmodule Hyacinth.LabelingTest do
 
     test "raises if label_value is invalid", %{user: user, element: element} do
       assert_raise MatchError, fn ->
-        Labeling.create_label_entry!(element, user, "invalid option")
+        Labeling.create_label_entry!(element, user, "invalid option", DateTime.utc_now())
       end
 
       element_labels = Labeling.list_element_labels(element)
@@ -449,7 +449,7 @@ defmodule Hyacinth.LabelingTest do
       wrong_user = user_fixture()
 
       assert_raise MatchError, fn ->
-        Labeling.create_label_entry!(element, wrong_user, "valid option")
+        Labeling.create_label_entry!(element, wrong_user, "valid option", DateTime.utc_now())
       end
 
       element_labels = Labeling.list_element_labels(element)
@@ -461,9 +461,9 @@ defmodule Hyacinth.LabelingTest do
     setup [:setup_session, :extract_element]
 
     test "returns labels for element in descending order", %{user: user, element: element} do
-      Labeling.create_label_entry!(element, user, "valid option")
-      Labeling.create_label_entry!(element, user, "another option")
-      Labeling.create_label_entry!(element, user, "third option")
+      Labeling.create_label_entry!(element, user, "valid option", DateTime.utc_now())
+      Labeling.create_label_entry!(element, user, "another option", DateTime.utc_now())
+      Labeling.create_label_entry!(element, user, "third option", DateTime.utc_now())
 
       labels = Labeling.list_element_labels(element)
       assert length(labels) == 3

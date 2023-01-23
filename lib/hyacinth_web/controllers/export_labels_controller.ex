@@ -41,9 +41,9 @@ defmodule HyacinthWeb.ExportLabelsController do
       "element_index",
       "label_option",
       if(args[:iso_timestamps], do: "started_at_iso"),
-      if(args[:unix_timestamps], do: "started_at_unix"),
+      if(args[:unix_timestamps], do: "started_at_unix_ms"),
       if(args[:iso_timestamps], do: "completed_at_iso"),
-      if(args[:unix_timestamps], do: "completed_at_unix"),
+      if(args[:unix_timestamps], do: "completed_at_unix_ms"),
     ] ++ header_object_cols
 
     body =
@@ -65,9 +65,9 @@ defmodule HyacinthWeb.ExportLabelsController do
             element.element_index,
             label.value.option,
             if(args[:iso_timestamps], do: label.metadata.started_at |> Calendar.strftime("%c")),
-            if(args[:unix_timestamps], do: label.metadata.started_at |> DateTime.to_unix() |> Integer.to_string()),
+            if(args[:unix_timestamps], do: label.metadata.started_at |> DateTime.to_unix(:millisecond) |> Integer.to_string()),
             if(args[:iso_timestamps], do: label.metadata.completed_at |> Calendar.strftime("%c")),
-            if(args[:unix_timestamps], do: label.metadata.completed_at |> DateTime.to_unix() |> Integer.to_string()),
+            if(args[:unix_timestamps], do: label.metadata.completed_at |> DateTime.to_unix(:millisecond) |> Integer.to_string()),
           ] ++ object_cols
         end)
       end)

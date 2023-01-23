@@ -16,9 +16,9 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       %LabelSession{} = label_session = label_session_fixture(job, user)
 
       [e1, e2, _e3] = Labeling.get_label_session_with_elements!(label_session.id).elements
-      Labeling.create_label_entry!(e1, user, "option 1")
-      Labeling.create_label_entry!(e2, user, "option 2")
-      Labeling.create_label_entry!(e2, user, "option 3")  # Overwrite previous label
+      Labeling.create_label_entry!(e1, user, "option 1", DateTime.utc_now())
+      Labeling.create_label_entry!(e2, user, "option 2", DateTime.utc_now())
+      Labeling.create_label_entry!(e2, user, "option 3", DateTime.utc_now())  # Overwrite previous label
 
       {:ok, _view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Show, label_session))
       assert html =~ "My Job"

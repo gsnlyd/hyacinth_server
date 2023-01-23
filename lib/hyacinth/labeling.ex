@@ -433,8 +433,8 @@ defmodule Hyacinth.Labeling do
       %LabelEntry{...}
 
   """
-  @spec create_label_entry!(%LabelElement{}, %User{}, String.t) :: %LabelEntry{}
-  def create_label_entry!(%LabelElement{} = element, %User{} = user, label_value) when is_binary(label_value) do
+  @spec create_label_entry!(%LabelElement{}, %User{}, String.t, %DateTime{}) :: %LabelEntry{}
+  def create_label_entry!(%LabelElement{} = element, %User{} = user, label_value, %DateTime{} = started_at) when is_binary(label_value) do
     result =
       Multi.new()
       |> Multi.run(:label_session, fn _repo, _values ->
@@ -483,7 +483,7 @@ defmodule Hyacinth.Labeling do
           option: label_value
         },
         metadata: %LabelEntry.Metadata{
-          started_at: DateTime.utc_now(),  # TODO: accept actual times
+          started_at: started_at,
           completed_at: DateTime.utc_now()
         },
         element_id: element.id,
