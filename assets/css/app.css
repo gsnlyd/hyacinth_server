@@ -164,6 +164,10 @@ h3 {
     @apply flex flex-col items-start space-y-1;
 }
 
+.form-content p.inline {
+    @apply flex-row items-center space-x-1 space-y-0;
+}
+
 .form-content .invalid-feedback {
     @apply text-xs text-red-400;
 }
