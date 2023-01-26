@@ -91,26 +91,22 @@
     </div>
 
   <% :steps -> %>
-    <div class="space-y-4">
+    <div class="space-y-6">
       <%= for transform <- @transforms do %>
-        <div>
+        <div class="relative">
+          <div class="absolute top-2 -left-20">
+            <div class="w-14 h-14 text-3xl text-black font-semibold bg-gray-300 rounded-full shadow flex justify-center items-center">
+              <%= transform.order_index + 1 %>
+            </div>
+          </div>
+
           <div class="flex items-center space-x-3">
-            <h3>Step <%= transform.order_index + 1 %></h3>
+            <h3><%= transform.driver %></h3>
             <.driver_format_tags driver={transform.driver} options={transform.options} />
           </div>
 
           <div class="mt-1 card">
-            <div>
-              <div class="text-sm text-gray-400">Driver</div>
-              <div class="text-lg text-gray-300"><%= transform.driver %></div>
-            </div>
-
-            <div class="mt-4">
-              <div class="text-sm text-gray-400">Options</div>
-              <div class="mt-1">
-                <.options_table options={transform.options} />
-              </div>
-            </div>
+            <.options_table options={transform.options} card={false} />
           </div>
 
         </div>

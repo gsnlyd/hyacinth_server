@@ -136,13 +136,14 @@ defmodule HyacinthWeb.Components.BasicComponents do
   end
 
   def options_table(assigns) do
+    assigns = assign_new(assigns, :card, fn -> true end)
     ~H"""
-    <div class="px-3 py-2 bg-black bg-gray-900 rounded">
+    <div class={@card && "px-3 py-2 bg-gray-900 rounded"}>
       <table>
         <tbody class="text-sm text-gray-200">
           <%= for {k, v} <- @options do %>
             <tr>
-              <td class="pr-4 text-gray-500"><%= humanize(k) %></td>
+              <td class={["pr-4", if(@card, do: "text-gray-500", else: "text-gray-400")]}><%= humanize(k) %></td>
               <td class="whitespace-pre"><%= if(is_list(v), do: Enum.join(v, ", "), else: v) %></td>
             </tr>
           <% end %>
