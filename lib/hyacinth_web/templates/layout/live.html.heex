@@ -2,7 +2,7 @@
   <%= render "_primary_nav.html", assigns %>
 <% end %>
 
-<div class={unless assigns[:use_wide_layout], do: "mt-6 pb-32 mx-auto max-w-screen-lg"}>
+<div class={unless assigns[:use_wide_layout], do: "mt-4 pb-32 mx-auto max-w-screen-lg"}>
   <p class="alert alert-info" role="alert"
     phx-click="lv:clear-flash"
     phx-value-key="info"><%= live_flash(@flash, :info) %></p>

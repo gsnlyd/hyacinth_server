@@ -8,16 +8,30 @@
     </:crumb>
   </.breadcrumbs>
 
-  <div class="flex justify-between items-start">
-    <div class="mt-2 flex items-center space-x-3">
-      <h1><%= @dataset.name %></h1>
-      <div>
-        <%= case @dataset.type do %>
-        <% :root -> %>
-          <div class="inline-block px-3 py-1 text-sm font-medium text-violet-400 bg-violet-400 bg-opacity-20 rounded-full">Root Dataset</div>
-        <% :derived -> %>
-          <div class="inline-block px-3 py-1 text-sm font-medium text-orange-400 bg-orange-400 bg-opacity-20 rounded-full">Derived Dataset</div>
-        <% end %>
+  <div class="flex justify-between items-center">
+    <div>
+      <div class="flex items-center space-x-3">
+        <h1><%= @dataset.name %></h1>
+        <div>
+          <%= case @dataset.type do %>
+          <% :root -> %>
+            <div class="inline-block px-3 py-1 text-sm font-medium text-violet-400 bg-violet-400 bg-opacity-20 rounded-full">Root Dataset</div>
+          <% :derived -> %>
+            <div class="inline-block px-3 py-1 text-sm font-medium text-orange-400 bg-orange-400 bg-opacity-20 rounded-full">Derived Dataset</div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="mt-2 flex items-center space-x-2">
+        <.header_tag tooltip="Labeling Jobs">
+          <:icon><Icons.rectangle_stack_mini /></:icon>
+          <:text><%= length(@jobs) %> labeling jobs</:text>
+        </.header_tag>
+
+        <.header_tag tooltip="Images">
+          <:icon><Icons.rectangle_stack_mini /></:icon>
+          <:text><%= length(@objects) %> images</:text>
+        </.header_tag>
       </div>
     </div>
 
@@ -25,18 +39,6 @@
       <Icons.plus_small_solid />
       <span>New Job</span>
     <% end %>
-  </div>
-
-  <div class="mt-2 flex items-center space-x-2">
-    <.header_tag tooltip="Labeling Jobs">
-      <:icon><Icons.rectangle_stack_mini /></:icon>
-      <:text><%= length(@jobs) %> labeling jobs</:text>
-    </.header_tag>
-
-    <.header_tag tooltip="Images">
-      <:icon><Icons.rectangle_stack_mini /></:icon>
-      <:text><%= length(@objects) %> images</:text>
-    </.header_tag>
   </div>
 
   <div class="mt-4 text-xl border-b-2 border-gray-700">

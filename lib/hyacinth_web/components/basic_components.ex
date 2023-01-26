@@ -49,7 +49,7 @@ defmodule HyacinthWeb.Components.BasicComponents do
 
   def breadcrumbs(assigns) do
     ~H"""
-    <div class="text-sm flex items-center">
+    <div class="pb-2 mb-2 text-sm border-b border-gray-700 flex items-center">
       <%= for {crumb, i} <- Enum.with_index(@crumb) do %>
         <%= if i > 0 do %>
           <span class="text-gray-500">

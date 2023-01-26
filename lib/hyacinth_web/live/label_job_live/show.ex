@@ -3,7 +3,7 @@ defmodule HyacinthWeb.LabelJobLive.Show do
 
   alias Hyacinth.Labeling
   alias Hyacinth.Warehouse.Object
-  alias Hyacinth.Labeling.{LabelSessionProgress, LabelElement}
+  alias Hyacinth.Labeling.{LabelSessionProgress, LabelElement, LabelJobType}
 
   defmodule SessionFilterForm do
     use Ecto.Schema
@@ -38,7 +38,7 @@ defmodule HyacinthWeb.LabelJobLive.Show do
     {:ok, socket}
   end
 
-  def filter_sessions(sessions, %Ecto.Changeset{} = changeset) when is_list(sessions) do
+  defp filter_sessions(sessions, %Ecto.Changeset{} = changeset) when is_list(sessions) do
     %SessionFilterForm{} = form = Ecto.Changeset.apply_changes(changeset)
 
     filter_func = fn %LabelSessionProgress{} = progress ->

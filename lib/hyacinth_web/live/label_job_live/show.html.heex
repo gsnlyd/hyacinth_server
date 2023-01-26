@@ -11,40 +11,35 @@
     </:crumb>
   </.breadcrumbs>
 
-  <div class="mt-2 flex justify-between items-start">
-    <div class="flex items-center space-x-3">
-      <h1><%= @job.name %></h1>
-      <%= case @job.type do %>
-        <% :classification -> %>
-          <div class="pill pill-lg pill-green">Classification Job</div>
-        <% :comparison_exhaustive -> %>
-          <div class="pill pill-lg pill-blue">Comparison Job</div>
-        <% :comparison_mergesort -> %>
-          <div class="pill pill-lg pill-blue">Comparison Job</div>
-      <% end %>
+  <div class="flex justify-between items-center">
+    <div>
+      <div class="flex items-center space-x-3">
+        <h1><%= @job.name %></h1>
+        <div class="pill pill-lg pill-green"><%= LabelJobType.name(@job.type) %></div>
+      </div>
+
+      <div class="mt-2 flex items-center space-x-2">
+        <.header_tag tooltip="Dataset">
+          <:icon><Icons.rectangle_stack_mini /></:icon>
+          <:text><%= @job.dataset.name %></:text>
+        </.header_tag>
+
+        <.header_tag tooltip="Created by">
+          <:icon><Icons.user_circle_mini /></:icon>
+          <:text><%= @job.created_by_user.name %></:text>
+        </.header_tag>
+
+        <.header_tag>
+          <:icon><Icons.photo_mini /></:icon>
+          <:text><%= length(@job.blueprint.elements) %> <%= elements_name(@job.blueprint.elements) %></:text>
+        </.header_tag>
+      </div>
     </div>
 
     <%= link to: Routes.label_session_path(@socket, :new, @job), class: "btn btn-blue btn-icon" do %>
       <Icons.plus_small_solid />
       <span>New Session</span>
     <% end %>
-  </div>
-
-  <div class="mt-2 flex items-center space-x-2">
-    <.header_tag tooltip="Dataset">
-      <:icon><Icons.rectangle_stack_mini /></:icon>
-      <:text><%= @job.dataset.name %></:text>
-    </.header_tag>
-
-    <.header_tag tooltip="Created by">
-      <:icon><Icons.user_circle_mini /></:icon>
-      <:text><%= @job.created_by_user.name %></:text>
-    </.header_tag>
-
-    <.header_tag>
-      <:icon><Icons.photo_mini /></:icon>
-      <:text><%= length(@job.blueprint.elements) %> <%= elements_name(@job.blueprint.elements) %></:text>
-    </.header_tag>
   </div>
 
   <div class="mt-4 text-xl border-b-2 border-gray-700">

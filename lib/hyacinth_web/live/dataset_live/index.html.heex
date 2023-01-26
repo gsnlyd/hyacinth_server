@@ -27,7 +27,7 @@
   </div>
 </header>
 
-<main class="mt-6">
+<main class="mt-4">
   <div class="grid grid-cols-3 gap-4">
     <%= for dataset_stats <- filter_datasets(@datasets, @dataset_filter_changeset) do %>
       <Cards.dataset_card dataset_stats={dataset_stats} socket={@socket} />
