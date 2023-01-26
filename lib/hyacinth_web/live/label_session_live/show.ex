@@ -12,6 +12,7 @@ defmodule HyacinthWeb.LabelSessionLive.Show do
 
     @primary_key false
     embedded_schema do
+      field :include_labels, Ecto.Enum, values: [:all_labels, :only_final_labels], default: :all_labels
       field :timestamp_columns, Ecto.Enum, values: [:iso, :unix, :iso_and_unix], default: :iso_and_unix
       field :object_columns, Ecto.Enum, values: [:names, :hashes, :names_and_hashes], default: :names_and_hashes
     end
@@ -19,8 +20,8 @@ defmodule HyacinthWeb.LabelSessionLive.Show do
     @doc false
     def changeset(struct, attrs) do
       struct
-      |> cast(attrs, [:timestamp_columns, :object_columns])
-      |> validate_required([:timestamp_columns, :object_columns])
+      |> cast(attrs, [:include_labels, :timestamp_columns, :object_columns])
+      |> validate_required([:include_labels, :timestamp_columns, :object_columns])
     end
   end
 
@@ -54,6 +55,7 @@ defmodule HyacinthWeb.LabelSessionLive.Show do
     case Ecto.Changeset.apply_action(changeset, :insert) do
       {:ok, %ExportLabelsForm{} = struct} ->
         args = [
+          include_labels: struct.include_labels,
           timestamp_columns: struct.timestamp_columns,
           object_columns: struct.object_columns,
         ]

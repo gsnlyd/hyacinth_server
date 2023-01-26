@@ -7,6 +7,7 @@ defmodule HyacinthWeb.ExportLabelsController do
 
   def show(conn, %{"session_id" => session_id} = params) do
     args =  [
+      all_labels:       params["include_labels"] == "all_labels",
       iso_timestamps:   params["timestamp_columns"] in ["iso", "iso_and_unix"],
       unix_timestamps:  params["timestamp_columns"] in ["unix", "iso_and_unix"],
       object_names:     params["object_columns"] in ["names", "names_and_hashes"],
@@ -59,7 +60,14 @@ defmodule HyacinthWeb.ExportLabelsController do
           end)
           |> Enum.concat()
 
-        element.labels
+        labels =
+          if args[:all_labels] do
+            element.labels
+          else
+            if length(element.labels) > 0, do: [hd(element.labels)], else: []
+          end
+
+        labels
         |> Enum.map(fn %LabelEntry{} = label ->
           [
             element.element_index,
