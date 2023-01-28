@@ -41,6 +41,29 @@ defmodule Hyacinth.LabelingTest do
       dataset = root_dataset_fixture()
       assert Labeling.list_label_jobs(dataset) == []
     end
+
+    test "returns all jobs for the given user" do
+      user = user_fixture()
+      label_job_fixture(%{}, nil, user)
+      label_job_fixture(%{}, nil, user)
+      label_job_fixture(%{}, nil, user)
+
+      other_user = user_fixture()
+      label_job_fixture(%{}, nil, other_user)
+      label_job_fixture(%{}, nil, other_user)
+
+      jobs = Labeling.list_label_jobs(user)
+      assert length(jobs) == 3
+    end
+
+    test "returns an empty list if the user has not created any jobs" do
+      user = user_fixture()
+      other_user = user_fixture()
+      label_job_fixture(%{}, nil, other_user)
+      label_job_fixture(%{}, nil, other_user)
+
+      assert length(Labeling.list_label_jobs(user)) == 0
+    end
   end
 
   describe "list_label_jobs_preloaded/0" do

@@ -29,19 +29,30 @@ defmodule Hyacinth.Labeling do
   end
 
   @doc """
-  Returns a list of LabelJobs for the given dataset.
+  Returns a list of LabelJobs for the given dataset or user.
 
   ## Examples
 
       iex> list_label_jobs(some_dataset)
       [%LabelJob{}, ...]
 
+      iex> list_label_jobs(some_user)
+      [%LabelJob{}, ...]
+
   """
-  @spec list_label_jobs(%Dataset{}) :: [%LabelJob{}]
+  @spec list_label_jobs(%Dataset{} | %User{}) :: [%LabelJob{}]
   def list_label_jobs(%Dataset{} = dataset) do
     Repo.all(
       from lj in LabelJob,
       where: lj.dataset_id == ^dataset.id,
+      select: lj
+    )
+  end
+
+  def list_label_jobs(%User{} = user) do
+    Repo.all(
+      from lj in LabelJob,
+      where: lj.created_by_user_id == ^user.id,
       select: lj
     )
   end

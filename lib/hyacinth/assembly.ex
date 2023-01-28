@@ -40,6 +40,26 @@ defmodule Hyacinth.Assembly do
   end
 
   @doc """
+  Returns a list of all Pipelines created by the given user
+  with their relations preloaded.
+
+  See `list_pipelines_preloaded/0` for details.
+
+  ## Examples
+
+      iex> list_running_pipeline_runs_preloaded(some_user)
+      [%Pipeline{}, %Pipeline{}, ...]
+
+  """
+  def list_pipelines_preloaded(%User{} = user) do
+    Repo.all(
+      from p in Pipeline,
+      where: p.creator_id == ^user.id,
+      preload: [:creator, :transforms, :runs]
+    )
+  end
+
+  @doc """
   Gets a single Pipeline.
 
   Raises `Ecto.NoResultsError` if the Pipeline does not exist.

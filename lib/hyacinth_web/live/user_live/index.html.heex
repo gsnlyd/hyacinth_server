@@ -1,0 +1,32 @@
+<header>
+  <div>
+    <h1>Users</h1>
+  </div>
+</header>
+
+<main>
+  <div class="mt-2 border border-gray-700 rounded">
+    <table class="mt-1 w-full table">
+      <thead>
+        <tr>
+          <th class="!text-left">User</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+
+      <tbody class="text-sm text-gray-400">
+        <%= for %User{} = user <- @users do %>
+          <tr>
+            <td class="!text-left">
+              <%= link to: Routes.live_path(@socket, HyacinthWeb.UserLive.Show, user), class: "group inline-flex items-center space-x-2" do %>
+                <.user_profile_image user={user} />
+                <span class="text-base font-medium"><%= user.name %></span>
+              <% end %>
+            </td>
+            <td><%= Calendar.strftime(user.inserted_at, "%x") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</main>

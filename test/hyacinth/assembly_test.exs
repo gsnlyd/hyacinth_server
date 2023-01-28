@@ -30,6 +30,37 @@ defmodule Hyacinth.AssemblyTest do
     end
   end
 
+  describe "list_pipelines_preloaded/1" do
+    test "returns the list of pipelines created by the user" do
+      user = user_fixture()
+      pipeline_fixture(nil, user)
+      pipeline_fixture(nil, user)
+      pipeline_fixture(nil, user)
+
+      other_user = user_fixture()
+      pipeline_fixture(nil, other_user)
+      pipeline_fixture(nil, other_user)
+
+      pipelines = Assembly.list_pipelines_preloaded(user)
+      assert length(pipelines) == 3
+
+      Enum.each(pipelines, fn %Pipeline{} = p ->
+        assert Ecto.assoc_loaded?(p.creator)
+        assert Ecto.assoc_loaded?(p.transforms)
+        assert Ecto.assoc_loaded?(p.runs)
+      end)
+    end
+
+    test "returns empty list if user has not created any pipelines" do
+      user = user_fixture()
+      other_user = user_fixture()
+      pipeline_fixture(nil, other_user)
+      pipeline_fixture(nil, other_user)
+
+      assert length(Assembly.list_pipelines_preloaded(user)) == 0
+    end
+  end
+
   describe "get_pipeline!/1" do
     test "returns pipeline if it exists" do
       pipeline = pipeline_fixture()

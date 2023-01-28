@@ -1,0 +1,58 @@
+<header>
+  <.breadcrumbs>
+    <:crumb label={nil} to={Routes.live_path(@socket, HyacinthWeb.UserLive.Index)}>
+      Users
+    </:crumb>
+    <:crumb label="User" to={Routes.live_path(@socket, HyacinthWeb.UserLive.Show, @user)}>
+      <%= @user.name %>
+    </:crumb>
+  </.breadcrumbs>
+
+  <div class="flex items-center space-x-3">
+    <.user_profile_image user={@user} />
+    <h1><%= @user.name %></h1>
+  </div>
+
+  <div class="mt-3 flex items-center space-x-2">
+    <.header_tag tooltip="Labeling Sessions">
+      <:icon><Icons.rectangle_stack_mini /></:icon>
+      <:text><%= length(@sessions) %> labeling sessions</:text>
+    </.header_tag>
+
+    <.header_tag tooltip="Join Date">
+      <:icon><Icons.rectangle_stack_mini /></:icon>
+      <:text>Joined <%= Calendar.strftime(@user.inserted_at, "%x") %></:text>
+    </.header_tag>
+  </div>
+
+  <.tab_bar cur_tab={@tab} event="set_tab">
+    <:tab name="sessions">Labeling Sessions</:tab>
+    <:tab name="jobs">Labeling Jobs</:tab>
+    <:tab name="pipelines">Pipelines</:tab>
+  </.tab_bar>
+</header>
+
+<main class="mt-4">
+  <%= case @tab do %>
+  <% :sessions -> %>
+    <div class="grid grid-cols-3 gap-4">
+      <%= for session_progress <- @sessions do %>
+        <Cards.label_session_progress_card progress={session_progress} socket={@socket} />
+      <% end %>
+    </div>
+
+  <% :jobs -> %>
+    <div class="grid grid-cols-3 gap-4">
+      <%= for job <- @jobs do %>
+        <Cards.label_job_card job={job} socket={@socket} />
+      <% end %>
+    </div>
+
+  <% :pipelines -> %>
+    <div class="grid grid-cols-3 gap-4">
+      <%= for pipeline <- @pipelines do %>
+        <Cards.pipeline_card pipeline={pipeline} socket={@socket} />
+      <% end %>
+    </div>
+  <% end %>
+</main>

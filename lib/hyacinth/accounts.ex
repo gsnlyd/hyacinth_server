@@ -8,6 +8,20 @@ defmodule Hyacinth.Accounts do
 
   alias Hyacinth.Accounts.{User, UserToken, UserNotifier}
 
+  @doc """
+  Returns a list of all users.
+
+  ## Examples
+
+      iex> list_users()
+      [%User{}, %User{}, ...]
+
+  """
+  @spec list_users() :: [%User{}]
+  def list_users do
+    Repo.all(User)
+  end
+
   ## Database getters
 
   @doc """

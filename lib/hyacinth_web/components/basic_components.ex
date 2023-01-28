@@ -31,6 +31,20 @@ defmodule HyacinthWeb.Components.BasicComponents do
     """
   end
 
+  def tab_bar(assigns) do
+    ~H"""
+    <div class="mt-4 text-xl border-b-2 border-gray-700">
+      <div class="-mb-0.5">
+        <%= for tab <- @tab do %>
+          <.tab_button cur_tab={@cur_tab} event={@event} tab={tab.name}>
+            <%= render_slot(tab) %>
+          </.tab_button>
+        <% end %>
+      </div>
+    </div>
+    """
+  end
+
   def tab_button(assigns) do
     button_class =
       "px-2 pb-1 border-purple-400 transition" <>
@@ -150,6 +164,41 @@ defmodule HyacinthWeb.Components.BasicComponents do
           <% end %>
         </tbody>
       </table>
+    </div>
+    """
+  end
+
+  @profile_image_colors [
+    "bg-green-200 border-green-400",
+    "bg-blue-200 border-blue-400",
+    "bg-purple-200 border-purple-400",
+    "bg-orange-200 border-orange-400",
+    "bg-amber-200 border-amber-400",
+    "bg-pink-200 border-pink-400",
+  ]
+  @num_profile_image_colors length(@profile_image_colors)
+
+  def user_profile_image(assigns) do
+    initials =
+      assigns.user.name
+      |> String.split()
+      |> Enum.map(&String.first/1)
+      |> Enum.join()
+
+    color_i =
+      assigns.user.name
+      |> String.to_charlist()
+      |> Enum.sum()
+      |> rem(@num_profile_image_colors)
+
+    assigns = assign(assigns, %{
+      initials: initials,
+      color_class: Enum.at(@profile_image_colors, color_i),
+    })
+
+    ~H"""
+    <div class={["w-10 h-10 rounded-full border-2 flex justify-center items-center", @color_class]}>
+      <span class="text-base text-black font-bold"><%= @initials %></span>
     </div>
     """
   end

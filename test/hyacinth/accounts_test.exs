@@ -6,6 +6,17 @@ defmodule Hyacinth.AccountsTest do
   import Hyacinth.AccountsFixtures
   alias Hyacinth.Accounts.{User, UserToken}
 
+  describe "list_users/0" do
+    test "correctly lists all users" do
+      user_fixture(%{name: "First User"})
+      user_fixture(%{name: "Second User"})
+      user_fixture(%{name: "Third User"})
+
+      users = Accounts.list_users()
+      assert length(users) == 3
+    end
+  end
+
   describe "get_user_by_email/1" do
     test "does not return the user if the email does not exist" do
       refute Accounts.get_user_by_email("unknown@example.com")

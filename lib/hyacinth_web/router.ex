@@ -33,6 +33,9 @@ defmodule HyacinthWeb.Router do
 
       live "/", HomeLive.Index
 
+      live "/users", UserLive.Index
+      live "/users/profile/:user_id", UserLive.Show
+
       live "/datasets", DatasetLive.Index
       live "/datasets/:dataset_id", DatasetLive.Show
 

@@ -21,6 +21,10 @@
           to: Routes.live_path(assigns[:conn] || assigns[:socket], HyacinthWeb.LabelJobLive.Index),
           class: "px-2 py-0.5 text-gray-400 hover:text-black hover:bg-blue-200 active:bg-blue-300 rounded"
         %>
+        <%= live_redirect "Users",
+          to: Routes.live_path(assigns[:conn] || assigns[:socket], HyacinthWeb.UserLive.Index),
+          class: "px-2 py-0.5 text-gray-400 hover:text-black hover:bg-blue-200 active:bg-blue-300 rounded"
+        %>
       </div>
     </div>
 
@@ -37,15 +41,22 @@
           <div class="absolute z-10 hidden group-hover:block w-full">
             <div class="mt-1 p-1 text-sm text-gray-400 font-medium bg-gray-800 border border-gray-700 rounded shadow-lg shadow-black flex flex-col">
 
+              <%= link to: Routes.live_path(assigns[:conn] || assigns[:socket], HyacinthWeb.UserLive.Show, @current_user) do %>
+                <div class="px-2 py-1.5 hover:text-gray-300 hover:bg-gray-900 rounded flex items-center space-x-2 transition">
+                  <span class="opacity-60"><HyacinthWeb.Components.Icons.user_circle_mini /></span>
+                  <span>Profile</span>
+                </div>
+              <% end %>
+
               <%= link to: Routes.user_settings_path(assigns[:conn] || assigns[:socket], :edit) do %>
-                <div class="p-2 hover:text-gray-300 hover:bg-gray-900 rounded flex items-center space-x-2 transition">
+                <div class="px-2 py-1.5 hover:text-gray-300 hover:bg-gray-900 rounded flex items-center space-x-2 transition">
                   <span class="opacity-60"><HyacinthWeb.Components.Icons.cog_6_tooth_mini /></span>
                   <span>Settings</span>
                 </div>
               <% end %>
 
               <%= link to: Routes.user_session_path(assigns[:conn] || assigns[:socket], :delete), method: :delete do %>
-                <div class="p-2 hover:text-gray-300 hover:bg-gray-900 rounded flex items-center space-x-2 transition">
+                <div class="px-2 py-1.5 hover:text-gray-300 hover:bg-gray-900 rounded flex items-center space-x-2 transition">
                   <span class="opacity-60"><HyacinthWeb.Components.Icons.arrow_left_circle_mini /></span>
                   <span>Log out</span>
                 </div>
