@@ -99,10 +99,10 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       %LabelSession{} = label_session = label_session_fixture(job)
 
       {:ok, view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 1))
-      refute html =~ "<h1>Label History</h1>"
+      refute html =~ "<h2>Label History</h2>"
 
       html = render_click(view, :open_modal_label_history, %{})
-      assert html =~ "<h1>Label History</h1>"
+      assert html =~ "<h2>Label History</h2>"
       assert html =~ "No label history yet."
     end
 
@@ -115,10 +115,10 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       render_click(view, :set_label, %{"label" => "Second Option"})
       html = render_click(view, :set_label, %{"label" => "First Option"})
 
-      refute html =~ "<h1>Label History</h1>"
+      refute html =~ "<h2>Label History</h2>"
 
       html = render_click(view, :open_modal_label_history, %{})
-      assert html =~ "<h1>Label History</h1>"
+      assert html =~ "<h2>Label History</h2>"
       assert html =~ "First Option</td>"
       assert html =~ "Second Option</td>"
       refute html =~ "Third Option</td>"
@@ -129,10 +129,10 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       %LabelSession{} = label_session = label_session_fixture(job)
 
       {:ok, view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 1))
-      refute html =~ "<h1>Notes</h1>"
+      refute html =~ "<h2>Notes</h2>"
 
       html = render_click(view, :open_modal_notes, %{})
-      assert html =~ "<h1>Notes</h1>"
+      assert html =~ "<h2>Notes</h2>"
     end
 
     test "note_submit event creates note", %{conn: conn, user: user} do
@@ -140,14 +140,14 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       {:ok, view, _html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 1))
 
       html = render_click(view, :open_modal_notes, %{})
-      assert html =~ "<h1>Notes</h1>"
+      assert html =~ "<h2>Notes</h2>"
       refute html =~ "These are my notes."
 
       params = %{"text" => "These are my notes."}
       render_submit(view, :note_submit, %{"note" => params})
 
       html = render_click(view, :open_modal_notes, %{})
-      assert html =~ "<h1>Notes</h1>"
+      assert html =~ "<h2>Notes</h2>"
       assert html =~ "These are my notes."
     end
 
@@ -161,14 +161,14 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       render_submit(view, :note_submit, %{"note" => params})
 
       html = render_click(view, :open_modal_notes, %{})
-      assert html =~ "<h1>Notes</h1>"
+      assert html =~ "<h2>Notes</h2>"
       assert html =~ "These are my initial notes."
 
       params = %{"text" => "These are my updated notes."}
       render_submit(view, :note_submit, %{"note" => params})
 
       html = render_click(view, :open_modal_notes, %{})
-      assert html =~ "<h1>Notes</h1>"
+      assert html =~ "<h2>Notes</h2>"
       refute html =~ "These are my initial notes."
       assert html =~ "These are my updated notes."
     end
