@@ -1,6 +1,6 @@
 # Roadmap
 
-## 1.0
+## 1.0.0
 - [x] Add names to users
 - [x] Finish LabelJobLive.New form
 - [x] Add additional options to job types
@@ -21,10 +21,15 @@
 - [x] Add viewer selection to labeling page
 - [x] Add release action to CI
 
-## 1.1
+## 1.1.0
 - [x] Add script to generate a default config file
 - [x] Add support for active labeling sessions
 - [x] Add merge sort comparison job type
 - [x] Add label export functionality for labeling sessions
+- [x] Add info tags to all pages and generally clean up design
+- [x] Improve labeling interface, particularly comparisons
+- [x] Add user profile pages
+
+## 1.2.0
 - [ ] Add collaborative viewing/labeling features
 - [ ] Add viewers for other image types (DICOM, Nifti)
