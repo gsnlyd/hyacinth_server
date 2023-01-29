@@ -4,8 +4,7 @@ Hyacinth is a collaborative data management and labeling tool for medical images
 The Hyacinth server provides a uniform and friendly interface for ingesting, transforming,
 and labeling medical images in a collaborative environment.
 
-<img width="1000" alt="Hyacinth Home Page Example" src="https://user-images.githubusercontent.com/48926197/205537542-d7ea3e16-c381-48b4-9f24-f09c8460cf04.png">
-
+https://user-images.githubusercontent.com/48926197/215347637-5f84d38d-43ce-44f9-bafe-aa02922ab585.mp4
 
 Here are some things you can do with Hyacinth:
 
