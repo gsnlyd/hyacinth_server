@@ -1,12 +1,13 @@
 defmodule HyacinthWeb.ViewerLive.Viewers.AdvancedPNG do
-  use HyacinthWeb, :live_view
+  use HyacinthWeb, :live_component
 
   alias Hyacinth.Warehouse
 
-  def mount(_params, session, socket) do
+  def update(assigns, socket) do
     socket = assign(socket, %{
-      object: Warehouse.get_object!(session["object_id"]),
-      unique_id: session["unique_id"] || 0,
+      object: Warehouse.get_object!(assigns.object_id),
+      unique_id: assigns[:unique_id] || 0,
+      collaboration: assigns[:collaboration] || false,
     })
     {:ok, socket}
   end

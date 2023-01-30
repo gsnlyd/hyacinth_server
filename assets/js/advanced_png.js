@@ -210,11 +210,10 @@ export function createHook() {
     return {
         mounted() {
             this.image = null;
-            this.minThreshold = 0;
-            this.maxThreshold = 100;
             this.dragOrigin = null;
 
             const uniqueId = this.el.dataset.uniqueId;
+            const collaborationEnabled = this.el.dataset.collaborationEnabled === "true";
             this.dragBoxEl = document.getElementById('advanced-png-viewer-drag-box-' + uniqueId);
 
             this.minSliderEl = document.getElementById('advanced-png-viewer-min-slider-' + uniqueId);
@@ -235,44 +234,58 @@ export function createHook() {
                 .then(() => {
                     this.minSliderEl.min = this.image.minValue;
                     this.minSliderEl.max = this.image.maxValue;
-                    this.minSliderEl.value = this.image.minValue;
                     this.minInputEl.min = this.image.minValue;
                     this.minInputEl.max = this.image.maxValue;
-                    this.minInputEl.value = this.image.minValue;
-
-                    this.minThreshold = this.image.minValue;
 
                     this.maxSliderEl.min = this.image.minValue;
                     this.maxSliderEl.max = this.image.maxValue;
-                    this.maxSliderEl.value = this.image.maxValue;
                     this.maxInputEl.min = this.image.minValue;
                     this.maxInputEl.max = this.image.maxValue;
-                    this.maxInputEl.value = this.image.maxValue;
 
-                    this.maxThreshold = this.image.maxValue;
-
-                    render(this.el, this.image, this.minThreshold, this.maxThreshold);
+                    updateState({
+                        minThreshold: this.image.minValue,
+                        maxThreshold: this.image.maxValue,
+                    }, false);
                 });
 
+            this.viewerState = {
+                uniqueId: uniqueId,
+                minThreshold: 0,
+                maxThreshold: 0,
+            };
+
+            this.handleEvent('viewer_state_pushed', newState => {
+                if (newState.uniqueId === uniqueId) updateState(newState, false);
+            });
+
+            const updateState = (newState, broadcast=true) => {
+                for (const [k, v] of Object.entries(newState)) {
+                    this.viewerState[k] = v;
+                }
+                updateSliders();
+                if(broadcast && collaborationEnabled) this.pushEvent('viewer_state_updated', this.viewerState);
+
+                if (this.image) render(this.el, this.image, this.viewerState.minThreshold, this.viewerState.maxThreshold);
+            }
+
+            const updateSliders = () => {
+                this.minSliderEl.value = this.viewerState.minThreshold;
+                this.minInputEl.value = this.viewerState.minThreshold;
+                this.maxSliderEl.value = this.viewerState.maxThreshold;
+                this.maxInputEl.value = this.viewerState.maxThreshold;
+            }
+
             const updateMinThreshold = (minThreshold) => {
-                minThreshold = parseInt(minThreshold);
-                if (minThreshold >= this.maxThreshold) minThreshold = this.maxThreshold - 1;
-                this.minThreshold = minThreshold;
-                this.minSliderEl.value = minThreshold;
-                this.minInputEl.value = minThreshold;
-                if (this.image) render(this.el, this.image, this.minThreshold, this.maxThreshold);
+                minThreshold = Math.min(parseInt(minThreshold), this.viewerState.maxThreshold - 1);
+                updateState({minThreshold});
             }
 
             this.minSliderEl.addEventListener('input', ev => updateMinThreshold(ev.currentTarget.value));
             this.minInputEl.addEventListener('change', ev => updateMinThreshold(ev.currentTarget.value));
 
             const updateMaxThreshold = (maxThreshold) => {
-                maxThreshold = parseInt(maxThreshold);
-                if (maxThreshold <= this.minThreshold) maxThreshold = this.minThreshold + 1;
-                this.maxThreshold = maxThreshold;
-                this.maxSliderEl.value = maxThreshold;
-                this.maxInputEl.value = maxThreshold;
-                if (this.image) render(this.el, this.image, this.minThreshold, this.maxThreshold);
+                maxThreshold = Math.max(parseInt(maxThreshold), this.viewerState.minThreshold + 1);
+                updateState({maxThreshold});
             }
 
             this.maxSliderEl.addEventListener('input', ev => updateMaxThreshold(ev.currentTarget.value));

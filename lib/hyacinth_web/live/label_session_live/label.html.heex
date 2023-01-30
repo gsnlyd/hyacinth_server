@@ -79,7 +79,7 @@
                 style="height: calc(100vh - 16rem);"
               />
             <% :advanced -> %>
-              <%= live_render(@socket, HyacinthWeb.ViewerLive.Viewers.AdvancedPNG, session: %{"object_id" => object.id, "unique_id" => i}, id: "viewer-advanced-png-#{object.id}")  %>
+              <.live_component module={HyacinthWeb.ViewerLive.Viewers.AdvancedPNG} object_id={object.id} unique_id={i} id={"viewer-advanced-png-#{i}"} />
             <% end %>
           </div>
         </div>

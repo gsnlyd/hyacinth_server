@@ -8,6 +8,7 @@
     id={"advanced-png-viewer-canvas-#{@unique_id}"}
     data-object-id={@object.id}
     data-unique-id={@unique_id}
+    data-collaboration-enabled={if(@collaboration, do: "true", else: "false")}
   ></canvas>
 
   <div phx-update="ignore" id={"advanced-png-viewer-controls-#{@unique_id}"}>
