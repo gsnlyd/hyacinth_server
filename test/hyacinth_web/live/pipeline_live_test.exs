@@ -99,6 +99,7 @@ defmodule HyacinthWeb.PipelineLiveTest do
 
       params = %{
         "name" => "My Pipeline",
+        "description" => "This is my pipeline.",
         "transforms" => %{
           "0" => %{"driver" => "dicom_to_nifti", "order_index" => "0"},
           "1" => %{"driver" => "slicer", "order_index" => "1"},
@@ -114,6 +115,7 @@ defmodule HyacinthWeb.PipelineLiveTest do
       [%Pipeline{} = pipeline] = Assembly.list_pipelines_preloaded()
       assert pipeline.id == 1
       assert pipeline.name == "My Pipeline"
+      assert pipeline.description == "This is my pipeline."
 
       [tr1, tr2, tr3] = pipeline.transforms
       assert %Transform{} = tr1

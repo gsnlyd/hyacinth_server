@@ -12,6 +12,12 @@
             <%= text_input f, :name, placeholder: "My Pipeline" %>
             <%= error_tag f, :name %>
           </p>
+
+          <p>
+            <%= label f, :description %>
+            <%= textarea f, :description, placeholder: "A very cool pipeline." %>
+            <%= error_tag f, :description %>
+          </p>
         </div>
       </div>
 
