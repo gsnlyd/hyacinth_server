@@ -13,7 +13,7 @@ defmodule Hyacinth.Assembly do
   alias Hyacinth.Warehouse
 
   alias Hyacinth.Accounts.User
-  alias Hyacinth.Warehouse.{Dataset, Object}
+  alias Hyacinth.Warehouse.{Dataset, Object, FormatType}
   alias Hyacinth.Assembly.{Pipeline, Transform, PipelineRun, TransformRun, Driver}
 
   @doc """
@@ -136,6 +136,32 @@ defmodule Hyacinth.Assembly do
       from t in Ecto.assoc(pipeline, :transforms),
       select: t
     )
+  end
+
+  @doc """
+  Returns the input format of the first non-pure
+  transform in the given list of transforms.
+
+  If all transforms are pure, returns `:any`.
+
+  ## Examples
+
+      iex> get_input_format(some_transforms)
+      :dicom
+
+      iex> get_input_format(some_other_transforms)
+      :any
+
+  """
+  @spec get_input_format([%Transform{}]) :: FormatType.t | :any
+  def get_input_format(transforms) when is_list(transforms) do
+    Enum.find_value(transforms, :any, fn %Transform{} = transform ->
+      if Driver.pure?(transform.driver) do
+        false
+      else
+        Driver.input_format(transform.driver, transform.options)
+      end
+    end)
   end
 
   @doc """

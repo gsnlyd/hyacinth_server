@@ -18,6 +18,23 @@ defmodule Hyacinth.WarehouseTest do
     end
   end
 
+  describe "list_datasets_with_format/1" do
+    test "returns all matching datasets" do
+      dataset_fixture(%{}, many_object_params_fixtures(nil, nil, :png))
+      dataset_fixture(%{}, many_object_params_fixtures(nil, nil, :png))
+      dataset_fixture(%{}, many_object_params_fixtures(nil, nil, :dicom))
+
+      assert length(Warehouse.list_datasets_with_format(:png)) == 2
+      assert length(Warehouse.list_datasets_with_format(:dicom)) == 1
+    end
+
+    test "returns empty list if there are no matching datasets" do
+      dataset_fixture(%{}, many_object_params_fixtures(nil, nil, :dicom))
+
+      assert length(Warehouse.list_datasets_with_format(:png)) == 0
+    end
+  end
+
   describe "list_datasets_with_stats/0" do
     test "returns all datasets with counts" do
       dataset1 = root_dataset_fixture()

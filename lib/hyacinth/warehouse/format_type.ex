@@ -48,6 +48,8 @@ defmodule Hyacinth.Warehouse.FormatType do
   """
   def container?(format), do: module_for(format).container?()
 
+  @type t :: :png | :dicom | :nifti
+
   defp module_for(:png), do: FormatType.PNG
   defp module_for(:dicom), do: FormatType.DICOM
   defp module_for(:nifti), do: FormatType.Nifti

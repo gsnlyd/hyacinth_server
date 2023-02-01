@@ -220,6 +220,26 @@ defmodule Hyacinth.AssemblyTest do
     end
   end
 
+  describe "get_input_format/1" do
+    test "returns correct input format" do
+      transforms = [
+        %Transform{order_index: 0, driver: :dicom_to_nifti, options: %{}},
+        %Transform{order_index: 1, driver: :slicer, options: %{}},
+      ]
+
+      assert Assembly.get_input_format(transforms) == :dicom
+    end
+
+    test "returns :any for pure transforms" do
+      transforms = [
+        %Transform{order_index: 0, driver: :sample, options: %{}},
+        %Transform{order_index: 1, driver: :sample, options: %{}},
+      ]
+
+      assert Assembly.get_input_format(transforms) == :any
+    end
+  end
+
   describe "check_transform_formats/2" do
     test "returns no errors for valid transforms" do
       transforms = [

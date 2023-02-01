@@ -25,6 +25,27 @@ defmodule Hyacinth.Warehouse do
     Repo.all(Dataset)
   end
 
+  @doc """
+  Returns the list of datasets which have
+  at least one object with the given format.
+
+  ## Examples
+
+      iex> list_datasets_with_format(:png)
+      [%Dataset{}, %Dataset{}, ...]
+
+  """
+  @spec list_datasets_with_format(atom) :: [%Dataset{}]
+  def list_datasets_with_format(format) when is_atom(format) do
+    Repo.all(
+      from d in Dataset,
+      inner_join: o in assoc(d, :objects),
+      where: o.format == ^format,
+      select: d,
+      distinct: true
+    )
+  end
+
   defmodule DatasetStats do
     @type t :: %__MODULE__{
       dataset: %Dataset{},

@@ -47,13 +47,19 @@ defmodule HyacinthWeb.PipelineLive.Show do
 
   def mount(params, _session, socket) do
     pipeline = Assembly.get_pipeline_preloaded!(params["pipeline_id"])
-
     if connected?(socket), do: Assembly.subscribe_pipeline_run_updates(pipeline)
+
+    transforms = Assembly.list_transforms(pipeline)
+    datasets =
+      case Assembly.get_input_format(transforms) do
+        :any -> Warehouse.list_datasets()
+        format -> Warehouse.list_datasets_with_format(format)
+      end
 
     socket = assign(socket, %{
       pipeline: pipeline,
-      transforms: Assembly.list_transforms(pipeline),
-      datasets: Warehouse.list_datasets(),
+      transforms: transforms,
+      datasets: datasets,
 
       run_filter_changeset: RunFilterForm.changeset(%RunFilterForm{}, %{}),
 
