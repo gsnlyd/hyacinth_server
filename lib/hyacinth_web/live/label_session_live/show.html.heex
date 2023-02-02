@@ -54,12 +54,25 @@
     </div>
 
     <div class="shrink-0">
-      <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Label, @label_session, 0), class: "btn btn-lg btn-blue btn-icon" do %>
-        <Icons.play_circle_solid />
-        <span>Start Labeling</span>
-      <% end %>
+      <%= cond do %>
+        <% @num_labeled == 0 -> %>
+          <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Label, @label_session, 0), class: "btn btn-lg btn-blue btn-icon" do %>
+            <Icons.play_circle_solid />
+            <span>Start Labeling</span>
+          <% end %>
 
-      <%= live_redirect "View Results", to: Routes.live_path(@socket, HyacinthWeb.ResultsLive.Show, @label_session), class: "link" %>
+        <% @num_labeled < @num_total -> %>
+          <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Label, @label_session, 0), class: "btn btn-lg btn-yellow btn-icon" do %>
+            <Icons.play_circle_solid />
+            <span>Resume Labeling</span>
+          <% end %>
+
+        <% true -> %>
+          <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.ResultsLive.Show, @label_session), class: "btn btn-lg btn-green btn-icon" do %>
+            <Icons.rectangle_stack_solid />
+            <span>View Results</span>
+          <% end %>
+      <% end %>
     </div>
   </div>
 </header>
