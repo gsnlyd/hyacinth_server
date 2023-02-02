@@ -1,0 +1,45 @@
+<header>
+  <.breadcrumbs>
+    <:crumb label={nil} to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Index)}>
+      Datasets
+    </:crumb>
+    <:crumb label="Dataset" to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, @label_session.job.dataset)}>
+      <%= @label_session.job.dataset.name %>
+    </:crumb>
+    <:crumb label="Job" to={Routes.live_path(@socket, HyacinthWeb.LabelJobLive.Show, @label_session.job)}>
+      <%= @label_session.job.name %>
+    </:crumb>
+    <:crumb label="Session" to={Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @label_session)}>
+      <%= @label_session.user.name %>'s Session
+    </:crumb>
+    <:crumb label="Results" to={Routes.live_path(@socket, HyacinthWeb.ResultsLive.Show, @label_session)}>
+      <%= @label_session.user.name %>'s Session
+    </:crumb>
+  </.breadcrumbs>
+
+  <div>
+    <h1>Results for <%= @label_session.user.name %>'s Session</h1>
+  </div>
+</header>
+
+<main class="mt-4">
+  <div class="grid grid-cols-4 gap-4">
+    <%= for {object, value} <- @results_objects do %>
+      <div>
+        <img
+          class="w-full aspect-square object-contain bg-black rounded"
+          src={Routes.image_path(@socket, :show, object.id)}
+        />
+
+        <div class="mt-2 text-center">
+          <div>
+            <span class="text-gray-400 font-medium"><%= object.name %></span>
+            <%= live_redirect "(View)", to: Routes.live_path(@socket, HyacinthWeb.ViewerLive.Show, object), class: "link text-sm" %>
+          </div>
+
+          <div class="text-sm text-gray-500"><%= value %></div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</main>

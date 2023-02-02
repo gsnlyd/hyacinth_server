@@ -1,6 +1,9 @@
 defmodule Hyacinth.Labeling.LabelJobType.ComparisonExhaustive do
   alias Hyacinth.Labeling.LabelJobType
 
+  alias Hyacinth.Labeling.{LabelJob, LabelSession, LabelElement}
+  alias Hyacinth.Warehouse.Object
+
   defmodule ComparisonExhaustiveOptions do
     use Ecto.Schema
     import Ecto.Changeset
@@ -94,6 +97,63 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonExhaustive do
   def list_object_label_options(options) do
     options = ComparisonExhaustiveOptions.parse(options)
     options.comparison_label_options
+  end
+
+  @impl LabelJobType
+  def session_results(options, %LabelJob{} = job, %LabelSession{} = label_session) do
+    options = ComparisonExhaustiveOptions.parse(options)
+    objects =
+      job.blueprint.elements
+      |> Enum.map(fn %LabelElement{objects: objects} -> objects end)
+      |> Enum.concat()
+      |> Enum.uniq()
+
+    objects_wld = Map.new(objects, fn %Object{} = object ->
+      {object.id, {object, 0, 0, 0}}
+    end)
+
+    label_session.elements
+    |> Enum.reduce(objects_wld, fn %LabelElement{} = element, acc ->
+      if length(element.labels) > 0 do
+        label_option = hd(element.labels).value.option
+        [obj1, obj2] = element.objects
+
+        cond do
+          # First Object Won
+          label_option == Enum.at(options.comparison_label_options, 0) ->
+            acc
+            |> Map.update!(obj1.id, fn {obj, w, l, d} -> {obj, w + 1, l, d} end)
+            |> Map.update!(obj2.id, fn {obj, w, l, d} -> {obj, w, l + 1, d} end)
+
+          # Second Object Won
+          label_option == Enum.at(options.comparison_label_options, 1) ->
+            acc
+            |> Map.update!(obj1.id, fn {obj, w, l, d} -> {obj, w, l + 1, d} end)
+            |> Map.update!(obj2.id, fn {obj, w, l, d} -> {obj, w + 1, l, d} end)
+
+          # Draw
+          true ->
+            acc
+            |> Map.update!(obj1.id, fn {obj, w, l, d} -> {obj, w, l, d + 1} end)
+            |> Map.update!(obj2.id, fn {obj, w, l, d} -> {obj, w, l, d + 1} end)
+        end
+      else
+        acc
+      end
+    end)
+    |> Enum.map(fn {_id, tuple} -> tuple end)
+    |> Enum.map(fn {obj, w, l, d} ->
+      score = if w + l + d <= 0, do: 0, else: w / (w + l + d)
+      {obj, w, l, d, score}
+    end)
+    |> Enum.sort(fn tuple1, tuple2 ->
+      score1 = elem(tuple1, 4)
+      score2 = elem(tuple2, 4)
+      score1 >= score2
+    end)
+    |> Enum.map(fn {%Object{} = obj, w, l, d, score} ->
+      {obj, "Score: #{score} (WLD #{w} / #{l} / #{d})"}
+    end)
   end
 
   @impl LabelJobType

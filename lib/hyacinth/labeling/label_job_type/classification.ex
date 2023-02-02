@@ -2,6 +2,8 @@ defmodule Hyacinth.Labeling.LabelJobType.Classification do
   alias Hyacinth.Labeling.LabelJobType
   alias Hyacinth.Warehouse.Object
 
+  alias Hyacinth.Labeling.{LabelJob, LabelSession, LabelElement, LabelEntry}
+
   defmodule ClassificationOptions do
     use Ecto.Schema
     import Ecto.Changeset
@@ -71,6 +73,23 @@ defmodule Hyacinth.Labeling.LabelJobType.Classification do
 
   @impl LabelJobType
   def list_object_label_options(_options), do: nil
+
+  @impl LabelJobType
+  def session_results(_options, %LabelJob{} = job, %LabelSession{} = label_session) do
+    label_session.elements
+    |> Enum.filter(fn %LabelElement{} = element -> length(element.labels) > 0 end)
+    |> Enum.map(fn %LabelElement{} = element ->
+      {hd(element.objects), hd(element.labels)}
+    end)
+    |> Enum.sort(fn {_obj1, %LabelEntry{} = label1}, {_obj2, %LabelEntry{} = label2} ->
+      ind1 = Enum.find_index(job.label_options, &(&1 == label1.value.option))
+      ind2 = Enum.find_index(job.label_options, &(&1 == label2.value.option))
+      ind1 >= ind2
+    end)
+    |> Enum.map(fn {%Object{} = object, %LabelEntry{} = label} ->
+      {object, "Label: " <> label.value.option}
+    end)
+  end
 
   @impl LabelJobType
   def active?, do: false

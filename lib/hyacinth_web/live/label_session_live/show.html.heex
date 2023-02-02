@@ -58,6 +58,8 @@
         <Icons.play_circle_solid />
         <span>Start Labeling</span>
       <% end %>
+
+      <%= live_redirect "View Results", to: Routes.live_path(@socket, HyacinthWeb.ResultsLive.Show, @label_session), class: "link" %>
     </div>
   </div>
 </header>

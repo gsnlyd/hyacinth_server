@@ -2,7 +2,7 @@ defmodule Hyacinth.Labeling.LabelJobType do
   alias Hyacinth.Labeling.LabelJobType
 
   alias Hyacinth.Warehouse.Object
-  alias Hyacinth.Labeling.LabelElement
+  alias Hyacinth.Labeling.{LabelJob, LabelSession, LabelElement}
 
   @doc """
   Callback that returns a display name for this job type.
@@ -132,6 +132,10 @@ defmodule Hyacinth.Labeling.LabelJobType do
   """
   @spec list_object_label_options(atom, map) :: [String.t] | nil
   def list_object_label_options(job_type, options), do: module_for(job_type).list_object_label_options(options)
+
+  @callback session_results(options :: map, job :: %LabelJob{}, label_session :: %LabelSession{}) :: [{%Object{}, term}]
+
+  def session_results(job_type, options, job, label_session), do: module_for(job_type).session_results(options, job, label_session)
 
   @doc """
   Callback that returns true if this is an active job type.

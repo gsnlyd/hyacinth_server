@@ -2,7 +2,7 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonMergesort do
   alias Hyacinth.Labeling.LabelJobType
 
   alias Hyacinth.Warehouse.Object
-  alias Hyacinth.Labeling.LabelElement
+  alias Hyacinth.Labeling.{LabelJob, LabelSession, LabelElement}
 
   defmodule ComparisonMergesortOptions do
     use Ecto.Schema
@@ -89,6 +89,29 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonMergesort do
   end
 
   @impl LabelJobType
+  def session_results(options, %LabelJob{} = job, %LabelSession{} = label_session) do
+    options = ComparisonMergesortOptions.parse(options)
+
+    all_labeled = Enum.all?(label_session.elements, fn %LabelElement{} = element -> length(element.labels) > 0 end)
+
+    if all_labeled do
+      objects = Enum.map(job.blueprint.elements, fn %LabelElement{objects: objects} -> hd(objects) end)
+      lookup_table = build_lookup_table(options, label_session.elements)
+
+      case find_next_group(objects, lookup_table) do
+        {:labeling_complete, objects_sorted} ->
+          objects_sorted
+          |> Enum.with_index()
+          |> Enum.map(fn {obj, i} -> {obj, "No. #{i + 1}"} end)
+
+        _next_group -> []
+      end
+    else
+      []
+    end
+  end
+
+  @impl LabelJobType
   def active?, do: true
 
   @impl LabelJobType
@@ -99,7 +122,10 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonMergesort do
     objects = Enum.map(blueprint_elements, fn %LabelElement{objects: objects} -> hd(objects) end)
     lookup_table = build_lookup_table(options, session_elements)
 
-    find_next_group(objects, lookup_table)
+    case find_next_group(objects, lookup_table) do
+      {:labeling_complete, _objects_sorted} -> :labeling_complete
+      next_group -> next_group
+    end
   end
 
   @spec build_lookup_table(%ComparisonMergesortOptions{}, [%LabelElement{}]) :: %{integer => %{integer => boolean}}
@@ -118,18 +144,19 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonMergesort do
     defexception [:message, :obj1, :obj2]
   end
 
-  @spec find_next_group([%Object{}], %{integer => %{integer => boolean}}) :: [%Object{}] | :labeling_complete
+  @spec find_next_group([%Object{}], %{integer => %{integer => boolean}}) :: [%Object{}] | {:labeling_complete, [%Object{}]}
   defp find_next_group(objects, lookup_table) do
     try do
-      Enum.sort(objects, fn %Object{} = obj1, %Object{} = obj2 ->
-        if Map.has_key?(lookup_table, obj1.id) and Map.has_key?(lookup_table[obj1.id], obj2.id) do
-          lookup_table[obj1.id][obj2.id]
-        else
-          raise UnknownLookupException, message: "Unknown lookup #{obj1.id} #{obj2.id}", obj1: obj1, obj2: obj2
-        end
-      end)
+      objects_sorted =
+        Enum.sort(objects, fn %Object{} = obj1, %Object{} = obj2 ->
+          if Map.has_key?(lookup_table, obj1.id) and Map.has_key?(lookup_table[obj1.id], obj2.id) do
+            lookup_table[obj1.id][obj2.id]
+          else
+            raise UnknownLookupException, message: "Unknown lookup #{obj1.id} #{obj2.id}", obj1: obj1, obj2: obj2
+          end
+        end)
 
-      :labeling_complete
+      {:labeling_complete, objects_sorted}
     rescue
       e in UnknownLookupException ->
         [e.obj1, e.obj2]
