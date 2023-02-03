@@ -5,6 +5,18 @@ defmodule HyacinthWeb.Components.BasicComponents do
   alias HyacinthWeb.Components.Icons
   alias Hyacinth.Assembly.Driver
 
+  # TODO: deduplicate this and modal/1
+  def empty_modal(assigns) do
+    assigns = assign_new(assigns, :close_event, fn -> "close_modal" end)
+    ~H"""
+    <div class="top-0 left-0 fixed bg-black bg-opacity-90 flex justify-center items-start" style="width: 100vw; height: 100vh;">
+      <div style="margin-top: calc(2rem + 10vh);" phx-click-away={@close_event}>
+        <%= render_slot(@inner_block) %>
+      </div>
+    </div>
+    """
+  end
+
   def modal(assigns) do
     assigns = assign_new(assigns, :close_event, fn -> "close_modal" end)
     assigns = assign_new(assigns, :size, fn -> "md" end)

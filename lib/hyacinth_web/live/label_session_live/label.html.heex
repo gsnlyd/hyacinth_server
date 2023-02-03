@@ -29,7 +29,7 @@
       <button class="btn btn-gray btn-icon-only" phx-click="open_modal_notes">
         <Icons.pencil_mini />
       </button>
-      <button class="btn btn-gray btn-icon-only">
+      <button class="btn btn-gray btn-icon-only" phx-click="open_modal_keymap">
         <Icons.information_circle_mini />
       </button>
     </div>
@@ -185,6 +185,41 @@
         </.form>
       </div>
     </.modal>
+
+  <% :keymap -> %>
+    <.empty_modal>
+      <div class="mt-1 px-4 py-2 w-96 rounded border border-gray-700">
+        <div class="pb-2 border-b border-gray-700 flex justify-between items-center">
+          <h3>Keymap</h3>
+          <button class="-mt-2 text-3xl text-gray-500 hover:text-gray-300 transition" phx-click="close_modal">&times;</button>
+        </div>
+
+        <table class="mt-2 w-full border-separate border-spacing-y-0.5">
+          <thead class="text-sm text-gray-500 font-medium">
+            <tr>
+              <td>Key</td>
+              <td>Action</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="group hover:text-black hover:bg-white hover:font-medium">
+              <td class="pr-6 text-gray-400 group-hover:text-black">Left Arrow (&larr;)</td>
+              <td>Previous</td>
+            </tr>
+
+            <tr class="group hover:text-black hover:bg-white hover:font-medium">
+              <td class="pr-6 text-gray-400 group-hover:text-black">Right Arrow (&rarr;)</td>
+              <td>Next</td>
+            </tr>
+
+            <tr class="group hover:text-black hover:bg-white hover:font-medium">
+              <td class="pr-6 text-gray-400 group-hover:text-black">Number Key (1-9)</td>
+              <td>Set Label 1-9</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </.empty_modal>
 
   <% :labeling_complete -> %>
     <.modal size="xs">

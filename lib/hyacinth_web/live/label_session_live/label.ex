@@ -176,6 +176,10 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
     {:noreply, assign(socket, :modal, {:notes, changeset})}
   end
 
+  def handle_event("open_modal_keymap", _value, socket) do
+    {:noreply, assign(socket, :modal, :keymap)}
+  end
+
   def handle_event("close_modal", _value, socket) do
     {:noreply, assign(socket, :modal, nil)}
   end
