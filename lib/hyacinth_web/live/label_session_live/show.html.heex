@@ -55,23 +55,25 @@
 
     <div class="shrink-0">
       <%= cond do %>
-        <% @num_labeled == 0 -> %>
+        <% @num_labeled == 0 and @current_user.id == @label_session.user_id -> %>
           <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Label, @label_session, 0), class: "btn btn-lg btn-blue btn-icon" do %>
             <Icons.play_circle_solid />
             <span>Start Labeling</span>
           <% end %>
 
-        <% @num_labeled < @num_total -> %>
+        <% @num_labeled < @num_total and @current_user.id == @label_session.user_id -> %>
           <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Label, @label_session, 0), class: "btn btn-lg btn-yellow btn-icon" do %>
             <Icons.play_circle_solid />
             <span>Resume Labeling</span>
           <% end %>
 
-        <% true -> %>
+        <% @num_labeled == @num_total -> %>
           <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.ResultsLive.Show, @label_session), class: "btn btn-lg btn-green btn-icon" do %>
             <Icons.rectangle_stack_solid />
             <span>View Results</span>
           <% end %>
+
+        <% true -> %>
       <% end %>
     </div>
   </div>
