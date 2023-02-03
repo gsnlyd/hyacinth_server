@@ -7,7 +7,7 @@ defmodule HyacinthWeb.HomeLive.Index do
     if connected?(socket), do: Assembly.subscribe_all_pipeline_run_updates()
 
     socket = assign(socket, %{
-      user_sessions: Labeling.list_sessions_with_progress(socket.assigns.current_user),
+      user_sessions: Enum.sort_by(Labeling.list_sessions_with_progress(socket.assigns.current_user), &(&1.session.inserted_at), {:desc, DateTime}),
       running_pipeline_runs: Assembly.list_running_pipeline_runs_preloaded(),
 
       datasets: Warehouse.list_datasets_with_stats(),
