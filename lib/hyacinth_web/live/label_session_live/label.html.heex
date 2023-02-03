@@ -185,6 +185,24 @@
         </.form>
       </div>
     </.modal>
+
+  <% :labeling_complete -> %>
+    <.modal size="xs">
+      <:header>Labeling Complete</:header>
+
+      <div class="mt-3 space-y-3">
+        <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.ResultsLive.Show, @label_session), class: "btn btn-lg btn-blue btn-icon" do %>
+          <Icons.rectangle_stack_solid />
+          <span>View Results</span>
+        <% end %>
+
+        <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @label_session), class: "btn btn-lg btn-blue btn-icon" do %>
+          <Icons.arrow_left_circle_mini />
+          <span>Back to Session</span>
+        <% end %>
+      </div>
+    </.modal>
+
   <% nil -> %>
   <% end %>
 </div>

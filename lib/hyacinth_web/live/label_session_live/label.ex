@@ -55,6 +55,15 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
     {:ok, socket}
   end
 
+  defp check_complete(socket) do
+    elements = socket.assigns.label_session.elements
+    if Enum.all?(elements, fn element -> length(element.labels) > 0 end) do
+      assign(socket, :modal, :labeling_complete)
+    else
+      socket
+    end
+  end
+
   def handle_event("set_label", %{"label" => label_value}, socket) do
     Labeling.create_label_entry!(socket.assigns.element, socket.assigns.current_user, label_value, socket.assigns.started_at)
 
@@ -65,6 +74,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
       started_at: DateTime.utc_now(),
       current_value: hd(labels).value.option,
     })
+    socket = check_complete(socket)
     {:noreply, socket}
   end
 
@@ -87,6 +97,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
           started_at: DateTime.utc_now(),
           current_value: hd(labels).value.option,
         })
+        socket = check_complete(socket)
         {:noreply, socket}
 
       nil ->

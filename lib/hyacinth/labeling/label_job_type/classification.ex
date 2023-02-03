@@ -84,7 +84,7 @@ defmodule Hyacinth.Labeling.LabelJobType.Classification do
     |> Enum.sort(fn {_obj1, %LabelEntry{} = label1}, {_obj2, %LabelEntry{} = label2} ->
       ind1 = Enum.find_index(job.label_options, &(&1 == label1.value.option))
       ind2 = Enum.find_index(job.label_options, &(&1 == label2.value.option))
-      ind1 >= ind2
+      ind1 <= ind2
     end)
     |> Enum.map(fn {%Object{} = object, %LabelEntry{} = label} ->
       {object, "Label: " <> label.value.option}
