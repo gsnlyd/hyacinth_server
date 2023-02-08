@@ -30,6 +30,11 @@
 - [x] Improve labeling interface, particularly comparisons
 - [x] Add user profile pages
 
+# 1.1.1
+- [x] Add basic results support
+- [x] Add key bindings modal to labeling page
+- [x] Fix config generation script in releases
+
 ## 1.2.0
 - [ ] Add collaborative viewing/labeling features
 - [ ] Add viewers for other image types (DICOM, Nifti)
