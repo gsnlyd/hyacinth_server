@@ -48,7 +48,7 @@ unless System.get_env("HYACINTH_GENERATING_CONFIG") do
     :prod ->
       config :hyacinth, :python_path, System.get_env("PYTHON_PATH") || "python"
       # TODO: Use Application.app_dir at runtime in slicer.ex and remove this from the config entirely
-      config :hyacinth, :slicer_path, System.get_env("SLICER_PATH") || Path.expand(Path.join(File.cwd!, "../lib/hyacinth-0.1.0/priv/drivers/python_slicer/slicer.py"))
+      config :hyacinth, :slicer_path, System.get_env("SLICER_PATH") || Path.expand(Path.join(File.cwd!, "../lib/hyacinth-1.1.1/priv/drivers/python_slicer/slicer.py"))
       config :hyacinth, :dcm2niix_path, System.get_env("DCM2NIIX_PATH") || "dcm2niix"
   end
 
