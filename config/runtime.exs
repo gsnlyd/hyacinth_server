@@ -47,18 +47,13 @@ unless System.get_env("HYACINTH_GENERATING_CONFIG") do
 
     :prod ->
       config :hyacinth, :python_path, System.get_env("PYTHON_PATH") || "python"
-      # TODO: copy slicer to somewhere less annoying in the release
+      # TODO: Use Application.app_dir at runtime in slicer.ex and remove this from the config entirely
       config :hyacinth, :slicer_path, System.get_env("SLICER_PATH") || Path.expand(Path.join(File.cwd!, "../lib/hyacinth-0.1.0/priv/drivers/python_slicer/slicer.py"))
       config :hyacinth, :dcm2niix_path, System.get_env("DCM2NIIX_PATH") || "dcm2niix"
   end
 
   if config_env() == :prod do
-    database_path =
-      System.get_env("DATABASE_PATH") ||
-        raise """
-        environment variable DATABASE_PATH is missing.
-        For example: /etc/hyacinth/hyacinth.db
-        """
+    database_path = System.get_env("DATABASE_PATH") || raise "Environment variable DATABASE_PATH is missing!"
 
     config :hyacinth, Hyacinth.Repo,
       database: database_path,
@@ -69,17 +64,12 @@ unless System.get_env("HYACINTH_GENERATING_CONFIG") do
     # want to use a different value for prod and you most likely don't want
     # to check this value into version control, so we use an environment
     # variable instead.
-    secret_key_base =
-      System.get_env("SECRET_KEY_BASE") ||
-        raise """
-        environment variable SECRET_KEY_BASE is missing.
-        You can generate one by calling: mix phx.gen.secret
-        """
+    secret_key_base = System.get_env("SECRET_KEY_BASE") || raise "Environment variable SECRET_KEY_BASE is missing!"
 
-    host = System.get_env("PHX_HOST") || "example.com"
+    host = System.get_env("PHX_HOST") || "localhost"
     port = String.to_integer(System.get_env("PORT") || "4000")
-    url_port = String.to_integer(System.get_env("URL_PORT") || "443")
-    url_scheme = System.get_env("URL_SCHEME") || "https"
+    url_port = String.to_integer(System.get_env("URL_PORT") || "4000")
+    url_scheme = System.get_env("URL_SCHEME") || "http"
 
     config :hyacinth, HyacinthWeb.Endpoint,
       url: [host: host, port: url_port, scheme: url_scheme],
@@ -92,23 +82,5 @@ unless System.get_env("HYACINTH_GENERATING_CONFIG") do
         port: port
       ],
       secret_key_base: secret_key_base
-
-    # ## Configuring the mailer
-    #
-    # In production you need to configure the mailer to use a different adapter.
-    # Also, you may need to configure the Swoosh API client of your choice if you
-    # are not using SMTP. Here is an example of the configuration:
-    #
-    #     config :hyacinth, Hyacinth.Mailer,
-    #       adapter: Swoosh.Adapters.Mailgun,
-    #       api_key: System.get_env("MAILGUN_API_KEY"),
-    #       domain: System.get_env("MAILGUN_DOMAIN")
-    #
-    # For this example you need include a HTTP client required by Swoosh API client.
-    # Swoosh supports Hackney and Finch out of the box:
-    #
-    #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
-    #
-    # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
   end
 end
