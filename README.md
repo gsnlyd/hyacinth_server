@@ -46,7 +46,7 @@ you through this process.
 1. Extract your downloaded Hyacinth release and cd inside:
 
     ```console
-    $ tar -x your-hyacinth-release.tar
+    $ tar -xf your-hyacinth-release.tar
     $ cd hyacinth
     ```
 
@@ -61,6 +61,7 @@ the variables will be passed to the server without being added to your shell env
 
     ```console
     $ ./bin/generate_config
+    $ mv bin/config.env .
     ```
 
 3. The Hyacinth server uses two directories to manage data. The `warehouse` directory is used to
