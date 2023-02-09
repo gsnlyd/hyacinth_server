@@ -167,7 +167,7 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonExhaustive do
     |> Enum.sort(fn tuple1, tuple2 ->
       score1 = elem(tuple1, 4)
       score2 = elem(tuple2, 4)
-      score1 >= score2
+      score1 <= score2
     end)
     |> Enum.map(fn {%Object{} = obj, w, l, d, score} ->
       {obj, "Score: #{score} (WLD #{w} / #{l} / #{d})"}

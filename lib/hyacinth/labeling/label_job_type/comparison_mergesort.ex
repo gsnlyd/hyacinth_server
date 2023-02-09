@@ -103,6 +103,7 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonMergesort do
           objects_sorted
           |> Enum.with_index()
           |> Enum.map(fn {obj, i} -> {obj, "No. #{i + 1}"} end)
+          |> Enum.reverse()  # Reverse because results list should be ascending
 
         _next_group -> []
       end

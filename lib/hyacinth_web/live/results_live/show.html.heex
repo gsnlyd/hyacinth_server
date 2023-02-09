@@ -47,8 +47,27 @@
 </header>
 
 <main class="mt-4">
-  <div class="grid grid-cols-4 gap-4">
-    <%= for {object, value} <- @results_objects do %>
+  <div>
+    <div class="filter-form-content flex justify-between items-center">
+      <.form let={f} for={@display_changeset} phx-change="display_form_change">
+        <p>
+          <%= label f, :order %>
+          <%= select f, :order, humanize_enum(ResultsDisplayForm, :order) %>
+        </p>
+      </.form>
+
+      <div class="space-x-1">
+        <%= for num_cols <- [2, 4, 8] do %>
+          <button class={["btn", if(@columns == num_cols, do: "btn-dark-blue", else: "btn-gray")]} phx-click="set_columns" phx-value-columns={num_cols}>
+            <span><%= num_cols %></span>
+          </button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class={["mt-4 grid gap-4", grid_cols_class(@columns)]}>
+    <%= for {object, value} <- order_results(@display_changeset, @results_objects) do %>
       <div>
         <img
           class="w-full aspect-square object-contain bg-black rounded"
