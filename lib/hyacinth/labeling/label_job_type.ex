@@ -137,6 +137,10 @@ defmodule Hyacinth.Labeling.LabelJobType do
 
   def session_results(job_type, options, job, label_session), do: module_for(job_type).session_results(options, job, label_session)
 
+  @callback job_results(options :: map, job :: %LabelJob{}, label_sessions :: [%LabelSession{}]) :: [{%Object{}, term}]
+
+  def job_results(job_type, options, job, label_sessions), do: module_for(job_type).job_results(options,  job, label_sessions)
+
   @doc """
   Callback that returns true if this is an active job type.
 

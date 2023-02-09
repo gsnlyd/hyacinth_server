@@ -287,6 +287,26 @@ defmodule Hyacinth.Labeling do
 
 
   @doc """
+  Lists the label sessions which belong to
+  the given job, excluding the blueprint session.
+
+  The following fields are preloaded:
+    * `elements`
+    * `LabelElement.objects`
+    * `LabelElement.labels`
+
+  """
+  @spec list_sessions_preloaded(%LabelJob{}) :: [%LabelSession{}]
+  def list_sessions_preloaded(%LabelJob{} = job) do
+    Repo.all(
+      from ls in LabelSession,
+      where: ls.job_id == ^job.id and ls.blueprint == false,
+      select: ls,
+      preload: [elements: [:objects, :labels]]
+    )
+  end
+
+  @doc """
   Gets a single LabelSession.
 
   ## Examples

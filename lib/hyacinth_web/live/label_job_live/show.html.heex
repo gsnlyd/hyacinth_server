@@ -36,10 +36,16 @@
       </div>
     </div>
 
-    <%= link to: Routes.label_session_path(@socket, :new, @job), class: "btn btn-blue btn-icon" do %>
-      <Icons.plus_small_solid />
-      <span>New Session</span>
-    <% end %>
+    <div class="flex flex-col items-center space-y-2">
+      <%= link to: Routes.label_session_path(@socket, :new, @job), class: "btn btn-blue btn-icon" do %>
+        <Icons.plus_small_solid />
+        <span>New Session</span>
+      <% end %>
+
+      <%= live_redirect to: Routes.results_show_path(@socket, :show_job, @job), class: "link text-sm" do %>
+        <span>View Results</span>
+      <% end %>
+    </div>
   </div>
 
   <div class="mt-4 text-xl border-b-2 border-gray-700">

@@ -92,5 +92,55 @@ defmodule Hyacinth.Labeling.LabelJobType.Classification do
   end
 
   @impl LabelJobType
+  def job_results(_options, job, label_sessions) do
+    completed_sessions =
+      label_sessions
+      |> Enum.filter(fn %LabelSession{elements: elements} ->
+        Enum.all?(elements, fn %LabelElement{labels: labels} -> length(labels) > 0 end)
+      end)
+
+    label_map_default = Map.new(job.label_options, fn opt -> {opt, 0} end)
+    object_labels = Map.new(job.blueprint.elements, fn %LabelElement{} = element ->
+      object = hd(element.objects)
+      {object.id, {object, label_map_default}}
+    end)
+
+    completed_sessions
+    |> Enum.map(&(&1.elements))
+    |> Enum.concat()
+    |> Enum.map(fn %LabelElement{} = element ->
+      {hd(element.objects), hd(element.labels)}
+    end)
+    |> Enum.reduce(object_labels, fn {%Object{} = object, %LabelEntry{} = label}, acc ->
+      Map.update!(acc, object.id, fn {object, label_map} ->
+        {
+          object,
+          Map.update!(label_map, label.value.option, fn v -> v + 1 end)
+        }
+      end)
+    end)
+    |> Enum.map(fn {_id, tuple} -> tuple end)
+    |> Enum.map(fn {%Object{} = object, label_map} ->
+      top_label =
+        Enum.reduce(label_map, {hd(job.label_options), 0}, fn {k, v}, acc ->
+          if v > elem(acc, 1) do
+            {k, v}
+          else
+            acc
+          end
+        end)
+      {object, top_label}
+    end)
+    |> Enum.sort(fn {_obj1, {label1, _count1}}, {_obj2, {label2, _count2}} ->
+      ind1 = Enum.find_index(job.label_options, &(&1 == label1))
+      ind2 = Enum.find_index(job.label_options, &(&1 == label2))
+      ind1 <= ind2
+    end)
+    |> Enum.map(fn {%Object{} = object, {label_option, count}} ->
+      {object, "Top Label: #{label_option} (#{count} / #{length(completed_sessions)})"}
+    end)
+  end
+
+  @impl LabelJobType
   def active?, do: false
 end

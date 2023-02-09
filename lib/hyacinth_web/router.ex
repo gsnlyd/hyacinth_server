@@ -52,7 +52,8 @@ defmodule HyacinthWeb.Router do
       live "/sessions/:label_session_id", LabelSessionLive.Show
       live "/sessions/:label_session_id/label/:element_index", LabelSessionLive.Label
 
-      live "/results/:label_session_id", ResultsLive.Show
+      live "/results/session/:label_session_id", ResultsLive.Show, :show_session
+      live "/results/job/:label_job_id", ResultsLive.Show, :show_job
 
       live "/viewer/:object_id", ViewerLive.Show
       live "/viewer/:object_id/:viewer_session_id", ViewerLive.Show

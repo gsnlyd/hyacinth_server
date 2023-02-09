@@ -261,6 +261,48 @@ defmodule Hyacinth.LabelingTest do
     end
   end
 
+  describe "list_sessions_preloaded/1" do
+    test "returns sessions for job with preloads" do
+      job = label_job_fixture()
+      label_session_fixture(job)
+      label_session_fixture(job)
+      label_session_fixture(job)
+
+      other_job = label_job_fixture()
+      label_session_fixture(other_job)
+      label_session_fixture(other_job)
+
+      label_sessions = Labeling.list_sessions_preloaded(job)
+      assert length(label_sessions) == 3
+
+      Enum.each(label_sessions, fn %LabelSession{} = session ->
+        assert Ecto.assoc_loaded?(session.elements)
+
+        Enum.each(session.elements, fn %LabelElement{} = element ->
+          assert Ecto.assoc_loaded?(element.objects)
+          assert Ecto.assoc_loaded?(element.labels)
+        end)
+      end)
+    end
+
+    test "returns empty list if there are no sessions for the job" do
+      job = label_job_fixture()
+      assert Labeling.list_sessions_preloaded(job) == []
+    end
+
+    test "does not return blueprint session" do
+      job = label_job_fixture()
+      label_session_fixture(job)
+      label_session_fixture(job)
+      label_session_fixture(job)
+
+      label_sessions = Labeling.list_sessions_preloaded(job)
+      Enum.each(label_sessions, fn %LabelSession{} = session ->
+        assert session.blueprint == false
+      end)
+    end
+  end
+
   describe "get_label_session!/1" do
     test "returns session" do
       session = label_session_fixture()

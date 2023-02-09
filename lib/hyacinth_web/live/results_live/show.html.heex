@@ -1,25 +1,49 @@
 <header>
-  <.breadcrumbs>
-    <:crumb label={nil} to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Index)}>
-      Datasets
-    </:crumb>
-    <:crumb label="Dataset" to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, @label_session.job.dataset)}>
-      <%= @label_session.job.dataset.name %>
-    </:crumb>
-    <:crumb label="Job" to={Routes.live_path(@socket, HyacinthWeb.LabelJobLive.Show, @label_session.job)}>
-      <%= @label_session.job.name %>
-    </:crumb>
-    <:crumb label="Session" to={Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @label_session)}>
-      <%= @label_session.user.name %>'s Session
-    </:crumb>
-    <:crumb label="Results" to={Routes.live_path(@socket, HyacinthWeb.ResultsLive.Show, @label_session)}>
-      <%= @label_session.user.name %>'s Session
-    </:crumb>
-  </.breadcrumbs>
+  <%= case @live_action do %>
+  <% :show_session -> %>
+    <.breadcrumbs>
+      <:crumb label={nil} to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Index)}>
+        Datasets
+      </:crumb>
+      <:crumb label="Dataset" to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, @label_session.job.dataset)}>
+        <%= @label_session.job.dataset.name %>
+      </:crumb>
+      <:crumb label="Job" to={Routes.live_path(@socket, HyacinthWeb.LabelJobLive.Show, @label_session.job)}>
+        <%= @label_session.job.name %>
+      </:crumb>
+      <:crumb label="Session" to={Routes.live_path(@socket, HyacinthWeb.LabelSessionLive.Show, @label_session)}>
+        <%= @label_session.user.name %>'s Session
+      </:crumb>
+      <:crumb label="Results" to={Routes.results_show_path(@socket, :show_session, @label_session)}>
+        <%= @label_session.user.name %>'s Results
+      </:crumb>
+    </.breadcrumbs>
 
-  <div>
-    <h1>Results for <%= @label_session.user.name %>'s Session</h1>
-  </div>
+    <div>
+      <h1>Results for <%= @label_session.user.name %>'s Session</h1>
+    </div>
+
+  <% :show_job -> %>
+    <.breadcrumbs>
+      <:crumb label={nil} to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Index)}>
+        Datasets
+      </:crumb>
+      <:crumb label="Dataset" to={Routes.live_path(@socket, HyacinthWeb.DatasetLive.Show, @job.dataset)}>
+        <%= @job.dataset.name %>
+      </:crumb>
+      <:crumb label="Job" to={Routes.live_path(@socket, HyacinthWeb.LabelJobLive.Show, @job)}>
+        <%= @job.name %>
+      </:crumb>
+      <:crumb label="Results" to={Routes.results_show_path(@socket, :show_job, @job)}>
+        <%= @job.name %> Results
+      </:crumb>
+    </.breadcrumbs>
+
+    <div>
+      <h1>Results for <%= @job.name %></h1>
+    </div>
+
+  <% end %>
 </header>
 
 <main class="mt-4">

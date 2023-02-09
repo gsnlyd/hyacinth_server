@@ -68,7 +68,7 @@
           <% end %>
 
         <% @num_labeled == @num_total -> %>
-          <%= live_redirect to: Routes.live_path(@socket, HyacinthWeb.ResultsLive.Show, @label_session), class: "btn btn-lg btn-green btn-icon" do %>
+          <%= live_redirect to: Routes.results_show_path(@socket, :show_session, @label_session), class: "btn btn-lg btn-green btn-icon" do %>
             <Icons.rectangle_stack_solid />
             <span>View Results</span>
           <% end %>

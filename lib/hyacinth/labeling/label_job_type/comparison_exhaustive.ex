@@ -102,6 +102,24 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonExhaustive do
   @impl LabelJobType
   def session_results(options, %LabelJob{} = job, %LabelSession{} = label_session) do
     options = ComparisonExhaustiveOptions.parse(options)
+    compute_results(options, job, label_session.elements)
+  end
+
+  @impl LabelJobType
+  def job_results(options, job, label_sessions) do
+    options = ComparisonExhaustiveOptions.parse(options)
+    elements =
+      label_sessions
+      |> Enum.filter(fn %LabelSession{elements: elements} ->
+        Enum.all?(elements, fn %LabelElement{labels: labels} -> length(labels) > 0 end)
+      end)
+      |> Enum.map(fn %LabelSession{elements: elements} -> elements end)
+      |> Enum.concat()
+
+    compute_results(options, job, elements)
+  end
+
+  defp compute_results(%ComparisonExhaustiveOptions{} = options, %LabelJob{} = job, elements) when is_list(elements) do
     objects =
       job.blueprint.elements
       |> Enum.map(fn %LabelElement{objects: objects} -> objects end)
@@ -112,7 +130,7 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonExhaustive do
       {object.id, {object, 0, 0, 0}}
     end)
 
-    label_session.elements
+    elements
     |> Enum.reduce(objects_wld, fn %LabelElement{} = element, acc ->
       if length(element.labels) > 0 do
         label_option = hd(element.labels).value.option

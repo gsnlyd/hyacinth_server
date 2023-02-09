@@ -112,6 +112,11 @@ defmodule Hyacinth.Labeling.LabelJobType.ComparisonMergesort do
   end
 
   @impl LabelJobType
+  def job_results(_options, _job, _label_sessions) do
+    []
+  end
+
+  @impl LabelJobType
   def active?, do: true
 
   @impl LabelJobType
