@@ -12,9 +12,9 @@ defmodule HyacinthWeb.LabelSessionLive.Show do
 
     @primary_key false
     embedded_schema do
-      field :include_labels, Ecto.Enum, values: [:all_labels, :only_final_labels], default: :all_labels
-      field :timestamp_columns, Ecto.Enum, values: [:iso, :unix, :iso_and_unix], default: :iso_and_unix
-      field :object_columns, Ecto.Enum, values: [:names, :hashes, :names_and_hashes], default: :names_and_hashes
+      field :include_labels, Ecto.Enum, values: [:all_labels, :only_final_labels], default: :only_final_labels
+      field :timestamp_columns, Ecto.Enum, values: [:iso, :unix, :iso_and_unix], default: :iso
+      field :object_columns, Ecto.Enum, values: [:names, :hashes, :names_and_hashes], default: :names
     end
 
     @doc false
