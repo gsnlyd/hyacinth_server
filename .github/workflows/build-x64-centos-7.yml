@@ -27,21 +27,15 @@ jobs:
           localedef -c -f UTF-8 -i en_US en_US.UTF-8
       - name: Install dev tools
         run: dnf -y install gcc make glibc-devel
-      - name: Install devtoolset
+      - name: Install devtoolset to get gcc 8
         run: |
           dnf -y install centos-release-scl
           dnf -y install devtoolset-8-gcc
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: test1
-        run: ls /opt/rh
-      - name: test2
-        run: ls /opt/rh/devtoolset-8
       - name: Build release
         run: |
           source /opt/rh/devtoolset-8/enable
-          gcc --version
-          make --version
           export LC_ALL=en_US.UTF-8
           export PATH="$PATH:$HOME/elixir/bin"
           export MIX_ENV=prod
