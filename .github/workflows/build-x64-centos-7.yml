@@ -33,9 +33,13 @@ jobs:
           dnf -y install devtoolset-8-gcc
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: test1
+        run: ls /opt/rh
+      - name: test2
+        run: ls /opt/rh/devtoolset-8
       - name: Build release
         run: |
-          source scl_source enable devtoolset-8
+          source /opt/rh/devtoolset-8/enable
           gcc --version
           make --version
           export LC_ALL=en_US.UTF-8
