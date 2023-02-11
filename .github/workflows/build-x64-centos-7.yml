@@ -24,7 +24,6 @@ jobs:
           unzip elixir-otp-24.zip -d ~/elixir
       - name: Define en_US.UTF-8 locale
         run: |
-          dnf -y install glibc-locale-source glibc-langpack-en
           localedef -c -f UTF-8 -i en_US en_US.UTF-8
       - name: Install dev tools
         run: dnf -y install gcc make glibc-devel
