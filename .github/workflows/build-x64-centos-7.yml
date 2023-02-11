@@ -9,7 +9,7 @@ jobs:
       image: centos:7
     steps:
       - name: Install dnf
-        run: yum install dnf
+        run: yum -y install dnf
       - name: Install Erlang/OTP
         run: |
           dnf config-manager --set-enabled powertools
