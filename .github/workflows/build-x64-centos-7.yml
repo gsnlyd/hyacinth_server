@@ -12,8 +12,6 @@ jobs:
         run: yum -y install dnf
       - name: Install Erlang/OTP
         run: |
-          dnf config-manager --set-enabled powertools
-          dnf -y install epel-release epel-next-release
           dnf -y install wget
           wget https://packages.erlang-solutions.com/erlang-solutions-2.0-1.noarch.rpm
           dnf -y install erlang-solutions-2.0-1.noarch.rpm
