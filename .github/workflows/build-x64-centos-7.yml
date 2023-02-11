@@ -36,6 +36,8 @@ jobs:
       - name: Build release
         run: |
           scl enable devtoolset-8 -- bash
+          gcc --version
+          make --version
           export LC_ALL=en_US.UTF-8
           export PATH="$PATH:$HOME/elixir/bin"
           export MIX_ENV=prod
