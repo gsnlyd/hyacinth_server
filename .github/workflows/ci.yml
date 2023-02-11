@@ -9,3 +9,6 @@ jobs:
 
   build-x64-centos-stream-8:
     uses: ./.github/workflows/build-x64-centos-stream-8.yml
+
+  build-x64-centos-7:
+    uses: ./.github/workflows/build-x64-centos-7.yml
