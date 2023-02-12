@@ -25,7 +25,8 @@ defmodule Hyacinth.Assembly.Pipeline do
     |> cast(attrs, [:name, :description])
     |> validate_required([:name])
     |> cast_assoc(:transforms, with: &Transform.changeset/2, required: true, required_message: "can't be empty")
-    |> validate_length(:name, min: 1, max: 30)
+    |> validate_length(:name, min: 1, max: 300)
+    |> validate_length(:description, min: 1, max: 2000)
     |> validate_transform_order()
     |> validate_transform_inputs_match_outputs()
   end

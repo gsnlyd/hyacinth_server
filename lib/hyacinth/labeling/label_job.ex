@@ -32,7 +32,9 @@ defmodule Hyacinth.Labeling.LabelJob do
     label_job
     |> cast(attrs, [:name, :description, :prompt, :label_options_string, :type, :options, :dataset_id])
     |> validate_required([:name, :label_options_string, :type, :options, :dataset_id])
-    |> validate_length(:label_options_string, min: 1)
+    |> validate_length(:name, min: 1, max: 300)
+    |> validate_length(:description, min: 1, max: 2000)
+    |> validate_length(:label_options_string, min: 1, max: 1000)
     |> parse_comma_separated_string(:label_options_string, :label_options)
     |> validate_job_type_options()
   end
