@@ -46,10 +46,10 @@ jobs:
           mix assets.deploy
           mix release
       - name: Create release tarball
-        run: tar -cvf hyacinth-x64-centos-7.tar hyacinth
+        run: tar -cvzf hyacinth-x64-centos-7.tar.gz hyacinth
         working-directory: _build/prod/rel
       - name: Upload release artifact
         uses: actions/upload-artifact@v3
         with:
           name: hyacinth-x64-centos-7
-          path: _build/prod/rel/hyacinth-x64-centos-7.tar
+          path: _build/prod/rel/hyacinth-x64-centos-7.tar.gz
