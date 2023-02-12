@@ -88,7 +88,7 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
   def command_args(options, file_path) do
     options = SlicerOptions.parse(options)
 
-    binary_path = Application.fetch_env!(:hyacinth, :python_path)
+    binary_path = Application.fetch_env!(:hyacinth, :python_binary_path)
     args = [
       Application.fetch_env!(:hyacinth, :slicer_path),
       file_path,

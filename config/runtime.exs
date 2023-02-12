@@ -41,15 +41,15 @@ unless System.get_env("HYACINTH_GENERATING_CONFIG") do
   # Configure driver paths
   case config_env() do
     env when env in [:dev, :test] ->
-      config :hyacinth, :python_path, Path.join(File.cwd!, "priv/drivers/python_slicer/venv/bin/python")
+      config :hyacinth, :python_binary_path, Path.join(File.cwd!, "priv/drivers/python_slicer/venv/bin/python")
       config :hyacinth, :slicer_path, Path.join(File.cwd!, "priv/drivers/python_slicer/slicer.py")
-      config :hyacinth, :dcm2niix_path, "dcm2niix"
+      config :hyacinth, :dcm2niix_binary_path, "dcm2niix"
 
     :prod ->
-      config :hyacinth, :python_path, System.get_env("PYTHON_PATH") || "python"
+      config :hyacinth, :python_binary_path, System.get_env("PYTHON_BINARY_PATH") || "python"
       # TODO: Use Application.app_dir at runtime in slicer.ex and remove this from the config entirely
       config :hyacinth, :slicer_path, System.get_env("SLICER_PATH") || Path.expand(Path.join(File.cwd!, "../lib/hyacinth-1.1.1/priv/drivers/python_slicer/slicer.py"))
-      config :hyacinth, :dcm2niix_path, System.get_env("DCM2NIIX_PATH") || "dcm2niix"
+      config :hyacinth, :dcm2niix_binary_path, System.get_env("DCM2NIIX_BINARY_PATH") || "dcm2niix"
   end
 
   if config_env() == :prod do

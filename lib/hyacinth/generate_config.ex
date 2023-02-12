@@ -18,6 +18,13 @@ defmodule Hyacinth.GenerateConfig do
       export WAREHOUSE_PATH="~/hyacinth/warehouse"
       export TRANSFORM_PATH="~/hyacinth/transform"
 
+      export PYTHON_BINARY_PATH="python"
+      export DCM2NIIX_BINARY_PATH="dcm2niix"
+
+      export PHX_HOST="localhost"
+      export PORT="4000"
+      export URL_PORT="4000"
+
       export SECRET_KEY_BASE="#{secret_key_base}"
       """
 
