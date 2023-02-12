@@ -7,6 +7,7 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
 
     @primary_key false
     embedded_schema do
+      field :input_format, Ecto.Enum, values: [:nifti, :dicom], default: :nifti
       field :orientation, Ecto.Enum, values: [:sagittal, :coronal, :axial], default: :sagittal
       field :bit_depth, Ecto.Enum, values: [:"8bit", :"16bit"], default: :"8bit"
       field :tone_map, Ecto.Enum, values: [:disabled, :linear], default: :linear
@@ -16,8 +17,8 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
     @doc false
     def changeset(schema, params) do
       schema
-      |> cast(params, [:orientation, :bit_depth, :tone_map, :max_clamp_percentile])
-      |> validate_required([:orientation, :bit_depth, :tone_map, :max_clamp_percentile])
+      |> cast(params, [:input_format, :orientation, :bit_depth, :tone_map, :max_clamp_percentile])
+      |> validate_required([:input_format, :orientation, :bit_depth, :tone_map, :max_clamp_percentile])
       |> validate_number(:max_clamp_percentile, greater_than_or_equal_to: 0, less_than_or_equal_to: 100)
     end
 
@@ -43,10 +44,18 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
     ~H"""
     <div class="form-content">
       <p>
-        <%= label @form, :orientation %>
-        <%= select @form, :orientation, Ecto.Enum.values(SlicerOptions, :orientation) %>
-        <%= error_tag @form, :orientation %>
+        <%= label @form, :input_format %>
+        <%= select @form, :input_format, Ecto.Enum.values(SlicerOptions, :input_format) %>
+        <%= error_tag @form, :input_format %>
       </p>
+
+      <%= if Ecto.Changeset.apply_changes(@form.source).input_format == :nifti do %>
+        <p>
+          <%= label @form, :orientation %>
+          <%= select @form, :orientation, Ecto.Enum.values(SlicerOptions, :orientation) %>
+          <%= error_tag @form, :orientation %>
+        </p>
+      <% end %>
 
       <p>
         <%= label @form, :bit_depth %>
@@ -96,7 +105,10 @@ defmodule Hyacinth.Assembly.Driver.Slicer do
   def results_glob(_options), do: "output/*.png"
 
   @impl Driver
-  def input_format(_options), do: :nifti
+  def input_format(options) do
+    options = SlicerOptions.parse(options)
+    options.input_format
+  end
 
   @impl Driver
   def output_format(_options), do: :png
