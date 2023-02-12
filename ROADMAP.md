@@ -35,6 +35,10 @@
 - [x] Add key bindings modal to labeling page
 - [x] Fix config generation script in releases
 
+# 1.1.2
+- [x] Add support for job results
+- [x] Add dicom support to slicer driver
+
 ## 1.2.0
 - [ ] Add collaborative viewing/labeling features
 - [ ] Add viewers for other image types (DICOM, Nifti)
