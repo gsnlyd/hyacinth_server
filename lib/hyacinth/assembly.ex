@@ -547,7 +547,7 @@ defmodule Hyacinth.Assembly do
       end)
       |> Multi.run(:dataset, fn _repo, %{pipeline_run: %PipelineRun{pipeline: %Pipeline{} = pipeline}} ->
         dataset_params = %{
-          name: "Derived from #{pipeline.name} T#{transform_run.order_index + 1}",
+          name: "Derived from Step #{transform_run.order_index + 1} of #{pipeline.name}",
           type: :derived,
         }
 
