@@ -3,18 +3,22 @@ import argparse
 import time
 import numpy as np
 import nibabel
+import pydicom
 from PIL import Image
 
 
-def main(file_path: str, slice_plane: str, bit_depth: str, tone_map: str, max_clamp_percentile: int):
+def create_output_dir(file_path: str):
+    output_dir = os.path.join(os.path.dirname(file_path), 'output')
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+        print(f'Created output dir: {output_dir}')
+
+    return output_dir
+
+
+def tone_map_data(data_arr, bit_depth: str, tone_map: str, max_clamp_percentile: int):
     if max_clamp_percentile < 0 or max_clamp_percentile > 100:
         raise ArgumentError('Max clamp percentile must be between 0 and 100')
-
-    start = time.time()
-    img = nibabel.load(file_path)
-    img = nibabel.as_closest_canonical(img)
-
-    fdata = img.get_fdata()
 
     if bit_depth == '8bit':
         cast_dtype = np.uint8
@@ -29,13 +33,22 @@ def main(file_path: str, slice_plane: str, bit_depth: str, tone_map: str, max_cl
         pass
     elif args.tone_map == 'linear':
         dtype_max = np.iinfo(cast_dtype).max
-        max_clamp = np.percentile(fdata, max_clamp_percentile)
-        print(f'Clamping to {max_clamp_percentile} percentile value: {max_clamp}')
-        fdata = (np.clip(fdata, 0, max_clamp) / max_clamp) * dtype_max
+        max_clamp = np.percentile(data_arr, max_clamp_percentile)
+        data_arr = (np.clip(data_arr, 0, max_clamp) / max_clamp) * dtype_max
     else:
         raise ArgumentError('Inavlid tone map')
 
-    fdata = fdata.astype(cast_dtype)
+    return data_arr.astype(cast_dtype), image_mode
+
+
+def slice_nifti(file_path: str, slice_plane: str, bit_depth: str, tone_map: str, max_clamp_percentile: int):
+    output_dir = create_output_dir(file_path)
+
+    img = nibabel.load(file_path)
+    img = nibabel.as_closest_canonical(img)
+
+    fdata = img.get_fdata()
+    fdata, image_mode = tone_map_data(fdata, bit_depth, tone_map, max_clamp_percentile)
 
     if slice_plane == 'sagittal':
         i_max = fdata.shape[0]
@@ -45,11 +58,6 @@ def main(file_path: str, slice_plane: str, bit_depth: str, tone_map: str, max_cl
         i_max = fdata.shape[2]
     else:
         raise ArgumentError('Invalid slice plane')
-
-    output_dir = os.path.join(os.path.dirname(file_path), 'output')
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
-        print(f'Created output dir: {output_dir}')
 
     for i in range(0, i_max):
         if slice_plane == 'sagittal':
@@ -65,7 +73,40 @@ def main(file_path: str, slice_plane: str, bit_depth: str, tone_map: str, max_cl
         save_path = os.path.join(output_dir, f'slice_{slice_plane}_{i:03}.png')
         img_slice.save(save_path)
 
-    print(f'Wrote {i_max} images in {time.time() - start:.2f} seconds')
+    print(f'Wrote {i_max} images')
+
+
+def slice_dicom_directory(file_path: str, bit_depth: str, tone_map: str, max_clamp_percentile: int):
+    output_dir = create_output_dir(file_path)
+
+    slice_file_names = [n for n in os.listdir(file_path) if n.endswith('.dcm')]
+
+    for slice_name in slice_file_names:
+        slice_path = os.path.join(file_path, slice_name)
+
+        ds = pydicom.dcmread(slice_path)
+        slice_data = ds.pixel_array
+
+        slice_data, image_mode = tone_map_data(slice_data, bit_depth, tone_map_data, max_clamp_percentile)
+        img_slice = Image.fromarray(slice_data, mode=image_mode)
+
+        save_path = os.path.join(output_dir, os.path.splitext(slice_name)[0] + '.png')
+        img_slice.save(save_path)
+
+    print(f'Wrote {len(slice_file_names)} images')
+
+
+def main(file_path: str, slice_plane: str, bit_depth: str, tone_map: str, max_clamp_percentile: int):
+    start = time.time()
+
+    if file_path.endswith('.nii') or file_path.endswith('.nii.gz'):
+        slice_nifti(file_path, slice_plane, bit_depth, tone_map, max_clamp_percentile)
+    elif os.path.isdir(file_path):
+        slice_dicom_directory(file_path, bit_depth, tone_map, max_clamp_percentile)
+    else:
+        print(f'Invalid file type for {file_path}')
+
+    print(f'Finished in {time.time() - start:.2f} seconds')
 
 
 if __name__ == "__main__":
