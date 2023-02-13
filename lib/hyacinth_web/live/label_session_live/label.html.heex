@@ -26,9 +26,6 @@
       <button class="btn btn-gray btn-icon-only" phx-click="open_modal_label_history">
         <Icons.book_open_mini />
       </button>
-      <button class="btn btn-gray btn-icon-only" phx-click="open_modal_notes">
-        <Icons.pencil_mini />
-      </button>
       <button class="btn btn-gray btn-icon-only" phx-click="open_modal_keymap">
         <Icons.information_circle_mini />
       </button>
@@ -131,6 +128,23 @@
           <% end %>
         </div>
       </div>
+
+      <div class="mt-8">
+        <.form let={f} for={@note_changeset} phx-change="note_change" phx-submit="note_submit">
+          <div class="form-content form-wide">
+            <p>
+              <%= label f, :text, "Notes" %>
+              <%= textarea f, :text, placeholder: "Notes are empty." %>
+              <%= error_tag f, :text, name: "Notes" %>
+            </p>
+          </div>
+
+          <div class="mt-3 flex justify-end">
+            <%= submit "Save", class: "btn btn-blue" %>
+          </div>
+        </.form>
+      </div>
+
     </div>
   </div>
 </main>
@@ -162,27 +176,6 @@
             </table>
           </div>
         <% end %>
-      </div>
-    </.modal>
-
-  <% {:notes, %Ecto.Changeset{} = element_notes_changeset} -> %>
-    <.modal size="sm">
-      <:header>Notes</:header>
-
-      <div class="mt-2">
-        <.form let={f} for={element_notes_changeset} phx-change="note_change" phx-submit="note_submit">
-          <div class="form-content form-wide">
-            <p>
-              <%= textarea f, :text, placeholder: "Add notes here." %>
-              <%= error_tag f, :text, name: "Notes" %>
-            </p>
-
-          </div>
-            <div class="mt-4 flex justify-end space-x-2">
-              <button type="button" class="btn btn-gray" phx-click="close_modal">Cancel</button>
-              <%= submit "Save", class: "btn btn-blue" %>
-            </div>
-        </.form>
       </div>
     </.modal>
 

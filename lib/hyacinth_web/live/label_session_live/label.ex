@@ -47,6 +47,8 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
       next_timer_nonce: 0,
 
+      note_changeset: Note.changeset(element.note || %Note{}, %{}),
+
       modal: nil,
 
       disable_primary_nav: true,
@@ -137,7 +139,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
       |> Note.changeset(params)
       |> Map.put(:action, :insert)
 
-    {:noreply, assign(socket, :modal, {:notes, changeset})}
+    {:noreply, assign(socket, :note_changeset, changeset)}
   end
 
   def handle_event("note_submit", %{"note" => params}, socket) do
@@ -145,27 +147,29 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
       nil ->
         case Labeling.create_note(socket.assigns.current_user, socket.assigns.element, params) do
           {:ok, _values} ->
+            element = Labeling.get_label_element!(socket.assigns.label_session, socket.assigns.element.element_index)
             socket = assign(socket, %{
-              element: Labeling.get_label_element!(socket.assigns.label_session, socket.assigns.element.element_index),
-              modal: nil,
+              element: element,
+              note_changeset: Note.changeset(element.note, %{}),
             })
             {:noreply, socket}
 
           {:error, :note, %Ecto.Changeset{} = changeset, _changes} ->
-            {:noreply, assign(socket, :modal, {:notes, changeset})}
+            {:noreply, assign(socket, :note_changeset, changeset)}
         end
 
       %Note{} = existing_note ->
         case Labeling.update_note(socket.assigns.current_user, existing_note, params) do
           {:ok, _values} ->
+            element = Labeling.get_label_element!(socket.assigns.label_session, socket.assigns.element.element_index)
             socket = assign(socket, %{
-              element: Labeling.get_label_element!(socket.assigns.label_session, socket.assigns.element.element_index),
-              modal: nil,
+              element: element,
+              note_changeset: Note.changeset(element.note, %{}),
             })
             {:noreply, socket}
 
           {:error, :note, %Ecto.Changeset{} = changeset, _changes} ->
-            {:noreply, assign(socket, :modal, {:notes, changeset})}
+            {:noreply, assign(socket, :note_changeset, changeset)}
         end
     end
   end
@@ -191,11 +195,6 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
   def handle_event("open_modal_label_history", _value, socket) do
     {:noreply, assign(socket, :modal, :label_history)}
-  end
-
-  def handle_event("open_modal_notes", _value, socket) do
-    changeset = Note.changeset(socket.assigns.element.note || %Note{}, %{})
-    {:noreply, assign(socket, :modal, {:notes, changeset})}
   end
 
   def handle_event("open_modal_keymap", _value, socket) do

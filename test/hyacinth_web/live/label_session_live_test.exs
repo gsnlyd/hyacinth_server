@@ -124,30 +124,13 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       refute html =~ "Third Option</td>"
     end
 
-    test "open_modal_notes event opens notes modal", %{conn: conn} do
-      job = label_job_fixture(%{label_options_string: "First Option, Second Option, Third Option"})
-      %LabelSession{} = label_session = label_session_fixture(job)
-
-      {:ok, view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 1))
-      refute html =~ "<h2>Notes</h2>"
-
-      html = render_click(view, :open_modal_notes, %{})
-      assert html =~ "<h2>Notes</h2>"
-    end
-
     test "note_submit event creates note", %{conn: conn, user: user} do
       %LabelSession{} = label_session = label_session_fixture(nil, user)
       {:ok, view, _html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 1))
 
-      html = render_click(view, :open_modal_notes, %{})
-      assert html =~ "<h2>Notes</h2>"
-      refute html =~ "These are my notes."
-
       params = %{"text" => "These are my notes."}
-      render_submit(view, :note_submit, %{"note" => params})
+      html = render_submit(view, :note_submit, %{"note" => params})
 
-      html = render_click(view, :open_modal_notes, %{})
-      assert html =~ "<h2>Notes</h2>"
       assert html =~ "These are my notes."
     end
 
@@ -155,20 +138,14 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
       %LabelSession{} = label_session = label_session_fixture(nil, user)
       {:ok, view, _html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 1))
 
-      render_click(view, :open_modal_notes, %{})
-
       params = %{"text" => "These are my initial notes."}
-      render_submit(view, :note_submit, %{"note" => params})
+      html = render_submit(view, :note_submit, %{"note" => params})
 
-      html = render_click(view, :open_modal_notes, %{})
-      assert html =~ "<h2>Notes</h2>"
       assert html =~ "These are my initial notes."
 
       params = %{"text" => "These are my updated notes."}
-      render_submit(view, :note_submit, %{"note" => params})
+      html = render_submit(view, :note_submit, %{"note" => params})
 
-      html = render_click(view, :open_modal_notes, %{})
-      assert html =~ "<h2>Notes</h2>"
       refute html =~ "These are my initial notes."
       assert html =~ "These are my updated notes."
     end
