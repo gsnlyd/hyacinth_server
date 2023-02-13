@@ -45,6 +45,8 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
       viewer_select_changeset: ViewerSelectForm.changeset(%ViewerSelectForm{}, %{}),
 
+      next_timer_nonce: 0,
+
       modal: nil,
 
       disable_primary_nav: true,
@@ -55,13 +57,37 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
     {:ok, socket}
   end
 
+  defp jump_element_relative(socket, amount) do
+    new_index =
+      socket.assigns.element.element_index + amount
+      |> min(length(socket.assigns.label_session.elements) - 1)
+      |> max(0)
+
+    if new_index == socket.assigns.element.element_index do
+      socket
+    else
+      path = Routes.live_path(socket, HyacinthWeb.LabelSessionLive.Label, socket.assigns.label_session, new_index)
+      push_redirect(socket, to: path)
+    end
+  end
+
   defp check_complete(socket) do
     elements = socket.assigns.label_session.elements
-    if Enum.all?(elements, fn element -> length(element.labels) > 0 end) do
+    
+    on_last_element = socket.assigns.element.element_index == length(elements) - 1
+    all_complete = Enum.all?(elements, fn element -> length(element.labels) > 0 end)
+
+    if on_last_element and all_complete do
       assign(socket, :modal, :labeling_complete)
     else
       socket
     end
+  end
+
+  defp start_next_timer(socket) do
+    nonce = socket.assigns.next_timer_nonce + 1
+    :timer.send_after(300, {:next_timer_complete, nonce})
+    assign(socket, :next_timer_nonce, nonce)
   end
 
   defp set_label(label_value, socket) do
@@ -77,6 +103,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
       current_value: hd(labels).value.option,
     })
     |> check_complete()
+    |> start_next_timer()
   end
 
   def handle_event("set_label", %{"label" => label_value}, socket) do
@@ -153,15 +180,13 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
   end
 
   def handle_event("prev_element", _value, socket) do
-    new_index = max(socket.assigns.element.element_index - 1, 0)
-    path = Routes.live_path(socket, HyacinthWeb.LabelSessionLive.Label, socket.assigns.label_session, new_index)
-    {:noreply, push_redirect(socket, to: path)}
+    socket = jump_element_relative(socket, -1)
+    {:noreply, socket}
   end
 
   def handle_event("next_element", _value, socket) do
-    new_index = min(socket.assigns.element.element_index + 1, length(socket.assigns.label_session.elements) - 1)
-    path = Routes.live_path(socket, HyacinthWeb.LabelSessionLive.Label, socket.assigns.label_session, new_index)
-    {:noreply, push_redirect(socket, to: path)}
+    socket = jump_element_relative(socket, 1)
+    {:noreply, socket}
   end
 
   def handle_event("open_modal_label_history", _value, socket) do
@@ -179,5 +204,14 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
 
   def handle_event("close_modal", _value, socket) do
     {:noreply, assign(socket, :modal, nil)}
+  end
+
+  def handle_info({:next_timer_complete, nonce}, socket) do
+    if nonce == socket.assigns.next_timer_nonce do
+      socket = jump_element_relative(socket, 1)
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
   end
 end
