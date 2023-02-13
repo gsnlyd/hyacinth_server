@@ -35,7 +35,7 @@ defmodule HyacinthWeb.ExportLabelsController do
 
   @spec build_labels_csv([%LabelSession{}], keyword) :: [[String.t]]
   defp build_labels_csv(sessions, args) do
-    num_objects = length(hd(hd(sessions).elements).objects)
+    num_objects = if length(sessions) == 0, do: 1, else: length(hd(hd(sessions).elements).objects)
 
     header_object_cols =
       1..num_objects
