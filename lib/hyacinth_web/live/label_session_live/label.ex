@@ -64,17 +64,23 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
     end
   end
 
-  def handle_event("set_label", %{"label" => label_value}, socket) do
+  defp set_label(label_value, socket) do
     Labeling.create_label_entry!(socket.assigns.element, socket.assigns.current_user, label_value, socket.assigns.started_at)
 
     labels = Labeling.list_element_labels(socket.assigns.element)
-    socket = assign(socket, %{
+
+    socket
+    |> assign(%{
       label_session: Labeling.get_label_session_with_elements!(socket.assigns.label_session.id),
       labels: labels,
       started_at: DateTime.utc_now(),
       current_value: hd(labels).value.option,
     })
-    socket = check_complete(socket)
+    |> check_complete()
+  end
+
+  def handle_event("set_label", %{"label" => label_value}, socket) do
+    socket = set_label(label_value, socket)
     {:noreply, socket}
   end
 
@@ -88,16 +94,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
     label_value = Enum.at(all_label_options, label_i)
     case label_value do
       label_value when is_binary(label_value) ->
-        Labeling.create_label_entry!(socket.assigns.element, socket.assigns.current_user, label_value, socket.assigns.started_at)
-
-        labels = Labeling.list_element_labels(socket.assigns.element)
-        socket = assign(socket, %{
-          label_session: Labeling.get_label_session_with_elements!(socket.assigns.label_session.id),
-          labels: labels,
-          started_at: DateTime.utc_now(),
-          current_value: hd(labels).value.option,
-        })
-        socket = check_complete(socket)
+        socket = set_label(label_value, socket)
         {:noreply, socket}
 
       nil ->
