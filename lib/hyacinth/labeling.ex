@@ -291,6 +291,7 @@ defmodule Hyacinth.Labeling do
   the given job, excluding the blueprint session.
 
   The following fields are preloaded:
+    * `user`
     * `elements`
     * `LabelElement.objects`
     * `LabelElement.labels`
@@ -302,7 +303,7 @@ defmodule Hyacinth.Labeling do
       from ls in LabelSession,
       where: ls.job_id == ^job.id and ls.blueprint == false,
       select: ls,
-      preload: [elements: [:objects, :labels]]
+      preload: [:user, elements: [:objects, :labels]]
     )
   end
 

@@ -45,6 +45,10 @@
       <%= live_redirect to: Routes.results_show_path(@socket, :show_job, @job), class: "link text-sm" do %>
         <span>View Results</span>
       <% end %>
+
+      <button class="link text-sm" phx-click="open_modal_export_labels">
+        <span>Export Labels</span>
+      </button>
     </div>
   </div>
 
@@ -122,3 +126,9 @@
 
   <% end %>
 </main>
+
+<%= case @modal do %>
+  <% :export_labels -> %>
+    <.live_component module={HyacinthWeb.Components.ExportLabelsModal} id="export_labels_modal" job_id={@job.id} />
+  <% nil -> %>
+<% end %>

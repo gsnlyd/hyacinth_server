@@ -276,6 +276,7 @@ defmodule Hyacinth.LabelingTest do
       assert length(label_sessions) == 3
 
       Enum.each(label_sessions, fn %LabelSession{} = session ->
+        assert Ecto.assoc_loaded?(session.user)
         assert Ecto.assoc_loaded?(session.elements)
 
         Enum.each(session.elements, fn %LabelElement{} = element ->

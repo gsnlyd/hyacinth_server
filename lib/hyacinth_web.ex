@@ -47,12 +47,6 @@ defmodule HyacinthWeb do
       use Phoenix.LiveView,
         layout: {HyacinthWeb.LayoutView, "live.html"}
 
-      alias HyacinthWeb.Components.Icons
-      alias HyacinthWeb.Components.Cards
-
-      import HyacinthWeb.Components.BasicComponents
-      import HyacinthWeb.LiveUtils
-
       unquote(view_helpers())
     end
   end
@@ -104,6 +98,13 @@ defmodule HyacinthWeb do
       import HyacinthWeb.ErrorHelpers
       import HyacinthWeb.Gettext
       alias HyacinthWeb.Router.Helpers, as: Routes
+
+      # Import components/utils
+      alias HyacinthWeb.Components.Icons
+      alias HyacinthWeb.Components.Cards
+
+      import HyacinthWeb.Components.BasicComponents
+      import HyacinthWeb.LiveUtils
     end
   end
 

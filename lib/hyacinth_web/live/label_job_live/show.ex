@@ -34,6 +34,8 @@ defmodule HyacinthWeb.LabelJobLive.Show do
       session_filter_changeset: SessionFilterForm.changeset(%SessionFilterForm{}, %{}),
 
       tab: :sessions,
+
+      modal: nil,
     })
     {:ok, socket}
   end
@@ -67,5 +69,13 @@ defmodule HyacinthWeb.LabelJobLive.Show do
       "elements" -> :elements
     end
     {:noreply, assign(socket, :tab, tab)}
+  end
+
+  def handle_event("open_modal_export_labels", _value, socket) do
+    {:noreply, assign(socket, :modal, :export_labels)}
+  end
+
+  def handle_event("close_modal", _value, socket) do
+    {:noreply, assign(socket, :modal, nil)}
   end
 end

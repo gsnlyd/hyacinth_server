@@ -143,35 +143,7 @@
 </main>
 
 <%= case @modal do %>
-  <% {:export_labels,  export_labels_changeset} -> %>
-    <.modal size="xs">
-      <:header>Export Labels</:header>
-
-      <div class="mt-2">
-        <.form let={f} for={export_labels_changeset} phx-change="export_labels_change" phx-submit="export_labels_submit">
-          <div class="form-content">
-            <p>
-              <%= label f, :include_labels %>
-              <%= select f, :include_labels, humanize_enum(ExportLabelsForm, :include_labels) %>
-              <%= error_tag f, :include_labels %>
-            </p>
-
-            <p>
-              <%= label f, :timestamp_columns %>
-              <%= select f, :timestamp_columns, [{"Date/Time (ISO)", :iso}, {"UNIX", :unix}, {"Date/Time (ISO) and UNIX", :iso_and_unix}] %>
-              <%= error_tag f, :timestamp_columns %>
-            </p>
-
-            <p>
-              <%= label f, :object_columns %>
-              <%= select f, :object_columns, humanize_enum(ExportLabelsForm, :object_columns) %>
-              <%= error_tag f, :object_columns %>
-            </p>
-
-            <%= submit "Export", class: "btn btn-blue" %>
-          </div>
-        </.form>
-      </div>
-    </.modal>
+  <% :export_labels -> %>
+    <.live_component module={HyacinthWeb.Components.ExportLabelsModal} id="export_labels_modal" session_id={@label_session.id} />
   <% nil -> %>
 <% end %>

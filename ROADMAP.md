@@ -39,6 +39,9 @@
 - [x] Add support for job results
 - [x] Add dicom support to slicer driver
 
+# 1.1.3
+- [x] Add job labels export functionality
+
 ## 1.2.0
 - [ ] Add collaborative viewing/labeling features
 - [ ] Add viewers for other image types (DICOM, Nifti)

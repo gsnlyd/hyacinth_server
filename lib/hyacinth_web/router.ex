@@ -24,7 +24,8 @@ defmodule HyacinthWeb.Router do
 
     get "/object-image/:object_id", ImageController, :show
 
-    get "/session-labels/:session_id", ExportLabelsController, :show
+    get "/export-labels/session/:session_id", ExportLabelsController, :export_session
+    get "/export-labels/job/:job_id", ExportLabelsController, :export_job
   end
 
   live_session :authenticated, on_mount: {HyacinthWeb.UserLiveAuth, :user} do

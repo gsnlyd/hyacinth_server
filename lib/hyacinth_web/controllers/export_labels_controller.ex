@@ -5,8 +5,19 @@ defmodule HyacinthWeb.ExportLabelsController do
   alias Hyacinth.Warehouse.Object
   alias Hyacinth.Labeling.{LabelSession, LabelElement, LabelEntry}
 
-  def show(conn, %{"session_id" => session_id} = params) do
-    args =  [
+  def export_session(conn, %{"session_id" => session_id} = params) do
+    session  = Labeling.get_label_session_with_elements!(session_id)
+    export(conn, params, [session])
+  end
+
+  def export_job(conn, %{"job_id" => job_id} = params) do
+    job = Labeling.get_label_job!(job_id)
+    sessions = Labeling.list_sessions_preloaded(job)
+    export(conn, params, sessions)
+  end
+
+  def export(conn, params, sessions) do
+    args = [
       all_labels:       params["include_labels"] == "all_labels",
       iso_timestamps:   params["timestamp_columns"] in ["iso", "iso_and_unix"],
       unix_timestamps:  params["timestamp_columns"] in ["unix", "iso_and_unix"],
@@ -15,18 +26,16 @@ defmodule HyacinthWeb.ExportLabelsController do
     ]
 
     csv =
-      session_id
-      |> build_session_labels_csv(args)
+      sessions
+      |> build_labels_csv(args)
       |> rows_to_string()
 
     Phoenix.Controller.send_download(conn, {:binary, csv}, filename: "session_labels.csv", content_type: "text/plain", disposition: :inline)
   end
 
-  @spec build_session_labels_csv(term, keyword) :: [[String.t]]
-  defp build_session_labels_csv(session_id, args) do
-    %LabelSession{} = session = Labeling.get_label_session_with_elements!(session_id)
-
-    num_objects = length(hd(session.elements).objects)
+  @spec build_labels_csv([%LabelSession{}], keyword) :: [[String.t]]
+  defp build_labels_csv(sessions, args) do
+    num_objects = length(hd(hd(sessions).elements).objects)
 
     header_object_cols =
       1..num_objects
@@ -39,6 +48,8 @@ defmodule HyacinthWeb.ExportLabelsController do
       |> Enum.concat()
 
     header = [
+      "user_id",
+      "user_name",
       "element_index",
       "label_option",
       if(args[:iso_timestamps], do: "started_at_iso"),
@@ -48,8 +59,12 @@ defmodule HyacinthWeb.ExportLabelsController do
     ] ++ header_object_cols
 
     body =
-      session.elements
-      |> Enum.map(fn %LabelElement{} = element ->
+      sessions
+      |> Enum.map(fn %LabelSession{} = session ->
+        Enum.map(session.elements, fn element -> {session, element} end)
+      end)
+      |> Enum.concat()
+      |> Enum.map(fn {%LabelSession{} = session, %LabelElement{} = element} ->
         object_cols =
           element.objects
           |> Enum.map(fn %Object{} = object ->
@@ -70,6 +85,8 @@ defmodule HyacinthWeb.ExportLabelsController do
         labels
         |> Enum.map(fn %LabelEntry{} = label ->
           [
+            session.user_id,
+            session.user.name,
             element.element_index,
             label.value.option,
             if(args[:iso_timestamps], do: label.metadata.started_at |> Calendar.strftime("%c")),
@@ -84,6 +101,7 @@ defmodule HyacinthWeb.ExportLabelsController do
     [header] ++ body
   end
 
+  # TODO: move
   @spec rows_to_string([[String.t]]) :: String.t
   defp rows_to_string(rows) when is_list(rows) do
     rows
