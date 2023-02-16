@@ -81,17 +81,31 @@ defmodule HyacinthWeb.LabelSessionLiveTest do
     end
 
     test "prev_element event redirects", %{conn: conn} do
-      %LabelSession{} = label_session = label_session_fixture()
-      {:ok, view, _html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 1))
+      job = label_job_fixture(%{options: %{randomize: false}})
+      label_session = label_session_fixture(job)
+      {:ok, view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 2))
 
-      assert {:error, {:live_redirect, %{kind: :push, to: "/sessions/2/label/0"}}} = render_click(view, :prev_element, %{})
+      assert html =~ "object3.png"
+      refute html =~ "object2.png"
+
+      html = render_click(view, :prev_element, %{})
+
+      assert html =~ "object2.png"
+      refute html =~ "object3.png"
     end
 
     test "next_element event redirects", %{conn: conn} do
-      %LabelSession{} = label_session = label_session_fixture()
-      {:ok, view, _html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 1))
+      job = label_job_fixture(%{options: %{randomize: false}})
+      label_session = label_session_fixture(job)
+      {:ok, view, html} = live(conn, Routes.live_path(conn, HyacinthWeb.LabelSessionLive.Label, label_session, 0))
 
-      assert {:error, {:live_redirect, %{kind: :push, to: "/sessions/2/label/2"}}} = render_click(view, :next_element, %{})
+      assert html =~ "object1.png"
+      refute html =~ "object2.png"
+
+      html = render_click(view, :next_element, %{})
+
+      assert html =~ "object2.png"
+      refute html =~ "object1.png"
     end
 
     test "open_modal_label_history event opens label history modal with empty history", %{conn: conn} do

@@ -21,7 +21,22 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
     end
   end
 
-  def mount(params, _session, socket) do
+  def mount(_params, _session, socket) do
+    socket = assign(socket, %{
+      viewer_select_changeset: ViewerSelectForm.changeset(%ViewerSelectForm{}, %{}),
+
+      next_timer_nonce: 0,
+
+      modal: nil,
+
+      disable_primary_nav: true,
+      use_wide_layout: true,
+    })
+
+    {:ok, socket}
+  end
+
+  def handle_params(params, _uri, socket) do
     label_session = Labeling.get_label_session_with_elements!(params["label_session_id"])
     element = Labeling.get_label_element!(label_session, params["element_index"])
     labels = Labeling.list_element_labels(element)
@@ -38,25 +53,12 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
       labels: labels,
 
       object_label_options: object_label_options,
-
+      current_value: if(length(labels) == 0, do: nil, else: hd(labels).value.option),
       started_at: DateTime.utc_now(),
 
-      current_value: if(length(labels) == 0, do: nil, else: hd(labels).value.option),
-
-      viewer_select_changeset: ViewerSelectForm.changeset(%ViewerSelectForm{}, %{}),
-
-      next_timer_nonce: 0,
-
       note_changeset: Note.changeset(element.note || %Note{}, %{}),
-
-      modal: nil,
-
-      disable_primary_nav: true,
-      use_wide_layout: true,
-      import_viewer_scripts: true,
     })
-
-    {:ok, socket}
+    {:noreply, socket}
   end
 
   defp jump_element_relative(socket, amount) do
@@ -69,7 +71,7 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
       socket
     else
       path = Routes.live_path(socket, HyacinthWeb.LabelSessionLive.Label, socket.assigns.label_session, new_index)
-      push_redirect(socket, to: path)
+      push_patch(socket, to: path)
     end
   end
 
