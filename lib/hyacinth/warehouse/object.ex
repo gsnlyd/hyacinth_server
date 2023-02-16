@@ -2,14 +2,14 @@ defmodule Hyacinth.Warehouse.Object do
   use Hyacinth.Schema
   import Ecto.Changeset
 
-  alias Hyacinth.Warehouse.{Object, DatasetObject}
+  alias Hyacinth.Warehouse.{Object, DatasetObject, FormatType}
 
   schema "objects" do
     field :hash, :string
     field :type, Ecto.Enum, values: [:blob, :tree]
 
     field :name, :string
-    field :format, Ecto.Enum, values: [:png, :dicom, :nifti]
+    field :format, Ecto.Enum, values: FormatType.list_formats()
 
     belongs_to :parent_tree, Object
 

@@ -6,7 +6,7 @@ defmodule Hyacinth.Warehouse.FormatType do
 
   See extension/1 for details.
   """
-  @callback extension() :: [binary()]
+  @callback extension() :: String.t
 
   @doc """
   Returns the file extension for the given format.
@@ -19,6 +19,7 @@ defmodule Hyacinth.Warehouse.FormatType do
     iex> extension(:dicom)
     ".dcm"
   """
+  @spec extension(FormatType.t) :: String.t
   def extension(format), do: module_for(format).extension()
 
   @doc """
@@ -26,7 +27,7 @@ defmodule Hyacinth.Warehouse.FormatType do
 
   See container/1 for details.
   """
-  @callback container?() :: boolean()
+  @callback container?() :: boolean
 
   @doc """
   Returns whether the given format is a container format.
@@ -46,11 +47,16 @@ defmodule Hyacinth.Warehouse.FormatType do
     iex> container?(:dicom)
     true
   """
+  @spec container?(FormatType.t) :: boolean
   def container?(format), do: module_for(format).container?()
 
-  @type t :: :png | :dicom | :nifti
+  @type t :: :png | :dicom | :dicom_single | :nifti
+
+  @formats [:png, :dicom, :dicom_single, :nifti]
+  def list_formats, do: @formats
 
   defp module_for(:png), do: FormatType.PNG
   defp module_for(:dicom), do: FormatType.DICOM
+  defp module_for(:dicom_single), do: FormatType.DICOMSingle
   defp module_for(:nifti), do: FormatType.Nifti
 end
