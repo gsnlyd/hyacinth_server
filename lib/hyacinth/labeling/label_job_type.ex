@@ -133,12 +133,64 @@ defmodule Hyacinth.Labeling.LabelJobType do
   @spec list_object_label_options(atom, map) :: [String.t] | nil
   def list_object_label_options(job_type, options), do: module_for(job_type).list_object_label_options(options)
 
-  @callback session_results(options :: map, job :: %LabelJob{}, label_session :: %LabelSession{}) :: [{%Object{}, term}]
+  @doc """
+  Callback that returns the results for the given session for this job type.
 
+  See `session_results/4` for details.
+  """
+  @callback session_results(options :: map, job :: %LabelJob{}, label_session :: %LabelSession{}) :: [result_object]
+
+  @doc """
+  Returns the results for the given session and the given job type.
+
+  The results of a job/session are an ordered list of objects
+  representing the results of a labeling task.
+
+  Results are returned as tuples of {object, details} where
+  `details` is a string containing additional information about
+  the result.
+
+  ## Examples
+
+      iex> session_results(:classification, my_job.options, my_job, my_session)
+      [
+        %Object{...}, "Label: Some Label",
+        %Object{...}, "Label: Another Label",
+        %Object{...}, "Label: Some Label",
+      ]
+
+  """
+  @spec session_results(atom, map, %LabelJob{}, [%LabelSession{}]) :: [result_object]
   def session_results(job_type, options, job, label_session), do: module_for(job_type).session_results(options, job, label_session)
 
-  @callback job_results(options :: map, job :: %LabelJob{}, label_sessions :: [%LabelSession{}]) :: [{%Object{}, term}]
+  @doc """
+  Callback that returns the results for the given job for this job type.
 
+  See `job_results/4` for details.
+  """
+  @callback job_results(options :: map, job :: %LabelJob{}, label_sessions :: [%LabelSession{}]) :: [result_object]
+
+  @doc """
+  Returns the results for the given job and the given job type.
+
+  The results of a job/session are an ordered list of objects
+  representing the results of a labeling task.
+
+  Results are returned as tuples of {object, details} where
+  `details` is a string containing additional information about
+  the result.
+
+  ## Examples
+
+      iex> session_results(:classification, my_job.options, my_job, job_sessions)
+      [
+        %Object{...}, "Top Label: Some Label (3/4)",
+        %Object{...}, "Top Label: Another Label (4/4)",
+        %Object{...}, "Top Label: Some Label (2/4)",
+      ]
+
+  """
+  @spec job_results(atom, map, %LabelJob{}, [%LabelSession{}]) :: [result_object]
   def job_results(job_type, options, job, label_sessions), do: module_for(job_type).job_results(options,  job, label_sessions)
 
   @doc """
@@ -195,6 +247,10 @@ defmodule Hyacinth.Labeling.LabelJobType do
   def next_group(job_type, options, blueprint_elements, session_elements), do: module_for(job_type).next_group(options, blueprint_elements, session_elements)
 
   @optional_callbacks next_group: 3
+
+  @type result_object :: {%Object{}, String.t}
+
+  @type t :: :classification | :comparison_exhaustive | :comparison_mergesort
 
   defp module_for(:classification), do: LabelJobType.Classification
   defp module_for(:comparison_exhaustive), do: LabelJobType.ComparisonExhaustive
