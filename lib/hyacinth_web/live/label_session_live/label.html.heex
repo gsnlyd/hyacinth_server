@@ -96,6 +96,11 @@
               <%= label f, :viewer %>
               <%= select f, :viewer, humanize_enum(ViewerSelectForm, :viewer), class: "!w-full" %>
             </p>
+
+            <p class="inline-group">
+              <%= checkbox f, :auto_next %>
+              <%= label f, :auto_next %>
+            </p>
           </div>
         </.form>
       </div>

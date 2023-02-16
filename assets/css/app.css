@@ -191,8 +191,8 @@ h3 {
     @apply flex flex-col items-start space-y-1;
 }
 
-.form-content p.inline {
-    @apply flex-row items-center space-x-1 space-y-0;
+.form-content p.inline-group {
+    @apply flex-row items-center space-y-0;
 }
 
 .form-content .invalid-feedback {
@@ -201,6 +201,10 @@ h3 {
 
 .form-content label {
     @apply text-sm text-gray-400;
+}
+
+.form-content input[type="checkbox"] {
+    @apply mr-2;
 }
 
 .form-content input[type="text"],

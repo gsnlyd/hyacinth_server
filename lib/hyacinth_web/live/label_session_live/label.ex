@@ -11,13 +11,14 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
     @primary_key false
     embedded_schema do
       field :viewer, Ecto.Enum, values: [:basic, :advanced], default: :advanced
+      field :auto_next, :boolean, default: true
     end
 
     @doc false
     def changeset(viewer_select_form, attrs) do
       viewer_select_form
-      |> cast(attrs, [:viewer])
-      |> validate_required([:viewer])
+      |> cast(attrs, [:viewer, :auto_next])
+      |> validate_required([:viewer, :auto_next])
     end
   end
 
@@ -208,7 +209,8 @@ defmodule HyacinthWeb.LabelSessionLive.Label do
   end
 
   def handle_info({:next_timer_complete, nonce}, socket) do
-    if nonce == socket.assigns.next_timer_nonce do
+    next_enabled = Ecto.Changeset.apply_changes(socket.assigns.viewer_select_changeset).auto_next
+    if next_enabled and nonce == socket.assigns.next_timer_nonce do
       socket = jump_element_relative(socket, 1)
       {:noreply, socket}
     else
