@@ -56,12 +56,19 @@
         </p>
       </.form>
 
-      <div class="space-x-1">
-        <%= for num_cols <- [2, 4, 8] do %>
-          <button class={["btn", if(@columns == num_cols, do: "btn-dark-blue", else: "btn-gray")]} phx-click="set_columns" phx-value-columns={num_cols}>
-            <span><%= num_cols %></span>
-          </button>
-        <% end %>
+      <div class="flex items-center space-x-2">
+        <div class="space-x-1">
+          <%= for num_cols <- [2, 4, 8] do %>
+            <button class={["btn", if(@columns == num_cols, do: "btn-dark-blue", else: "btn-gray")]} phx-click="set_columns" phx-value-columns={num_cols}>
+              <span><%= num_cols %></span>
+            </button>
+          <% end %>
+        </div>
+
+        <button class="text-btn text-btn-blue text-btn-icon" phx-click="open_modal_export_results">
+          <span>Export</span>
+          <Icons.pencil_square_mini />
+        </button>
       </div>
     </div>
   </div>
@@ -86,3 +93,25 @@
     <% end %>
   </div>
 </main>
+
+<%= case @modal do %>
+<% {:export_results, changeset} -> %>
+  <.modal size="xs">
+    <:header>Export Results</:header>
+
+    <div class="mt-2">
+      <.form let={f} for={changeset} phx-change="export_results_change" phx-submit="export_results_submit">
+        <div class="form-content">
+          <p>
+            <%= label f, :object_columns %>
+            <%= select f, :object_columns, humanize_enum(ExportResultsForm, :object_columns) %>
+            <%= error_tag f, :object_columns %>
+          </p>
+
+          <%= submit "Export", class: "btn btn-blue" %>
+        </div>
+      </.form>
+    </div>
+  </.modal>
+<% nil -> %>
+<% end %>

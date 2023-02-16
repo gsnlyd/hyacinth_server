@@ -41,6 +41,8 @@
 
 # 1.1.3
 - [x] Add job labels export functionality
+- [x] Add automatic jump to next element when labeling
+- [x] Add session/job results export
 
 ## 1.2.0
 - [ ] Add collaborative viewing/labeling features

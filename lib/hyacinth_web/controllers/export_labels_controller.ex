@@ -1,7 +1,7 @@
 defmodule HyacinthWeb.ExportLabelsController do
   use HyacinthWeb, :controller
 
-  alias Hyacinth.Labeling
+  alias Hyacinth.{Labeling, Utils}
   alias Hyacinth.Warehouse.Object
   alias Hyacinth.Labeling.{LabelSession, LabelElement, LabelEntry}
 
@@ -28,7 +28,7 @@ defmodule HyacinthWeb.ExportLabelsController do
     csv =
       sessions
       |> build_labels_csv(args)
-      |> rows_to_string()
+      |> Utils.rows_to_csv_string()
 
     Phoenix.Controller.send_download(conn, {:binary, csv}, filename: "session_labels.csv", content_type: "text/plain", disposition: :inline)
   end
@@ -99,17 +99,5 @@ defmodule HyacinthWeb.ExportLabelsController do
       |> Enum.concat()
 
     [header] ++ body
-  end
-
-  # TODO: move
-  @spec rows_to_string([[String.t]]) :: String.t
-  defp rows_to_string(rows) when is_list(rows) do
-    rows
-    |> Enum.map(fn row when is_list(row) ->
-      row
-      |> Enum.filter(&(&1 != nil))
-      |> Enum.join(",")
-    end)
-    |> Enum.join("\n")
   end
 end
