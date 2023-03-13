@@ -14,6 +14,6 @@
     <% :web_image -> %>
       <%= live_render(@socket, HyacinthWeb.ViewerLive.Viewers.WebImage, session: %{"object_id" => @object.id}, id: "viewer-web-image") %>
     <% :advanced_png -> %>
-      <.live_component module={HyacinthWeb.ViewerLive.Viewers.AdvancedPNG} object_id={@object.id} collaboration={true} id="viewer-advanced-png" />
+      <.live_component module={HyacinthWeb.ViewerLive.Viewers.AdvancedPNG} object_id={@object.id} collaboration={true} session_owner={@session_owner} id="viewer-advanced-png" />
   <% end %>
 </main>

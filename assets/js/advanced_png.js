@@ -214,6 +214,7 @@ export function createHook() {
 
             const uniqueId = this.el.dataset.uniqueId;
             const collaborationEnabled = this.el.dataset.collaborationEnabled === "true";
+            const isSessionOwner = this.el.dataset.isSessionOwner === "true";
             this.dragBoxEl = document.getElementById('advanced-png-viewer-drag-box-' + uniqueId);
 
             this.minSliderEl = document.getElementById('advanced-png-viewer-min-slider-' + uniqueId);
@@ -242,10 +243,15 @@ export function createHook() {
                     this.maxInputEl.min = this.image.minValue;
                     this.maxInputEl.max = this.image.maxValue;
 
-                    updateState({
-                        minThreshold: this.image.minValue,
-                        maxThreshold: this.image.maxValue,
-                    }, false);
+                    if (isSessionOwner) {
+                        updateState({
+                            minThreshold: this.image.minValue,
+                            maxThreshold: this.image.maxValue,
+                        });
+                    }
+                    else {
+                        updateState({}, false);
+                    }
                 });
 
             this.viewerState = {
