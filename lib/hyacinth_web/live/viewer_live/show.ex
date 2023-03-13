@@ -3,6 +3,7 @@ defmodule HyacinthWeb.ViewerLive.Show do
   alias Phoenix.PubSub
 
   alias Hyacinth.Warehouse
+  alias Hyacinth.Warehouse.Object
 
   defmodule ViewerSelectForm do
     use Ecto.Schema
@@ -21,27 +22,34 @@ defmodule HyacinthWeb.ViewerLive.Show do
     end
   end
 
+  def mount(%{"object_id" => object_id}, _session, socket) do
+    socket = assign(socket, %{
+      object: Warehouse.get_object!(object_id),
+      viewer_select_changeset: ViewerSelectForm.changeset(%ViewerSelectForm{}, %{}),
+    })
+    {:ok, socket}
+  end
 
-  def mount(params, _session, socket) do
-    viewer_session_id = params["viewer_session_id"]
-    if viewer_session_id do
-      object = Warehouse.get_object!(params["object_id"])
-      if connected?(socket), do: PubSub.subscribe(Hyacinth.PubSub, "viewer:#{object.id}:#{viewer_session_id}")
-
-      socket = assign(socket, %{
-        object: object,
-        viewer_select_changeset: ViewerSelectForm.changeset(%ViewerSelectForm{}, %{}),
-
-        viewer_session_id: viewer_session_id,
-
-        import_viewer_scripts: true,
-      })
-      {:ok, socket}
-    else
-      viewer_session_id = Ecto.UUID.generate()
-      path = Routes.live_path(socket, HyacinthWeb.ViewerLive.Show, params["object_id"], viewer_session_id)
-      {:ok, push_redirect(socket, to: path)}
+  def handle_params(%{"viewer_session_id" => viewer_session_id}, _uri, socket) do
+    if connected?(socket) do
+      %Object{} = object = socket.assigns.object
+      PubSub.subscribe(Hyacinth.PubSub, "viewer:#{object.id}:#{viewer_session_id}")
     end
+
+    {:noreply, assign(socket, :viewer_session_id, viewer_session_id)}
+  end
+
+  def handle_params(params, _uri, socket) when not is_map_key(params, "viewer_session_id") do
+    socket =
+      if connected?(socket) do
+        %Object{} = object = socket.assigns.object
+        viewer_session_id = Ecto.UUID.generate()
+        path = Routes.viewer_show_path(socket, :show_session, object.id, viewer_session_id)
+        push_patch(socket, to: path, replace: true)
+      else
+        socket
+      end
+    {:noreply, socket}
   end
 
   def handle_event("form_change", %{"viewer_select_form" => params}, socket) do
