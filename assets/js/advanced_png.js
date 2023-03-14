@@ -243,38 +243,45 @@ export function createHook() {
                     this.maxInputEl.min = this.image.minValue;
                     this.maxInputEl.max = this.image.maxValue;
 
-                    if (isSessionOwner) {
-                        updateState({
-                            minThreshold: this.image.minValue,
-                            maxThreshold: this.image.maxValue,
-                        });
-                    }
-                    else {
-                        updateState({}, false);
-                    }
+                    initializeState({
+                        minThreshold: this.image.minValue,
+                        maxThreshold: this.image.maxValue,
+                    });
                 });
 
-            this.viewerState = {
-                uniqueId: uniqueId,
-                minThreshold: 0,
-                maxThreshold: 0,
-            };
+            this.viewerState = {};
 
-            this.handleEvent('viewer_state_pushed', newState => {
-                if (newState.uniqueId === uniqueId) updateState(newState, false);
+            this.handleEvent('viewer_state_pushed', data => {
+                if (data.uniqueId.toString() === uniqueId) updateState(data.state, false);
             });
 
+            const initializeState = (initialState) => {
+                if (Object.keys(this.viewerState).length === 0) {
+                    mergeState(initialState);
+                    broadcastState('viewer_state_initialized');
+                }
+                updateViewer();
+            }
+
             const updateState = (newState, broadcast=true) => {
+                mergeState(newState);
+                if (broadcast) broadcastState('viewer_state_updated');
+                updateViewer();
+            }
+
+            const mergeState = (newState) => {
                 for (const [k, v] of Object.entries(newState)) {
                     this.viewerState[k] = v;
                 }
-                updateSliders();
-                if(broadcast && collaborationEnabled) this.pushEvent('viewer_state_updated', this.viewerState);
-
-                if (this.image) render(this.el, this.image, this.viewerState.minThreshold, this.viewerState.maxThreshold);
             }
 
-            const updateSliders = () => {
+            const broadcastState = (eventName) => {
+                if (collaborationEnabled) this.pushEvent(eventName, this.viewerState);
+            }
+
+            const updateViewer = () => {
+                if (this.image) render(this.el, this.image, this.viewerState.minThreshold, this.viewerState.maxThreshold);
+
                 this.minSliderEl.value = this.viewerState.minThreshold;
                 this.minInputEl.value = this.viewerState.minThreshold;
                 this.maxSliderEl.value = this.viewerState.maxThreshold;

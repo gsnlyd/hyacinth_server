@@ -21,17 +21,12 @@ defmodule HyacinthWeb.ViewerLive.Show do
     end
   end
 
-  @initial_state %{
-    "minThreshold" => 0,
-    "maxThreshold" => 255,
-  }
-
   def mount(%{"object_id" => object_id}, _session, socket) do
     socket = assign(socket, %{
       object: Warehouse.get_object!(object_id),
       viewer_select_changeset: ViewerSelectForm.changeset(%ViewerSelectForm{}, %{}),
 
-      viewer_state: @initial_state,
+      viewer_state: %{},
       session_owner: false,
     })
     {:ok, socket}
@@ -62,7 +57,7 @@ defmodule HyacinthWeb.ViewerLive.Show do
         %Object{} = object = socket.assigns.object
         viewer_session_id = Ecto.UUID.generate()
 
-        ViewerState.start_link(socket.assigns.viewer_state, viewer_session_id)
+        ViewerState.start_link(%{}, viewer_session_id)
 
         path = Routes.viewer_show_path(socket, :show_session, object.id, viewer_session_id)
         socket
@@ -75,7 +70,11 @@ defmodule HyacinthWeb.ViewerLive.Show do
   end
 
   def push_state_to_client(socket) do
-    push_event(socket, "viewer_state_pushed", socket.assigns.viewer_state)
+    data = %{
+      state: socket.assigns.viewer_state,
+      uniqueId: 0,
+    }
+    push_event(socket, "viewer_state_pushed", data)
   end
 
   def handle_event("form_change", %{"viewer_select_form" => params}, socket) do
@@ -84,6 +83,15 @@ defmodule HyacinthWeb.ViewerLive.Show do
       viewer_select_changeset: changeset,
     })
     {:noreply, socket}
+  end
+
+  def handle_event("viewer_state_initialized", state, socket) do
+    if socket.assigns.session_owner do
+      viewer_state = ViewerState.merge_state(socket.assigns.viewer_session_id, state)
+      {:noreply, assign(socket, :viewer_state, viewer_state)}
+    else
+      {:noreply, socket}
+    end
   end
 
   def handle_event("viewer_state_updated", state, socket) do
