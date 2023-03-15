@@ -16,6 +16,8 @@ defmodule Hyacinth.Application do
       {Phoenix.PubSub, name: Hyacinth.PubSub},
       # Start the Endpoint (http/https)
       HyacinthWeb.Endpoint,
+      # Start the Presence system
+      HyacinthWeb.Presence,
       # Start the Pipeline Run TaskSupervisor
       {Task.Supervisor, name: Hyacinth.PipelineRunSupervisor},
 

@@ -191,26 +191,35 @@ defmodule HyacinthWeb.Components.BasicComponents do
   @num_profile_image_colors length(@profile_image_colors)
 
   def user_profile_image(assigns) do
+    assigns = assign_new(assigns, :size, fn -> "md" end)
+    user_name = if assigns[:user], do: assigns.user.name, else: assigns.user_name
+
     initials =
-      assigns.user.name
+      user_name
       |> String.split()
       |> Enum.map(&String.first/1)
       |> Enum.join()
 
     color_i =
-      assigns.user.name
+      user_name
       |> String.to_charlist()
       |> Enum.sum()
       |> rem(@num_profile_image_colors)
 
+    size_class = case assigns.size do
+      "sm" -> "w-6 h-6 text-xs"
+      "md" -> "w-10 h-10 text-base"
+    end
+
     assigns = assign(assigns, %{
       initials: initials,
       color_class: Enum.at(@profile_image_colors, color_i),
+      size_class: size_class,
     })
 
     ~H"""
-    <div class={["w-10 h-10 rounded-full border-2 flex justify-center items-center", @color_class]}>
-      <span class="text-base text-black font-bold"><%= @initials %></span>
+    <div class={[@size_class, @color_class, "rounded-full border-2 flex justify-center items-center"]}>
+      <span class="text-black font-bold"><%= @initials %></span>
     </div>
     """
   end
