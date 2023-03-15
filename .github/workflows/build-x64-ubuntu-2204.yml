@@ -1,0 +1,31 @@
+name: Build for Ubuntu 22.04 (x64)
+
+on: workflow_call
+
+jobs:
+  build-x64-ubuntu-2204:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:22.04
+    steps:
+      - name: Install Elixir
+        run: apt-get -y install elixir
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Build release
+        run: |
+          export MIX_ENV=prod
+          mix local.hex --force
+          mix local.rebar --force
+          mix deps.get --only prod
+          mix compile
+          mix assets.deploy
+          mix release
+      - name: Create release tarball
+        run: tar -cvzf hyacinth-x64-ubuntu-2204.tar.gz hyacinth
+        working-directory: _build/prod/rel
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: hyacinth-x64-ubuntu-2204
+          path: _build/prod/rel/hyacinth-x64-ubuntu-2204.tar.gz

@@ -7,6 +7,9 @@ jobs:
   integration-tests:
     uses: ./.github/workflows/integration-tests.yml
 
+  build-x64-ubuntu-2204:
+    uses: ./.github/workflows/build-x64-ubuntu-2204.yml
+
   build-x64-centos-stream-8:
     uses: ./.github/workflows/build-x64-centos-stream-8.yml
 
