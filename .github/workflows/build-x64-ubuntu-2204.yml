@@ -13,6 +13,8 @@ jobs:
           apt-get update
           apt-get -y install erlang
           apt-get -y install elixir
+      - name: Install dev tools
+        run: apt-get -y install build-essential
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Build release
