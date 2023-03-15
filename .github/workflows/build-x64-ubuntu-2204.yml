@@ -9,8 +9,9 @@ jobs:
       image: ubuntu:22.04
     steps:
       - name: Install Elixir
-        run: | 
+        run: |
           apt-get update
+          apt-get -y install erlang
           apt-get -y install elixir
       - name: Checkout repository
         uses: actions/checkout@v3
