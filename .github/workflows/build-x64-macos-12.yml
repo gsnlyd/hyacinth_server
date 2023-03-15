@@ -21,6 +21,7 @@ jobs:
           mix release
       - name: Create release tarball
         run: tar -cvzf hyacinth-x64-macos-12.tar.gz hyacinth
+        working-directory: _build/prod/rel
       - name: Upload release artifact
         uses: actions/upload-artifact@v3
         with:
