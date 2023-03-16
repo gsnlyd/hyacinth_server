@@ -6,27 +6,9 @@ defmodule HyacinthWeb.ViewerLive.Show do
   alias Hyacinth.{Warehouse, ViewerState}
   alias Hyacinth.Warehouse.Object
 
-  defmodule ViewerSelectForm do
-    use Ecto.Schema
-    import Ecto.Changeset
-
-    @primary_key false
-    embedded_schema do
-      field :viewer, Ecto.Enum, values: [:web_image, :advanced_png], default: :advanced_png
-    end
-
-    @doc false
-    def changeset(viewer_select_form, attrs) do
-      viewer_select_form
-      |> cast(attrs, [:viewer])
-      |> validate_required([:viewer])
-    end
-  end
-
   def mount(%{"object_id" => object_id}, _session, socket) do
     socket = assign(socket, %{
       object: Warehouse.get_object!(object_id),
-      viewer_select_changeset: ViewerSelectForm.changeset(%ViewerSelectForm{}, %{}),
 
       viewer_state: %{},
       session_owner: false,
@@ -102,14 +84,6 @@ defmodule HyacinthWeb.ViewerLive.Show do
       end)
 
     assign(socket, :user_list, user_list)
-  end
-
-  def handle_event("form_change", %{"viewer_select_form" => params}, socket) do
-    changeset = ViewerSelectForm.changeset(%ViewerSelectForm{}, params)
-    socket = assign(socket, %{
-      viewer_select_changeset: changeset,
-    })
-    {:noreply, socket}
   end
 
   def handle_event("viewer_state_initialized", state, socket) do

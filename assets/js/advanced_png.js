@@ -214,7 +214,6 @@ export function createHook() {
 
             const uniqueId = this.el.dataset.uniqueId;
             const collaborationEnabled = this.el.dataset.collaborationEnabled === "true";
-            const isSessionOwner = this.el.dataset.isSessionOwner === "true";
             this.dragBoxEl = document.getElementById('advanced-png-viewer-drag-box-' + uniqueId);
 
             this.minSliderEl = document.getElementById('advanced-png-viewer-min-slider-' + uniqueId);

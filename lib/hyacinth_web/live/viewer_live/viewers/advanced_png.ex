@@ -8,7 +8,6 @@ defmodule HyacinthWeb.ViewerLive.Viewers.AdvancedPNG do
       object: Warehouse.get_object!(assigns.object_id),
       unique_id: assigns[:unique_id] || 0,
       collaboration: assigns[:collaboration] || false,
-      session_owner: assigns[:session_owner] || false,
     })
     {:ok, socket}
   end
