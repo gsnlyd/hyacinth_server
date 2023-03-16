@@ -242,10 +242,7 @@ export function createHook() {
                     this.maxInputEl.min = this.image.minValue;
                     this.maxInputEl.max = this.image.maxValue;
 
-                    initializeState({
-                        minThreshold: this.image.minValue,
-                        maxThreshold: this.image.maxValue,
-                    });
+                    updateViewer();
                 });
 
             this.viewerState = {};

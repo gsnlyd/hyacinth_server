@@ -84,7 +84,7 @@
         <div class="mt-2 text-center">
           <div>
             <span class="text-gray-400 font-medium"><%= object.name %></span>
-            <%= link "(View)", to: Routes.viewer_show_path(@socket, :new_session, object), class: "link text-sm" %>
+            <%= link "(View)", to: Routes.viewer_show_path(@socket, :new_session, dataset: @job.dataset, object: object), class: "link text-sm" %>
           </div>
 
           <div class="text-sm text-gray-500"><%= value %></div>

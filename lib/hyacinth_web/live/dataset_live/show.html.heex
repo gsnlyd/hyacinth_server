@@ -103,7 +103,7 @@
                 <td><%= object.type %></td>
                 <td><%= Calendar.strftime(object.inserted_at, "%c") %></td>
                 <td>
-                  <%= link "View", to: Routes.viewer_show_path(@socket, :new_session, object), class: "link" %>
+                  <%= link "View", to: Routes.viewer_show_path(@socket, :new_session, dataset: @dataset, object: object), class: "link" %>
                 </td>
               </tr>
             <% end %>
