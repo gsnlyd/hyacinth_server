@@ -23,6 +23,40 @@ jobs:
             --repo $GITHUB_REPOSITORY \
             "${{ inputs.tagName }}"
 
+  build-x64-ubuntu-2204:
+    uses: ./.github/workflows/build-x64-ubuntu-2204.yml
+
+  upload-x64-ubuntu-2204:
+    needs: [create-release-draft, build-x64-ubuntu-2204]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: hyacinth-x64-ubuntu-2204
+      - name: Upload build to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload --repo $GITHUB_REPOSITORY ${{ inputs.tagName }} hyacinth-x64-ubuntu-2204.tar.gz
+
+  build-x64-macos-12:
+    uses: ./.github/workflows/build-x64-macos-12.yml
+
+  upload-x64-macos-12:
+    needs: [create-release-draft, build-x64-macos-12]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: hyacinth-x64-macos-12
+      - name: Upload build to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload --repo $GITHUB_REPOSITORY ${{ inputs.tagName }} hyacinth-x64-macos-12.tar.gz
+
   build-x64-centos-stream-8:
     uses: ./.github/workflows/build-x64-centos-stream-8.yml
 
