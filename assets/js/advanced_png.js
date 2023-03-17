@@ -242,7 +242,7 @@ export function createHook() {
                     this.maxInputEl.min = this.image.minValue;
                     this.maxInputEl.max = this.image.maxValue;
 
-                    updateViewer();
+                    initializeState({minThreshold: this.image.minValue, maxThreshold: this.image.maxValue});
                 });
 
             this.viewerState = {};
@@ -252,10 +252,8 @@ export function createHook() {
             });
 
             const initializeState = (initialState) => {
-                if (Object.keys(this.viewerState).length === 0) {
-                    mergeState(initialState);
-                    broadcastState('viewer_state_initialized');
-                }
+                mergeState(initialState, false);
+                broadcastState('viewer_state_initialized');
                 updateViewer();
             }
 
@@ -265,9 +263,9 @@ export function createHook() {
                 updateViewer();
             }
 
-            const mergeState = (newState) => {
+            const mergeState = (newState, replace=true) => {
                 for (const [k, v] of Object.entries(newState)) {
-                    this.viewerState[k] = v;
+                    if (replace || !(k in this.viewerState)) this.viewerState[k] = v;
                 }
             }
 
