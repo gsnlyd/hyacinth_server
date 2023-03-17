@@ -80,6 +80,13 @@ h3 {
     @apply focus:outline-none;
 }
 
+.btn-dark-gray {
+    @apply text-gray-300 font-medium;
+    @apply bg-gray-700 hover:bg-gray-600;
+    @apply focus:ring-gray-500 focus:hover:ring-gray-700;
+    @apply focus:outline-none;
+}
+
 .btn-icon {
     @apply pl-2 flex items-center space-x-1;
 }

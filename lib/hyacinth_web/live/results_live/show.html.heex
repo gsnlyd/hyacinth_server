@@ -49,25 +49,24 @@
 <main class="mt-4">
   <div>
     <div class="filter-form-content flex justify-between items-center">
-      <.form let={f} for={@display_changeset} phx-change="display_form_change">
-        <p>
-          <%= label f, :order %>
-          <%= select f, :order, humanize_enum(ResultsDisplayForm, :order) %>
-        </p>
-      </.form>
-
       <div class="flex items-center space-x-2">
-        <div class="space-x-1">
-          <%= for num_cols <- [2, 4, 8] do %>
-            <button class={["btn", if(@columns == num_cols, do: "btn-dark-blue", else: "btn-gray")]} phx-click="set_columns" phx-value-columns={num_cols}>
-              <span><%= num_cols %></span>
-            </button>
-          <% end %>
+        <div class="flex items-center">
+          <button class={["btn border focus:z-10 !rounded-r-none", if(@columns == 2, do: "btn-dark-blue border-blue-700", else: "btn-dark-gray border-gray-600")]} phx-click="set_columns" phx-value-columns={2}><%= 2 %></button>
+          <button class={["btn border focus:z-10 !rounded-none",   if(@columns == 4, do: "btn-dark-blue border-blue-700", else: "btn-dark-gray border-gray-600")]} phx-click="set_columns" phx-value-columns={4}><%= 4 %></button>
+          <button class={["btn border focus:z-10 !rounded-l-none", if(@columns == 8, do: "btn-dark-blue border-blue-700", else: "btn-dark-gray border-gray-600")]} phx-click="set_columns" phx-value-columns={8}><%= 8 %></button>
         </div>
 
+        <.form let={f} for={@display_changeset} phx-change="display_form_change">
+          <p>
+            <%= select f, :order, humanize_enum(ResultsDisplayForm, :order) %>
+          </p>
+        </.form>
+      </div>
+
+      <div class="flex items-center space-x-2">
         <button class="text-btn text-btn-blue text-btn-icon" phx-click="open_modal_export_results">
           <span>Export</span>
-          <Icons.pencil_square_mini />
+          <Icons.arrow_top_right_on_square_mini />
         </button>
       </div>
     </div>
