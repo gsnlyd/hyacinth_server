@@ -90,22 +90,6 @@
 
     <div class="w-64">
       <div>
-        <.form let={f} for={@viewer_select_changeset} phx-change="viewer_change">
-          <div class="form-content">
-            <p class="w-full">
-              <%= label f, :viewer %>
-              <%= select f, :viewer, humanize_enum(ViewerSelectForm, :viewer), class: "!w-full" %>
-            </p>
-
-            <p class="inline-group">
-              <%= checkbox f, :auto_next %>
-              <%= label f, :auto_next %>
-            </p>
-          </div>
-        </.form>
-      </div>
-
-      <div class="mt-4">
         <div class="text-sm text-gray-400">Instructions</div>
         <div class="mt-1 pl-2 border-l-4 border-gray-700">
           <div class="text-sm text-gray-300"><%= @label_session.job.prompt %></div>
@@ -139,7 +123,18 @@
         </div>
       </div>
 
-      <div class="mt-8">
+      <div class="mt-3">
+        <.form let={f} for={@viewer_select_changeset} phx-change="viewer_change">
+          <div class="form-content">
+            <p class="inline-group">
+              <%= checkbox f, :auto_next %>
+              <%= label f, :auto_next, "Auto-next" %>
+            </p>
+          </div>
+        </.form>
+      </div>
+
+      <div class="mt-6">
         <.form let={f} for={@note_changeset} phx-change="note_change" phx-submit="note_submit">
           <div class="form-content form-wide">
             <p>
