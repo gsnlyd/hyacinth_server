@@ -22,6 +22,8 @@ First, download a build of the Hyacinth server for your OS.
 
 Builds are currently provided for the following operating systems:
 
+* Ubuntu 22.04
+* MacOS 12
 * CentOS Stream 8
 * CentOS 7
 
