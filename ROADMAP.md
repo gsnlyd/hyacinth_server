@@ -39,11 +39,9 @@
 - [x] Add support for job results
 - [x] Add dicom support to slicer driver
 
-# 1.1.3
-- [x] Add job labels export functionality
+# 1.2.0
+- [x] Add session/job labels export functionality
+- [x] Add session/job results export functionality
 - [x] Add automatic jump to next element when labeling
-- [x] Add session/job results export
-
-## 1.2.0
-- [ ] Add collaborative viewing/labeling features
-- [ ] Add viewers for other image types (DICOM, Nifti)
+- [x] Add collaborative real-time image viewer
+- [x] Add builds for more operating systems
